@@ -10,7 +10,7 @@ import type { Definition, Term } from "@/lib/types";
 export type LookupState =
   | { status: "loading" }
   | { status: "done"; data: Definition }
-  | { status: "error"; message: string };
+  | { status: "error"; message: string; code?: string };
 
 type SaveError = "auth" | "subscription" | string | null;
 
@@ -76,13 +76,23 @@ export function DefinitionCard({
       {lookup.status === "error" && (
         <div className="mt-3 space-y-2">
           <p className="text-sm text-ink-soft">{lookup.message}</p>
-          <button
-            onClick={onRetry}
-            data-testid="definition-retry"
-            className="btn-tactile bg-ink !py-2 !px-4 text-sm shadow-tactile shadow-black/40"
-          >
-            <RefreshCw size={14} /> Try again
-          </button>
+          {lookup.code === "anon_daily_limit" ? (
+            <button
+              onClick={login}
+              data-testid="anon-limit-login"
+              className="btn-tactile bg-mango !py-2 !px-4 text-sm shadow-tactile shadow-mango-shadow"
+            >
+              <LogIn size={14} /> Sign in for unlimited · 7 days free
+            </button>
+          ) : (
+            <button
+              onClick={onRetry}
+              data-testid="definition-retry"
+              className="btn-tactile bg-ink !py-2 !px-4 text-sm shadow-tactile shadow-black/40"
+            >
+              <RefreshCw size={14} /> Try again
+            </button>
+          )}
         </div>
       )}
 

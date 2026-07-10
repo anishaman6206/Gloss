@@ -75,7 +75,7 @@ export function ScanWorkspace() {
       } else {
         setLookups((prev) => ({
           ...prev,
-          [key]: { status: "error", message: json.error ?? COULD_NOT_REACH },
+          [key]: { status: "error", message: json.error ?? COULD_NOT_REACH, code: json.code },
         }));
       }
     } catch {

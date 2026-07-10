@@ -35,7 +35,8 @@ Gloss is a contextual-vocabulary app: snap a page, tap a word, get a meaning tha
 - **Razorpay subscription** with `/api/subscribe` (creates a Razorpay **Order**) + `/api/subscribe/verify` (HMAC signature verification of the checkout success) + `/api/razorpay/webhook` (signature-verified `payment.captured` handler as a second-guarantee). Pricing page at `/subscribe`. Verified end-to-end with live test key `rzp_test_TBs4uRzcf1E8CI` — Razorpay Test Mode modal opens and orders are created (₹79 monthly / ₹599 yearly = 30/365 days added to `currentPeriodEnd`).
 - **Server-side subscription gating** in `saveWord` and `gradeReview`.
 - **SEO metadata**, `viewport` theme color, custom SVG favicon.
-- **Vercel deployment prep**: `vercel.json` (`prisma migrate deploy && next build`), `next.config.mjs` cleanup, comprehensive `README.md` with Neon Postgres setup.
+- **Vercel deployment prep**: `vercel.json` (`prisma migrate deploy && next build`), `next.config.mjs` cleanup, comprehensive `README.md` + `DEPLOY.md` with Neon Postgres step-by-step.
+- **Rate limiting** on `/api/define` — 40 lookups/day per anon IP (persisted via new Prisma `DefineRateLimit` table with atomic upsert). Signed-in users bypass entirely. Response includes `x-ratelimit-limit` and `x-ratelimit-remaining` headers. When the cap trips, the UI renders a "Sign in for unlimited · 7 days free" CTA instead of the generic retry button.
 
 ## Backlog / Next
 - **P1** — Swap to Razorpay **Subscriptions** API for true auto-renewal once the Razorpay account clears KYC review (currently using one-time Orders because the Subscriptions API is locked for accounts under review; period tracked in Prisma).

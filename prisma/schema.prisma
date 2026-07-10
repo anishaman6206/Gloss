@@ -76,3 +76,13 @@ model ReviewLog {
 
   @@index([userId])
 }
+
+model DefineRateLimit {
+  id    String @id @default(cuid())
+  ip    String
+  date  String // YYYY-MM-DD (UTC)
+  count Int    @default(0)
+
+  @@unique([ip, date])
+  @@index([date])
+}

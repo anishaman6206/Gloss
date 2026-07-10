@@ -31,7 +31,7 @@ export type DefineRequest = {
 
 export type DefineResult =
   | { ok: true; data: Definition }
-  | { ok: false; error: string };
+  | { ok: false; error: string; code?: string };
 
 export type WordStatus = "new" | "learning" | "learned";
 
