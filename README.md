@@ -2,7 +2,13 @@
 
 Gloss is a personal vocabulary app. Photograph a page from a book or textbook, tap the word or phrase you don't know directly on the image, and get a definition specific to how it's actually used in that sentence — not a generic dictionary entry. Saved words go into a personal word bank and come back for review on a spaced-repetition schedule.
 
-There's no visible AI branding anywhere in the product. The intelligence is just how the app works.
+## Features
+
+- **Scan and tap** — photograph any page, tap one or more words directly on the image, and get a definition based on the exact sentence they appear in
+- **Personal word bank** — every saved word is searchable, with its definition, part of speech, synonyms, example sentences, and the original sentence it came from
+- **Spaced repetition** — a daily review session schedules words using the SM-2 algorithm, so words you know well come back less often and words you struggle with come back sooner
+- **Mixed review modes** — each session mixes recall-flip, fill-in-the-blank, and produce-the-word exercises rather than drilling one format
+- **Progress tracking** — a reviews-per-day chart and streak counter show how consistently you're reviewing
 
 ## Stack
 
@@ -59,6 +65,5 @@ src/lib/                   prisma client, SM-2 scheduling, OCR + clustering,
 
 ## Notes
 
-- OCR and word selection are entirely client-side; only the definition-generation call goes to a server.
-- The Groq API key and model are server-side configuration, not user-facing settings — there's no settings screen with a key or model picker.
-- Speaking practice (pronunciation scoring via the Web Speech API) is a deliberate v2 feature. The review-mode type already has a slot reserved for it.
+- OCR and word selection run entirely in the browser; only the definition-generation call goes to a server.
+- Speaking practice (pronunciation scoring) is planned for a future version.
