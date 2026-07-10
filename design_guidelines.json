@@ -1,0 +1,132 @@
+{
+  "theme_and_identity": {
+    "app_name": "Gloss",
+    "persona": "The friendly, enthusiastic language tutor.",
+    "theme": "Vibrant, tactile, playful, light-mode by default (warm/paper-like). Mobile-first application.",
+    "archetype": "ARCHETYPE 6: VIBRANT PLAY combined with tactile neubrutalist elements for interactive depth.",
+    "emotional_tone": "Confident, warm, tactile, celebrating every small win."
+  },
+  "typography": {
+    "fonts": {
+      "headings": {
+        "family": "Fredoka",
+        "weights": ["600", "700"],
+        "purpose": "Hero sections, onboarding titles, achievement celebrations, empty states.",
+        "google_font_url": "https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&display=swap"
+      },
+      "body": {
+        "family": "Nunito",
+        "weights": ["400", "500", "700", "800"],
+        "purpose": "Definitions, text reading, buttons, input fields, navigation.",
+        "google_font_url": "https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;700;800&display=swap"
+      }
+    },
+    "scale": {
+      "h1": "text-4xl md:text-5xl font-bold tracking-tight text-text-primary",
+      "h2": "text-2xl md:text-3xl font-semibold text-text-primary",
+      "h3": "text-xl font-semibold text-text-primary",
+      "body": "text-base leading-relaxed text-text-secondary",
+      "button": "text-lg font-bold tracking-wide uppercase"
+    }
+  },
+  "colors": {
+    "background": "#F9FAFB",
+    "surface": "#FFFFFF",
+    "primary": {
+      "DEFAULT": "#1CB0F6",
+      "shadow": "#1899D6"
+    },
+    "secondary": {
+      "DEFAULT": "#FF9600",
+      "shadow": "#CC7800"
+    },
+    "success": {
+      "DEFAULT": "#58CC02",
+      "shadow": "#46A302"
+    },
+    "danger": {
+      "DEFAULT": "#FF4B4B",
+      "shadow": "#CC3C3C"
+    },
+    "text": {
+      "primary": "#1A1A24",
+      "secondary": "#525266",
+      "tertiary": "#8F90A6"
+    },
+    "borders": "#E5E7EB"
+  },
+  "spacing_and_radii": {
+    "radii": {
+      "button": "rounded-2xl",
+      "card": "rounded-3xl",
+      "badge": "rounded-full",
+      "bottom_sheet": "rounded-t-[2.5rem]"
+    },
+    "spacing": "Generous spacing. Mobile-first padding: p-4 for list items, p-6 or p-8 for cards and empty states."
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-[#1CB0F6] text-white font-bold rounded-2xl shadow-[0_4px_0_0_#1899D6] active:shadow-none active:translate-y-[4px] transition-all py-3 px-6 text-center w-full",
+      "success": "bg-[#58CC02] text-white font-bold rounded-2xl shadow-[0_4px_0_0_#46A302] active:shadow-none active:translate-y-[4px] transition-all py-3 px-6",
+      "secondary": "bg-white text-[#1CB0F6] font-bold rounded-2xl border-2 border-[#E5E7EB] shadow-[0_4px_0_0_#E5E7EB] active:shadow-none active:translate-y-[4px] transition-all py-3 px-6"
+    },
+    "cards": "bg-white rounded-3xl border-2 border-gray-100 shadow-sm p-5",
+    "badges": "inline-flex items-center justify-center rounded-full px-3 py-1 text-sm font-bold uppercase tracking-wider",
+    "status_badges": {
+      "new": "bg-blue-100 text-blue-600",
+      "learning": "bg-orange-100 text-orange-600",
+      "learned": "bg-green-100 text-green-600"
+    },
+    "inputs": "bg-gray-100 border-2 border-transparent focus:bg-white focus:border-[#1CB0F6] rounded-2xl p-4 font-medium text-lg w-full transition-colors outline-none",
+    "bottom_nav": "fixed bottom-0 w-full bg-white/90 backdrop-blur-xl border-t-2 border-gray-100 pb-safe pt-2 px-6 flex justify-between items-center z-50 rounded-t-3xl shadow-[0_-4px_20px_rgba(0,0,0,0.05)]"
+  },
+  "page_guidelines": {
+    "landing": "Warm welcome hero section with aesthetic reading imagery. Include a bouncing 'Start Scanning' primary CTA. Hide complex features until onboarding is complete.",
+    "scan": "Camera-first UI. Use a dark overlay (bg-black/60) with a clear rounded-3xl cutout area in the center for the book page. Add an animated scanning laser line (cyan glow) moving vertically across the cutout. Captured words should appear as selectable tactile chips.",
+    "library": "Searchable list of all saved words. Tap a word to open a 'Bottom Sheet' modal with its definition, part of speech, synonyms, and origin sentence. Use custom illustrations for the empty state.",
+    "review": "Flashcard style interface with swipe/flip gestures (use Framer Motion). 3 modes: recall-flip, fill-in-the-blank, produce-the-word. Include large, thumb-zone optimized grading buttons ('Didn't know it' - red, 'Hesitated' - orange, 'Knew it' - green).",
+    "stats": "Show streak counter with a fiery animation. Use a bento grid layout for the 14-day review bar chart.",
+    "pronunciation": "Include a prominent 'Listen' icon button (speaker). When recording, show dynamic, colorful visual sound waves. Display a massive animated Confetti blast if the user scores >90%.",
+    "onboarding": "3-4 step horizontal swipe sequence explaining the value prop (Scan -> Read -> Speak). Friendly illustrations.",
+    "achievements": "Grid of locked/unlocked badges (streak milestones, words learned). Unlocked badges use vibrant colors and drop shadows, locked are grayscale."
+  },
+  "motion_and_animation": {
+    "global": "Spring physics for all interactions (stiffness: 300, damping: 20). Framer Motion is mandatory.",
+    "buttons": "Tactile press (scale down, shadow removal, Y-translation).",
+    "celebration": "Use 'react-confetti' or similar particle effects on completing a daily review session or hitting a high pronunciation score.",
+    "page_transitions": "Slide up from bottom for modals (Bottom Sheets), slide left/right for onboarding steps."
+  },
+  "accessibility": {
+    "contrast": "Ensure text over primary/success colors meets 4.5:1 ratio (use white text on Mango/Ocean Blue).",
+    "testing": "All interactive elements, buttons, and form inputs MUST include a 'data-testid' attribute (e.g., data-testid='scan-button').",
+    "touch_targets": "Minimum 48x48px for all actionable elements, optimizing for thumb zones (bottom 1/3 of the screen)."
+  },
+  "media": {
+    "images": [
+      {
+        "url": "https://images.pexels.com/photos/11828912/pexels-photo-11828912.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "Person reading a book in a cozy setting",
+        "category": "landing_hero"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1761398601374-490e91b95818?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1Mjh8MHwxfHNlYXJjaHwzfHxwbGF5ZnVsJTIwYm9vayUyMGlsbHVzdHJhdGlvbnxlbnwwfHx8fDE3ODM2OTcxNTh8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Playful illustration for library empty state",
+        "category": "empty_state"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1578269174936-2709b6aeb913?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2OTF8MHwxfHNlYXJjaHwxfHx0cm9waHklMjBjZWxlYnJhdGlvbnxlbnwwfHx8fDE3ODM2OTcxNTh8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Yellow and white trophy for milestones",
+        "category": "achievements"
+      }
+    ]
+  },
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "You have .js files not .tsx file, so share the guideline and implement logic for .js files not for .tsx files.",
+    "Do not center align the app container. No generic `.App { text-align: center; }`.",
+    "Do not use pure transparent backgrounds for the header/nav or floating elements. Always use solid or heavy backdrop-blur (Glassmorphism).",
+    "Implement tactile 3D buttons using tailwind shadows and active states (e.g., `shadow-[0_4px_0_0_#1899D6] active:shadow-none active:translate-y-[4px]`). This is critical for the playful aesthetic.",
+    "NEVER use generic AI slop patterns (no purple-white gradients, no Inter/Roboto fonts).",
+    "Use Lucide-react or FontAwesome for icons. No emoji icons.",
+    "Ensure all interactive elements and buttons include `data-testid` attributes."
+  ]
+}
