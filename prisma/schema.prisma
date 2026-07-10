@@ -3,9 +3,9 @@ generator client {
 }
 
 datasource db {
-  // Use sqlite locally; swap provider to "postgresql" on Vercel.
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
