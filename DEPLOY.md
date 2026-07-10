@@ -67,19 +67,21 @@ git push
 2. Framework preset should auto-detect as **Next.js**.
 3. **Root directory**: leave as `./`.
 4. **Build & Output**: leave defaults — `vercel.json` overrides them with `prisma generate && prisma migrate deploy && next build`.
-5. Expand **Environment Variables** and add these (paste from your `.env.local`):
+5. Expand **Environment Variables** and add these. Copy the values from your local `.env.local` file (this file is git-ignored so it's not in the repo — that's intentional):
 
-| Name | Value |
+| Name | Where to find the value |
 | --- | --- |
 | `DATABASE_URL` | Neon **pooled** URL (with `-pooler`) |
 | `DIRECT_URL` | Neon **direct** URL (no pooler) |
-| `GROQ_API_KEY` | `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` |
+| `GROQ_API_KEY` | Your key from https://console.groq.com/keys — also in your local `.env.local` |
 | `GROQ_MODEL` | `llama-3.3-70b-versatile` |
-| `RAZORPAY_KEY_ID` | `rzp_test_TBs4uRzcf1E8CI` |
-| `RAZORPAY_KEY_SECRET` | `D1giX1gd6tHQDG3j1wLbA6lx` |
-| `NEXT_PUBLIC_RAZORPAY_KEY_ID` | `rzp_test_TBs4uRzcf1E8CI` |
-| `RAZORPAY_WEBHOOK_SECRET` | *(pick any strong string, e.g. `whsec_gloss_2026_secure_x9k2m`)* |
-| `APP_URL` | leave empty; set it after the first deploy to your Vercel URL |
+| `RAZORPAY_KEY_ID` | Razorpay dashboard → Account & Settings → API Keys |
+| `RAZORPAY_KEY_SECRET` | Razorpay dashboard → API Keys (shown once at creation) |
+| `NEXT_PUBLIC_RAZORPAY_KEY_ID` | Same value as `RAZORPAY_KEY_ID` |
+| `RAZORPAY_WEBHOOK_SECRET` | *Pick any strong random string, e.g.* `whsec_gloss_yourname_2026_random` |
+| `APP_URL` | Leave empty on first deploy; set to your Vercel URL after |
+
+> **Tip**: Run `cat .env.local` locally to grab the values you already have. Never paste real secrets into any file that will be committed.
 
 6. Click **Deploy**. First build takes ~2 minutes.
 
