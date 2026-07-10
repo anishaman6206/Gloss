@@ -84,20 +84,18 @@ export function ScanWorkspace() {
   }, []);
 
   const handleLookup = useCallback(() => {
-    setActiveTerms((prev) => {
-      const existingKeys = new Set(prev.map(termKey));
-      const merged = [...prev];
-      for (const term of currentTerms) {
-        if (!existingKeys.has(termKey(term))) {
-          merged.push(term);
-          fetchDefinition(term);
-        }
-      }
-      return merged;
-    });
+    const existingKeys = new Set(activeTerms.map(termKey));
+    const toAdd: Term[] = [];
+    for (const term of currentTerms) {
+      if (!existingKeys.has(termKey(term))) toAdd.push(term);
+    }
+    if (toAdd.length === 0) return;
+    setActiveTerms((prev) => [...prev, ...toAdd]);
+    // Fire fetches AFTER state update, never inside the updater
+    for (const term of toAdd) fetchDefinition(term);
     // reset selection so user can pick another word
     setSelectedIds(new Set());
-  }, [currentTerms, fetchDefinition]);
+  }, [activeTerms, currentTerms, fetchDefinition]);
 
   const reset = useCallback(() => {
     setImageUrl(null);
