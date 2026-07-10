@@ -2,6 +2,10 @@ import { prisma } from "@/lib/prisma";
 import { ReviewSession } from "@/components/review/ReviewSession";
 import type { WordWithReview } from "@/lib/types";
 
+// Depends on the current time (due words), so it must never be served from
+// a static build-time snapshot.
+export const dynamic = "force-dynamic";
+
 export default async function ReviewPage() {
   const rows = await prisma.word.findMany({
     where: { review: { nextReviewAt: { lte: new Date() } } },

@@ -1,5 +1,9 @@
 import { prisma } from "@/lib/prisma";
 
+// Depends on the current date (streak, day window), so it must never be
+// served from a static build-time snapshot.
+export const dynamic = "force-dynamic";
+
 const DAYS = 14;
 const CHART_HEIGHT = 96;
 
