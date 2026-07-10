@@ -23,8 +23,39 @@ export function verifyWebhookSignature(rawBody: string, signature: string): bool
   return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature));
 }
 
+/**
+ * Verify a checkout success payload on the server before extending access.
+ * Signature = HMAC_SHA256(order_id + "|" + payment_id, key_secret).
+ */
+export function verifyCheckoutSignature(
+  orderId: string,
+  paymentId: string,
+  signature: string
+): boolean {
+  if (!RAZ_KEY_SECRET) return false;
+  const expected = crypto
+    .createHmac("sha256", RAZ_KEY_SECRET)
+    .update(`${orderId}|${paymentId}`)
+    .digest("hex");
+  return (
+    expected.length === signature.length &&
+    crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature))
+  );
+}
+
+// Plan catalog. Amounts are in paise. Duration = number of days to extend on success.
 export const PLANS = {
-  monthly: { id: () => process.env.RAZORPAY_PLAN_MONTHLY_ID, amount: 7900, label: "Monthly", price: "₹79" },
-  yearly:  { id: () => process.env.RAZORPAY_PLAN_YEARLY_ID,  amount: 59900, label: "Yearly",  price: "₹599" },
+  monthly: {
+    label: "Monthly",
+    price: "₹79",
+    amount: 7900,
+    durationDays: 30,
+  },
+  yearly: {
+    label: "Yearly",
+    price: "₹599",
+    amount: 59900,
+    durationDays: 365,
+  },
 } as const;
 export type PlanKey = keyof typeof PLANS;

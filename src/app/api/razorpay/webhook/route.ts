@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyWebhookSignature } from "@/lib/razorpay";
+import { PLANS, verifyWebhookSignature, type PlanKey } from "@/lib/razorpay";
 
+// Fallback: even if the client-side confirmation call fails, this webhook
+// gives us the second guarantee that a paid user actually gets access.
 export async function POST(req: Request) {
   const signature = req.headers.get("x-razorpay-signature") ?? "";
   const rawBody = await req.text();
@@ -13,48 +15,49 @@ export async function POST(req: Request) {
   const payload = JSON.parse(rawBody) as {
     event: string;
     payload?: {
-      subscription?: {
+      payment?: {
         entity?: {
           id: string;
-          status: string;
-          current_end?: number;
+          order_id?: string;
           notes?: Record<string, string>;
+          status?: string;
         };
       };
     };
   };
 
-  const sub = payload.payload?.subscription?.entity;
-  if (!sub) return NextResponse.json({ ok: true, ignored: true });
-
-  const userId = sub.notes?.userId;
-  if (!userId) return NextResponse.json({ ok: true, ignored: true });
-
-  let status = "trialing";
-  switch (payload.event) {
-    case "subscription.activated":
-    case "subscription.charged":
-    case "subscription.resumed":
-      status = "active";
-      break;
-    case "subscription.halted":
-    case "subscription.paused":
-      status = "past_due";
-      break;
-    case "subscription.cancelled":
-    case "subscription.completed":
-      status = "cancelled";
-      break;
+  if (payload.event !== "payment.captured") {
+    return NextResponse.json({ ok: true, ignored: true });
   }
+
+  const payment = payload.payload?.payment?.entity;
+  if (!payment) return NextResponse.json({ ok: true, ignored: true });
+
+  const userId = payment.notes?.userId;
+  const plan = payment.notes?.plan as PlanKey | undefined;
+  if (!userId || !plan || !(plan in PLANS)) {
+    return NextResponse.json({ ok: true, ignored: true });
+  }
+
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) return NextResponse.json({ ok: true, ignored: true });
+
+  const meta = PLANS[plan];
+  const now = new Date();
+  const base =
+    user.currentPeriodEnd && user.currentPeriodEnd > now ? user.currentPeriodEnd : now;
+  const currentPeriodEnd = new Date(base);
+  currentPeriodEnd.setDate(currentPeriodEnd.getDate() + meta.durationDays);
 
   await prisma.user.update({
     where: { id: userId },
     data: {
-      subscriptionStatus: status,
-      currentPeriodEnd: sub.current_end ? new Date(sub.current_end * 1000) : undefined,
-      razorpaySubId: sub.id,
+      subscriptionStatus: "active",
+      planId: plan,
+      currentPeriodEnd,
+      razorpaySubId: payment.order_id ?? payment.id,
     },
-  }).catch(() => null);
+  });
 
   return NextResponse.json({ ok: true });
 }

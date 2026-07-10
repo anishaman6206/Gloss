@@ -59,7 +59,7 @@ export function PricingClient({
       });
       const data = await res.json();
       if (!res.ok || !data.ok) {
-        if (data.error === "razorpay_not_configured" || data.error === "plan_not_configured") {
+        if (data.error === "razorpay_not_configured") {
           setError("Payments are being set up. Please try again shortly.");
         } else {
           setError("Couldn't start checkout. Try again.");
@@ -74,14 +74,39 @@ export function PricingClient({
 
       const rzp = new window.Razorpay({
         key: data.keyId,
-        subscription_id: data.subscriptionId,
+        order_id: data.orderId,
+        amount: data.amount,
+        currency: data.currency,
         name: "Gloss",
-        description: `${PLAN_META[selected].label} subscription`,
+        description: `${PLAN_META[selected].label} · ${PLAN_META[selected].price}`,
         prefill: { email: userEmail, name: userName },
         theme: { color: "#1CB0F6" },
-        handler: async () => {
-          // Webhook will confirm; refresh session state after a small delay.
-          setTimeout(() => window.location.reload(), 1500);
+        handler: async (response: {
+          razorpay_order_id: string;
+          razorpay_payment_id: string;
+          razorpay_signature: string;
+        }) => {
+          try {
+            const verifyRes = await fetch("/api/subscribe/verify", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              body: JSON.stringify({
+                orderId: response.razorpay_order_id,
+                paymentId: response.razorpay_payment_id,
+                signature: response.razorpay_signature,
+                plan: selected,
+              }),
+            });
+            const verifyData = await verifyRes.json();
+            if (verifyData.ok) {
+              window.location.reload();
+            } else {
+              setError("Payment received but activation failed. We'll fix it — contact support.");
+            }
+          } catch {
+            setError("Payment received. Activation is retrying — refresh in a moment.");
+          }
         },
       });
       rzp.open();

@@ -32,12 +32,13 @@ Gloss is a contextual-vocabulary app: snap a page, tap a word, get a meaning tha
 - **Session summary confetti** + result breakdown (knew / hesitated / again).
 - **Emergent Google Auth**: `/api/auth/session` (exchange), `/api/auth/me`, `/api/auth/logout`, sticky cookie, `AuthProvider`, `AuthCallbackHandler`, `AuthGate`.
 - **Prisma schema** extended: `User`, `Session`, subscription fields; per-user `Word`, `Review`, `ReviewLog`.
-- **Razorpay subscription** with `/api/subscribe` (creates subscription) + `/api/razorpay/webhook` (signature-verified state sync). Pricing page at `/subscribe`.
+- **Razorpay subscription** with `/api/subscribe` (creates a Razorpay **Order**) + `/api/subscribe/verify` (HMAC signature verification of the checkout success) + `/api/razorpay/webhook` (signature-verified `payment.captured` handler as a second-guarantee). Pricing page at `/subscribe`. Verified end-to-end with live test key `rzp_test_TBs4uRzcf1E8CI` — Razorpay Test Mode modal opens and orders are created (₹79 monthly / ₹599 yearly = 30/365 days added to `currentPeriodEnd`).
 - **Server-side subscription gating** in `saveWord` and `gradeReview`.
 - **SEO metadata**, `viewport` theme color, custom SVG favicon.
 - **Vercel deployment prep**: `vercel.json` (`prisma migrate deploy && next build`), `next.config.mjs` cleanup, comprehensive `README.md` with Neon Postgres setup.
 
 ## Backlog / Next
+- **P1** — Swap to Razorpay **Subscriptions** API for true auto-renewal once the Razorpay account clears KYC review (currently using one-time Orders because the Subscriptions API is locked for accounts under review; period tracked in Prisma).
 - **P1** — Add speech-recognition pronunciation *scoring* (Web Speech API `SpeechRecognition`) to the review flow.
 - **P1** — Onboarding carousel for first-time users (3-4 steps).
 - **P2** — Bottom-sheet modal for word detail on Library (currently inline expand).

@@ -41,13 +41,11 @@ Open <http://localhost:3000>.
 | `DATABASE_URL` | Prisma database URL. Locally: `file:./prisma/dev.db`. Production: Postgres connection string. |
 | `GROQ_API_KEY` | Server-only. From https://console.groq.com/keys. |
 | `GROQ_MODEL` | Optional. Defaults to `llama-3.3-70b-versatile`. |
-| `RAZORPAY_KEY_ID` | Razorpay dashboard → Keys. |
-| `RAZORPAY_KEY_SECRET` | Razorpay dashboard → Keys. |
-| `RAZORPAY_WEBHOOK_SECRET` | Razorpay dashboard → Webhooks. |
-| `RAZORPAY_PLAN_MONTHLY_ID` | Plan created in Razorpay dashboard for ₹79/month. |
-| `RAZORPAY_PLAN_YEARLY_ID` | Plan created in Razorpay dashboard for ₹599/year. |
+| `RAZORPAY_KEY_ID` | Razorpay dashboard → Account & Settings → API Keys. |
+| `RAZORPAY_KEY_SECRET` | Razorpay dashboard → API Keys (secret is shown once). |
+| `RAZORPAY_WEBHOOK_SECRET` | Razorpay dashboard → Webhooks. Any strong string, set the same one on the webhook. |
 | `NEXT_PUBLIC_RAZORPAY_KEY_ID` | Same as `RAZORPAY_KEY_ID`, exposed to the client for Razorpay Checkout. |
-| `APP_URL` | Public base URL. |
+| `APP_URL` | Public base URL (e.g., https://gloss.vercel.app). |
 
 ## Deploying to Vercel
 
@@ -90,14 +88,15 @@ git add prisma && git commit -m "postgres migration"
 ### 4. Configure Razorpay
 
 1. Log in to https://dashboard.razorpay.com.
-2. Create two Subscription Plans:
-   - Monthly: ₹79, period `monthly`, interval 1.
-   - Yearly: ₹599, period `yearly`, interval 1.
-3. Copy each plan ID to `RAZORPAY_PLAN_MONTHLY_ID` / `RAZORPAY_PLAN_YEARLY_ID`.
-4. Webhooks → Add:
+2. Copy your **Key Id** + **Key Secret** into env variables `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, and `NEXT_PUBLIC_RAZORPAY_KEY_ID`.
+3. **Webhooks** → **Add New**:
    - URL: `https://<your-vercel-domain>/api/razorpay/webhook`
-   - Events: `subscription.activated`, `subscription.charged`, `subscription.halted`, `subscription.paused`, `subscription.cancelled`, `subscription.resumed`, `subscription.completed`.
-   - Secret: put the same value in `RAZORPAY_WEBHOOK_SECRET`.
+   - Active Events: `payment.captured`
+   - Secret: set any strong string, copy the same value into `RAZORPAY_WEBHOOK_SECRET`.
+
+> The app uses **one-time Razorpay Orders** for ₹79 (30 days) and ₹599 (365 days) instead of the Subscriptions API. Reason: many new Razorpay accounts don't get the Subscriptions API until KYC completes. Orders API works out-of-the-box, and the server tracks `currentPeriodEnd` per user in Prisma so the UX is identical.
+>
+> If/when you want true auto-renewing subscriptions, swap `/api/subscribe` to `client.subscriptions.create({ plan_id, total_count, ... })` and update the webhook to handle `subscription.charged`. All the plumbing is in place.
 
 ### 5. Redeploy
 

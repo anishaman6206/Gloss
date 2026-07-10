@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Sparkles, Volume2, BookmarkCheck, RefreshCw, Loader2 } from "lucide-react";
+import { Sparkles, Volume2, BookmarkCheck, RefreshCw, Loader2, Crown } from "lucide-react";
 import { saveWord } from "@/lib/actions";
 import { speak } from "@/lib/speak";
 import type { Definition, Term } from "@/lib/types";
@@ -104,7 +104,7 @@ export function DefinitionCard({
                 const res = await saveWord({ phrase: term.phrase, sentence: term.sentence, ...data });
                 if (res.ok) setSaved(true);
                 else if (res.error === "subscription_required")
-                  setError("Your trial ended — subscribe to keep saving words.");
+                  setError("subscription");
                 else setError("Couldn't save that. Try again.");
               });
             }}
@@ -122,6 +122,22 @@ export function DefinitionCard({
             <p className="text-sm font-bold text-cherry" data-testid="save-error">
               {error}
             </p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+ribe"
+                className="btn-tactile bg-mango !py-2.5 !px-4 text-sm shadow-tactile shadow-mango-shadow"
+              >
+                <Crown size={14} /> Your trial ended — subscribe to keep saving
+              </a>
+            ) : (
+              <p className="text-sm font-bold text-cherry" data-testid="save-error">
+                {error}
+              </p>
+            )
           )}
         </div>
       )}

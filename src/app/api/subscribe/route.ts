@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { PLANS, razorpayClient, isRazorpayConfigured, type PlanKey } from "@/lib/razorpay";
+import {
+  PLANS,
+  razorpayClient,
+  isRazorpayConfigured,
+  type PlanKey,
+} from "@/lib/razorpay";
 
 export async function POST(req: Request) {
   let user;
@@ -23,31 +28,32 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "invalid_plan" }, { status: 400 });
   }
 
-  const planId = PLANS[plan].id();
-  if (!planId) {
-    return NextResponse.json({ ok: false, error: "plan_not_configured" }, { status: 501 });
-  }
-
+  const meta = PLANS[plan];
   const client = razorpayClient();
-  const subscription = await client.subscriptions.create({
-    plan_id: planId,
-    total_count: plan === "monthly" ? 12 : 1, // 12 months or 1 year
-    quantity: 1,
-    customer_notify: 1,
-    notes: { userId: user.id, email: user.email },
+
+  const order = await client.orders.create({
+    amount: meta.amount,
+    currency: "INR",
+    receipt: `gloss_${user.id.slice(0, 8)}_${Date.now()}`,
+    notes: {
+      userId: user.id,
+      email: user.email,
+      plan,
+      durationDays: String(meta.durationDays),
+    },
   });
 
   await prisma.user.update({
     where: { id: user.id },
-    data: {
-      planId,
-      razorpaySubId: subscription.id,
-    },
+    data: { planId: plan },
   });
 
   return NextResponse.json({
     ok: true,
-    subscriptionId: subscription.id,
+    orderId: order.id,
+    amount: order.amount,
+    currency: order.currency,
     keyId: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+    plan,
   });
 }
