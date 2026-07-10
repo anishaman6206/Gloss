@@ -40,3 +40,8 @@ next-env.d.ts
 /prisma/dev.db-journal
 
 /.claude
+.env.*
+*.env
+credentials.json
+*.key
+.credentials

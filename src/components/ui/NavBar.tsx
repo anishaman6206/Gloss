@@ -71,22 +71,20 @@ export function NavBar() {
                 <LogOut size={14} />
               </button>
             ) : (
-              !showLanding && (
-                <button
-                  onClick={login}
-                  className="btn-tactile bg-brand !py-2 !px-4 text-sm shadow-tactile shadow-brand-shadow"
-                  data-testid="login-button"
-                >
-                  <LogIn size={14} /> Sign in
-                </button>
-              )
+              <button
+                onClick={login}
+                className="btn-tactile bg-brand !py-2 !px-4 text-sm shadow-tactile shadow-brand-shadow"
+                data-testid="login-button"
+              >
+                <LogIn size={14} /> Sign in
+              </button>
             )}
           </div>
         </div>
       </nav>
 
       {/* Bottom nav (mobile-first) */}
-      {user && !showLanding && (
+      {!showLanding && (
         <div
           className="fixed bottom-0 left-0 right-0 z-40 border-t-2 border-black/5 bg-white/90 backdrop-blur-xl"
           data-testid="bottom-nav"

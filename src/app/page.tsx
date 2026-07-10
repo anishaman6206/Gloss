@@ -16,7 +16,7 @@ export default function Landing() {
 
         <div className="relative">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-leaf/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-leaf-shadow">
-            <Zap size={12} /> 7 days free · then ₹79/mo
+            <Zap size={12} /> Scan free · save words after 7‑day trial
           </span>
           <h1 className="mt-4 font-display text-4xl font-bold leading-[1.05] tracking-tight md:text-6xl">
             Learn every word
@@ -30,38 +30,38 @@ export default function Landing() {
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
+            <Link
+              href="/scan"
+              data-testid="cta-scan-free"
+              className="btn-tactile bg-brand text-lg shadow-tactile shadow-brand-shadow"
+            >
+              <Camera size={18} /> Scan a page — free
+            </Link>
             {user ? (
               <Link
-                href="/scan"
-                data-testid="cta-open-app"
-                className="btn-tactile bg-leaf text-lg shadow-tactile shadow-leaf-shadow"
+                href="/library"
+                data-testid="cta-open-library"
+                className="btn-tactile !bg-white !text-ink border-2 border-black/10 shadow-tactile shadow-black/10 hover:bg-black/[0.02]"
               >
-                Open the app <ArrowRight size={18} />
+                Open my library
               </Link>
             ) : (
               <button
                 onClick={login}
                 data-testid="cta-start-trial"
-                className="btn-tactile bg-brand text-lg shadow-tactile shadow-brand-shadow"
+                className="btn-tactile !bg-white !text-ink border-2 border-black/10 shadow-tactile shadow-black/10 hover:bg-black/[0.02]"
               >
-                Start 7‑day free trial <ArrowRight size={18} />
+                <ArrowRight size={18} /> Sign in · save words
               </button>
             )}
-            <Link
-              href="#how"
-              data-testid="cta-how"
-              className="btn-tactile !bg-white !text-ink border-2 border-black/10 shadow-tactile shadow-black/10 hover:bg-black/[0.02]"
-            >
-              How it works
-            </Link>
           </div>
 
           <div className="mt-6 flex flex-wrap items-center gap-4 text-sm text-ink-soft">
             <span className="inline-flex items-center gap-1.5">
-              <Star size={14} className="fill-mango text-mango" /> Context‑aware, not a dictionary dump
+              <Star size={14} className="fill-mango text-mango" /> Scan & lookup are always free
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <Star size={14} className="fill-mango text-mango" /> Works with any book
+              <Star size={14} className="fill-mango text-mango" /> 7‑day trial for saving & reviews
             </span>
           </div>
         </div>
@@ -149,11 +149,11 @@ export default function Landing() {
         <div className="text-center">
           {user ? (
             <Link
-              href="/scan"
+              href="/library"
               className="btn-tactile bg-leaf text-lg shadow-tactile shadow-leaf-shadow"
               data-testid="cta-bottom-open"
             >
-              Continue to app <ArrowRight size={18} />
+              Open my library <ArrowRight size={18} />
             </Link>
           ) : (
             <button
@@ -161,7 +161,7 @@ export default function Landing() {
               className="btn-tactile bg-brand text-lg shadow-tactile shadow-brand-shadow"
               data-testid="cta-bottom-start"
             >
-              Start your free trial <ArrowRight size={18} />
+              Sign in · start your free trial <ArrowRight size={18} />
             </button>
           )}
         </div>

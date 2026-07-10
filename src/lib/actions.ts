@@ -3,11 +3,14 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "./prisma";
 import { applySm2 } from "./sm2";
-import { requireUser, subscriptionStatus } from "./auth";
+import { getCurrentUser, requireUser, subscriptionStatus } from "./auth";
 import type { Definition, ReviewQuality } from "./types";
 
 export async function saveWord(input: { phrase: string; sentence: string } & Definition) {
-  const user = await requireUser();
+  const user = await getCurrentUser();
+  if (!user) {
+    return { ok: false as const, error: "unauthorized" };
+  }
   const sub = subscriptionStatus(user);
   if (!sub.isActive) {
     return { ok: false as const, error: "subscription_required" };

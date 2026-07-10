@@ -1,15 +1,18 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Sparkles, Volume2, BookmarkCheck, RefreshCw, Loader2, Crown } from "lucide-react";
+import { Sparkles, Volume2, BookmarkCheck, RefreshCw, Loader2, Crown, LogIn } from "lucide-react";
 import { saveWord } from "@/lib/actions";
 import { speak } from "@/lib/speak";
+import { useAuth } from "@/components/auth/AuthProvider";
 import type { Definition, Term } from "@/lib/types";
 
 export type LookupState =
   | { status: "loading" }
   | { status: "done"; data: Definition }
   | { status: "error"; message: string };
+
+type SaveError = "auth" | "subscription" | string | null;
 
 export function DefinitionCard({
   term,
@@ -20,9 +23,31 @@ export function DefinitionCard({
   lookup: LookupState;
   onRetry: () => void;
 }) {
+  const { user, login } = useAuth();
   const [saved, setSaved] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<SaveError>(null);
   const [isSaving, startSaving] = useTransition();
+
+  const handleSave = () => {
+    if (lookup.status !== "done") return;
+    if (!user) {
+      setError("auth");
+      return;
+    }
+    const data = lookup.data;
+    setError(null);
+    startSaving(async () => {
+      const res = await saveWord({
+        phrase: term.phrase,
+        sentence: term.sentence,
+        ...data,
+      });
+      if (res.ok) setSaved(true);
+      else if (res.error === "subscription_required") setError("subscription");
+      else if (res.error === "unauthorized") setError("auth");
+      else setError("Couldn't save that. Try again.");
+    });
+  };
 
   return (
     <div
@@ -30,9 +55,7 @@ export function DefinitionCard({
       data-testid={`definition-card-${term.phrase}`}
     >
       <div className="flex items-center justify-between gap-2">
-        <div className="min-w-0">
-          <p className="font-display text-xl font-bold">{term.phrase}</p>
-        </div>
+        <p className="min-w-0 font-display text-xl font-bold">{term.phrase}</p>
         <button
           type="button"
           onClick={() => speak(term.phrase)}
@@ -72,7 +95,9 @@ export function DefinitionCard({
 
           {lookup.data.synonyms.length > 0 && (
             <div className="flex flex-wrap items-center gap-1.5">
-              <span className="text-xs font-bold uppercase tracking-wider text-ink-faint">Similar</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-ink-faint">
+                Similar
+              </span>
               {lookup.data.synonyms.map((s, i) => (
                 <span
                   key={i}
@@ -97,17 +122,7 @@ export function DefinitionCard({
 
           <button
             disabled={saved || isSaving}
-            onClick={() => {
-              const data = lookup.data;
-              setError(null);
-              startSaving(async () => {
-                const res = await saveWord({ phrase: term.phrase, sentence: term.sentence, ...data });
-                if (res.ok) setSaved(true);
-                else if (res.error === "subscription_required")
-                  setError("subscription");
-                else setError("Couldn't save that. Try again.");
-              });
-            }}
+            onClick={handleSave}
             data-testid={`save-word-${term.phrase}`}
             className={`btn-tactile ${
               saved
@@ -116,28 +131,31 @@ export function DefinitionCard({
             }`}
           >
             <BookmarkCheck size={16} />
-            {saved ? "Saved to library" : isSaving ? "Saving…" : "Save this word"}
+            {saved ? "Saved to library" : isSaving ? "Saving…" : "Save to my library"}
           </button>
-          {error && (
+
+          {error === "auth" && (
+            <button
+              onClick={login}
+              data-testid="save-error-login"
+              className="btn-tactile bg-mango !py-2.5 !px-4 text-sm shadow-tactile shadow-mango-shadow"
+            >
+              <LogIn size={14} /> Sign in to save · 7 days free
+            </button>
+          )}
+          {error === "subscription" && (
+            <a
+              href="/subscribe"
+              data-testid="save-error-subscribe"
+              className="btn-tactile bg-mango !py-2.5 !px-4 text-sm shadow-tactile shadow-mango-shadow"
+            >
+              <Crown size={14} /> Your trial ended — subscribe to keep saving
+            </a>
+          )}
+          {error && error !== "auth" && error !== "subscription" && (
             <p className="text-sm font-bold text-cherry" data-testid="save-error">
               {error}
             </p>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-ribe"
-                className="btn-tactile bg-mango !py-2.5 !px-4 text-sm shadow-tactile shadow-mango-shadow"
-              >
-                <Crown size={14} /> Your trial ended — subscribe to keep saving
-              </a>
-            ) : (
-              <p className="text-sm font-bold text-cherry" data-testid="save-error">
-                {error}
-              </p>
-            )
           )}
         </div>
       )}
