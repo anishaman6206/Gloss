@@ -16,7 +16,11 @@ export function WordOverlay({
   onToggle: (id: string) => void;
 }) {
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} className="absolute inset-0 h-full w-full">
+    <svg
+      viewBox={`0 0 ${width} ${height}`}
+      className="absolute inset-0 h-full w-full"
+      data-testid="word-overlay"
+    >
       {words.map((word) => {
         const selected = selectedIds.has(word.id);
         return (
@@ -26,15 +30,16 @@ export function WordOverlay({
             y={word.y0}
             width={Math.max(word.x1 - word.x0, 1)}
             height={Math.max(word.y1 - word.y0, 1)}
-            rx={4}
-            className="cursor-pointer transition-colors"
-            fill={selected ? "rgba(250, 204, 21, 0.45)" : "transparent"}
-            stroke={selected ? "rgba(161, 98, 7, 0.85)" : "transparent"}
-            strokeWidth={2}
+            rx={6}
+            className="cursor-pointer transition-all"
+            fill={selected ? "rgba(255, 150, 0, 0.5)" : "rgba(28, 176, 246, 0.06)"}
+            stroke={selected ? "#CC7800" : "rgba(28, 176, 246, 0.35)"}
+            strokeWidth={selected ? 3 : 1.5}
             onClick={(e) => {
               e.stopPropagation();
               onToggle(word.id);
             }}
+            data-testid={`word-rect-${word.id}`}
           />
         );
       })}

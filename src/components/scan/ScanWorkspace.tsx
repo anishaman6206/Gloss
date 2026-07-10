@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
+import { Sparkles, RotateCcw, Loader2 } from "lucide-react";
 import { ImageUploader } from "./ImageUploader";
 import { WordOverlay } from "./WordOverlay";
 import { DefinitionCard, type LookupState } from "./DefinitionCard";
@@ -94,6 +95,8 @@ export function ScanWorkspace() {
       }
       return merged;
     });
+    // reset selection so user can pick another word
+    setSelectedIds(new Set());
   }, [currentTerms, fetchDefinition]);
 
   const reset = useCallback(() => {
@@ -111,8 +114,8 @@ export function ScanWorkspace() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="relative overflow-hidden rounded-2xl border border-ink/10 bg-black/5">
+    <div className="space-y-5" data-testid="scan-workspace">
+      <div className="relative overflow-hidden rounded-3xl border-2 border-black/10 bg-black">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={imageUrl} alt="Scanned page" className="block w-full select-none" />
 
@@ -127,28 +130,37 @@ export function ScanWorkspace() {
         )}
 
         {stage === "reading" && (
-          <div className="absolute inset-0 flex items-center justify-center bg-paper/70">
-            <p className="text-sm font-medium">Reading the page…</p>
+          <div className="absolute inset-0 grid place-items-center bg-black/50 backdrop-blur-sm">
+            <div className="flex flex-col items-center gap-2 rounded-2xl bg-white/95 px-6 py-4 shadow-tactile shadow-black/20">
+              <Loader2 className="animate-spin text-brand" size={22} />
+              <p className="text-sm font-bold">Reading the page…</p>
+            </div>
           </div>
         )}
       </div>
 
       {stage === "empty" && (
-        <p className="text-sm text-ink/60">
+        <p className="rounded-2xl bg-cherry/10 p-4 text-sm text-cherry" data-testid="scan-empty">
           Couldn&apos;t find any text on that page — try a clearer or brighter photo.
         </p>
       )}
 
-      <div className="flex items-center justify-between">
-        <button onClick={reset} className="text-sm text-ink/50 underline underline-offset-2">
-          Scan another page
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <button
+          onClick={reset}
+          data-testid="scan-reset"
+          className="btn-tactile !bg-white !text-ink border-2 border-black/10 shadow-tactile shadow-black/10 !py-2"
+        >
+          <RotateCcw size={14} /> Scan another
         </button>
         {selectedIds.size > 0 && (
           <button
             onClick={handleLookup}
-            className="rounded-full bg-ink px-5 py-2 text-sm font-medium text-paper"
+            data-testid="scan-lookup"
+            className="btn-tactile bg-mango shadow-tactile shadow-mango-shadow"
           >
-            {currentTerms.length > 1 ? "Get the meanings" : "Get the meaning"}
+            <Sparkles size={16} />
+            {currentTerms.length > 1 ? `Get ${currentTerms.length} meanings` : "Get the meaning"}
           </button>
         )}
       </div>

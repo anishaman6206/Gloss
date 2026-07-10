@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import { Search } from "lucide-react";
 
 export function SearchBar({ initialQuery }: { initialQuery: string }) {
   const router = useRouter();
@@ -20,11 +21,18 @@ export function SearchBar({ initialQuery }: { initialQuery: string }) {
   }
 
   return (
-    <input
-      value={value}
-      onChange={(e) => update(e.target.value)}
-      placeholder="Search your words…"
-      className="w-full rounded-full border border-ink/15 bg-white/70 px-4 py-2 text-sm outline-none focus:border-ink/40"
-    />
+    <div className="relative" data-testid="search-bar">
+      <Search
+        className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink-faint"
+        size={18}
+      />
+      <input
+        value={value}
+        onChange={(e) => update(e.target.value)}
+        placeholder="Search your words…"
+        data-testid="search-input"
+        className="w-full rounded-2xl border-2 border-transparent bg-white pl-11 pr-4 py-3.5 text-base font-medium outline-none shadow-tactile shadow-black/5 focus:border-brand"
+      />
+    </div>
   );
 }

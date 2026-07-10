@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { gradeReview } from "@/lib/actions";
 import { pickFillBlankSentence } from "@/lib/review";
 import { RecallFlip } from "./RecallFlip";
@@ -24,7 +25,6 @@ function shuffle<T>(items: T[]): T[] {
   return copy;
 }
 
-// v2 will add a fourth "speak" mode here (Web Speech API pronunciation scoring).
 const MODES: ReviewMode[] = ["recall-flip", "fill-blank", "produce-word"];
 
 function buildQueue(words: WordWithReview[]): QueueItem[] {
@@ -37,12 +37,28 @@ function buildQueue(words: WordWithReview[]): QueueItem[] {
 }
 
 export function ReviewSession({ words }: { words: WordWithReview[] }) {
-  const [queue] = useState(() => buildQueue(words));
+  const [queue, setQueue] = useState<QueueItem[] | null>(null);
   const [index, setIndex] = useState(0);
   const [stats, setStats] = useState({ reviewed: 0, knew: 0, hesitated: 0, again: 0 });
   const [, startTransition] = useTransition();
 
+  // Randomize only after mount to avoid SSR/client hydration mismatch.
+  useEffect(() => {
+    setQueue(buildQueue(words));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (!queue) {
+    return (
+      <div className="rounded-3xl border-2 border-black/5 bg-white p-6 text-center text-ink-soft shadow-tactile shadow-black/5">
+        Loading your session…
+      </div>
+    );
+  }
+
   const current = queue[index];
+  const total = queue.length;
+  const progress = total > 0 ? (index / total) * 100 : 0;
 
   function handleGraded(quality: ReviewQuality) {
     if (!current) return;
@@ -60,48 +76,67 @@ export function ReviewSession({ words }: { words: WordWithReview[] }) {
     setIndex((i) => i + 1);
   }
 
-  if (!current) {
-    return <SessionSummary {...stats} />;
-  }
+  if (!current) return <SessionSummary {...stats} />;
 
   return (
-    <div className="space-y-3">
-      <p className="text-xs text-ink/40">
-        {index + 1} of {queue.length}
-      </p>
+    <div className="space-y-4" data-testid="review-session">
+      {/* Progress */}
+      <div className="flex items-center gap-3">
+        <div className="h-3 flex-1 overflow-hidden rounded-full bg-black/5">
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${progress}%` }}
+            transition={{ type: "spring", stiffness: 200, damping: 24 }}
+            className="h-full rounded-full bg-gradient-to-r from-brand to-leaf"
+          />
+        </div>
+        <span
+          className="rounded-full bg-white px-3 py-1 text-xs font-bold shadow-tactile shadow-black/5"
+          data-testid="review-progress"
+        >
+          {index + 1} / {total}
+        </span>
+      </div>
 
-      {current.mode === "recall-flip" && (
-        <RecallFlip
-          key={current.word.id}
-          sentence={current.word.sentence}
-          phrase={current.word.phrase}
-          definition={current.word.definition}
-          partOfSpeech={current.word.partOfSpeech}
-          examples={current.word.examples}
-          onGraded={handleGraded}
-        />
-      )}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={current.word.id + current.mode}
+          initial={{ opacity: 0, y: 20, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -20, scale: 0.98 }}
+          transition={{ type: "spring", stiffness: 300, damping: 24 }}
+        >
+          {current.mode === "recall-flip" && (
+            <RecallFlip
+              sentence={current.word.sentence}
+              phrase={current.word.phrase}
+              definition={current.word.definition}
+              partOfSpeech={current.word.partOfSpeech}
+              examples={current.word.examples}
+              onGraded={handleGraded}
+            />
+          )}
 
-      {current.mode === "fill-blank" && current.blanked && (
-        <FillBlank
-          key={current.word.id}
-          blanked={current.blanked}
-          phrase={current.word.phrase}
-          definition={current.word.definition}
-          onGraded={handleGraded}
-        />
-      )}
+          {current.mode === "fill-blank" && current.blanked && (
+            <FillBlank
+              blanked={current.blanked}
+              phrase={current.word.phrase}
+              definition={current.word.definition}
+              onGraded={handleGraded}
+            />
+          )}
 
-      {current.mode === "produce-word" && (
-        <ProduceWord
-          key={current.word.id}
-          definition={current.word.definition}
-          partOfSpeech={current.word.partOfSpeech}
-          phrase={current.word.phrase}
-          sentence={current.word.sentence}
-          onGraded={handleGraded}
-        />
-      )}
+          {current.mode === "produce-word" && (
+            <ProduceWord
+              definition={current.word.definition}
+              partOfSpeech={current.word.partOfSpeech}
+              phrase={current.word.phrase}
+              sentence={current.word.sentence}
+              onGraded={handleGraded}
+            />
+          )}
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }

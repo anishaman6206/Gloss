@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { Volume2, Check } from "lucide-react";
 import { GradeButtons } from "./GradeButtons";
+import { speak } from "@/lib/speak";
 import type { ReviewQuality } from "@/lib/types";
 
 export function FillBlank({
@@ -21,9 +23,14 @@ export function FillBlank({
   const correct = value.trim().toLowerCase() === phrase.trim().toLowerCase();
 
   return (
-    <div className="space-y-4 rounded-2xl border border-ink/10 bg-white/60 p-6">
-      <p className="text-xs uppercase tracking-wide text-ink/50">Fill in the blank</p>
-      <p className="text-lg leading-relaxed">{blanked}</p>
+    <div
+      className="space-y-4 rounded-3xl border-2 border-black/5 bg-white p-6 shadow-tactile shadow-black/5"
+      data-testid="fill-blank"
+    >
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-mango/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-mango-shadow">
+        Fill in the blank
+      </span>
+      <p className="text-xl leading-relaxed">{blanked}</p>
 
       {!checked ? (
         <form
@@ -38,18 +45,37 @@ export function FillBlank({
             value={value}
             onChange={(e) => setValue(e.target.value)}
             placeholder="Type the missing word…"
-            className="flex-1 rounded-full border border-ink/15 bg-white/70 px-4 py-2 text-sm outline-none focus:border-ink/40"
+            data-testid="fill-blank-input"
+            className="flex-1 rounded-2xl border-2 border-transparent bg-black/[0.04] px-4 py-3 text-base font-medium outline-none focus:border-brand focus:bg-white"
           />
-          <button type="submit" className="rounded-full bg-ink px-4 py-2 text-sm text-paper">
-            Check
+          <button
+            type="submit"
+            data-testid="fill-blank-check"
+            className="btn-tactile bg-brand !py-3 !px-5 shadow-tactile shadow-brand-shadow"
+          >
+            <Check size={16} /> Check
           </button>
         </form>
       ) : (
-        <div className="space-y-3 rounded-xl bg-ink/5 p-4">
-          <p className={correct ? "font-medium text-emerald-700" : "font-medium"}>
-            {correct ? "Correct — " : "It was — "}
-            {phrase}
-          </p>
+        <div className={`reveal space-y-3 rounded-2xl p-4 ${correct ? "bg-leaf/10" : "bg-cherry/10"}`}>
+          <div className="flex items-center gap-2">
+            <p
+              className={`font-display text-xl font-bold ${
+                correct ? "text-leaf-shadow" : "text-cherry"
+              }`}
+            >
+              {correct ? "Correct — " : "It was — "}
+              {phrase}
+            </p>
+            <button
+              onClick={() => speak(phrase)}
+              aria-label="Hear pronunciation"
+              data-testid="fill-blank-speak"
+              className="grid h-8 w-8 place-items-center rounded-xl bg-white/70 text-ink hover:bg-white"
+            >
+              <Volume2 size={14} strokeWidth={2.5} />
+            </button>
+          </div>
           <p>{definition}</p>
         </div>
       )}

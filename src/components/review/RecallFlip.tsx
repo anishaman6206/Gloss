@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { Volume2, Eye, Sparkles } from "lucide-react";
 import { GradeButtons } from "./GradeButtons";
+import { speak } from "@/lib/speak";
 import type { ReviewQuality } from "@/lib/types";
 
 export function RecallFlip({
@@ -22,26 +24,47 @@ export function RecallFlip({
   const [revealed, setRevealed] = useState(false);
 
   return (
-    <div className="space-y-4 rounded-2xl border border-ink/10 bg-white/60 p-6">
-      <p className="text-xs uppercase tracking-wide text-ink/50">Recall the meaning</p>
-      <p className="text-lg leading-relaxed">{highlight(sentence, phrase)}</p>
+    <div
+      className="space-y-4 rounded-3xl border-2 border-black/5 bg-white p-6 shadow-tactile shadow-black/5"
+      data-testid="recall-flip"
+    >
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-shadow">
+        Recall the meaning
+      </span>
+      <p className="text-xl leading-relaxed">{highlight(sentence, phrase)}</p>
 
       {!revealed ? (
         <button
           onClick={() => setRevealed(true)}
-          className="rounded-full bg-ink px-5 py-2 text-sm font-medium text-paper"
+          data-testid="recall-reveal"
+          className="btn-tactile bg-brand shadow-tactile shadow-brand-shadow"
         >
-          Reveal
+          <Eye size={16} /> Reveal
         </button>
       ) : (
-        <div className="space-y-3 rounded-xl bg-ink/5 p-4">
-          <p className="font-medium">{phrase}</p>
-          <p>{definition}</p>
-          <p className="text-sm italic text-ink/60">{partOfSpeech}</p>
+        <div className="reveal space-y-3 rounded-2xl bg-brand/5 p-4">
+          <div className="flex items-center gap-2">
+            <p className="font-display text-2xl font-bold">{phrase}</p>
+            <button
+              onClick={() => speak(phrase)}
+              aria-label="Hear pronunciation"
+              data-testid="recall-speak"
+              className="grid h-8 w-8 place-items-center rounded-xl bg-brand/10 text-brand hover:bg-brand/20"
+            >
+              <Volume2 size={14} strokeWidth={2.5} />
+            </button>
+          </div>
+          <p className="text-lg">{definition}</p>
+          <p className="text-xs font-bold uppercase tracking-wider text-ink-faint">
+            {partOfSpeech}
+          </p>
           {examples.length > 0 && (
-            <ul className="space-y-1 text-sm text-ink/70">
+            <ul className="space-y-1 text-sm text-ink-soft">
               {examples.map((example, i) => (
-                <li key={i}>&ldquo;{example}&rdquo;</li>
+                <li key={i} className="flex gap-2">
+                  <Sparkles size={12} className="mt-1 shrink-0 text-mango" />
+                  <span>&ldquo;{example}&rdquo;</span>
+                </li>
               ))}
             </ul>
           )}
@@ -62,7 +85,7 @@ function highlight(sentence: string, phrase: string) {
   return (
     <>
       {before}
-      <span className="rounded bg-yellow-200/70 px-1 font-medium">{match}</span>
+      <span className="rounded-md bg-mango/40 px-1.5 font-bold">{match}</span>
       {after}
     </>
   );

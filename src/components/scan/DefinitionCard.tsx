@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { Sparkles, Volume2, BookmarkCheck, RefreshCw, Loader2 } from "lucide-react";
 import { saveWord } from "@/lib/actions";
+import { speak } from "@/lib/speak";
 import type { Definition, Term } from "@/lib/types";
 
 export type LookupState =
@@ -19,39 +21,76 @@ export function DefinitionCard({
   onRetry: () => void;
 }) {
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [isSaving, startSaving] = useTransition();
 
   return (
-    <div className="rounded-2xl border border-ink/10 bg-white/60 p-4 shadow-sm">
-      <p className="text-xs uppercase tracking-wide text-ink/50">{term.phrase}</p>
+    <div
+      className="reveal rounded-3xl border-2 border-black/5 bg-white p-5 shadow-tactile shadow-black/5"
+      data-testid={`definition-card-${term.phrase}`}
+    >
+      <div className="flex items-center justify-between gap-2">
+        <div className="min-w-0">
+          <p className="font-display text-xl font-bold">{term.phrase}</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => speak(term.phrase)}
+          data-testid={`speak-${term.phrase}`}
+          aria-label={`Hear ${term.phrase}`}
+          className="grid h-9 w-9 place-items-center rounded-xl bg-brand/10 text-brand transition-colors hover:bg-brand/20"
+        >
+          <Volume2 size={16} strokeWidth={2.5} />
+        </button>
+      </div>
 
-      {lookup.status === "loading" && <p className="mt-2 text-sm text-ink/60">Looking that up…</p>}
+      {lookup.status === "loading" && (
+        <p className="mt-3 inline-flex items-center gap-2 text-sm text-ink-soft">
+          <Loader2 size={14} className="animate-spin" /> Looking that up…
+        </p>
+      )}
 
       {lookup.status === "error" && (
-        <div className="mt-2 space-y-2">
-          <p className="text-sm text-ink/70">{lookup.message}</p>
-          <button onClick={onRetry} className="rounded-full bg-ink px-3 py-1 text-sm text-paper">
-            Try again
+        <div className="mt-3 space-y-2">
+          <p className="text-sm text-ink-soft">{lookup.message}</p>
+          <button
+            onClick={onRetry}
+            data-testid="definition-retry"
+            className="btn-tactile bg-ink !py-2 !px-4 text-sm shadow-tactile shadow-black/40"
+          >
+            <RefreshCw size={14} /> Try again
           </button>
         </div>
       )}
 
       {lookup.status === "done" && (
-        <div className="mt-2 space-y-3">
+        <div className="mt-3 space-y-3">
           <p className="text-lg font-medium leading-snug">{lookup.data.definition}</p>
-          <p className="text-sm italic text-ink/60">{lookup.data.partOfSpeech}</p>
+          <p className="text-sm font-bold uppercase tracking-wider text-ink-faint">
+            {lookup.data.partOfSpeech}
+          </p>
 
           {lookup.data.synonyms.length > 0 && (
-            <p className="text-sm text-ink/70">
-              <span className="font-medium">Similar: </span>
-              {lookup.data.synonyms.join(", ")}
-            </p>
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="text-xs font-bold uppercase tracking-wider text-ink-faint">Similar</span>
+              {lookup.data.synonyms.map((s, i) => (
+                <span
+                  key={i}
+                  className="rounded-full bg-brand/10 px-2.5 py-1 text-xs font-bold text-brand-shadow"
+                >
+                  {s}
+                </span>
+              ))}
+            </div>
           )}
 
           {lookup.data.examples.length > 0 && (
-            <ul className="space-y-1 text-sm text-ink/70">
+            <ul className="space-y-1.5 rounded-2xl bg-mango/[0.08] p-3 text-sm text-ink-soft">
               {lookup.data.examples.map((example, i) => (
-                <li key={i}>&ldquo;{example}&rdquo;</li>
+                <li key={i} className="flex gap-2">
+                  <Sparkles size={12} className="mt-1 shrink-0 text-mango" />
+                  <span>&ldquo;{example}&rdquo;</span>
+                </li>
               ))}
             </ul>
           )}
@@ -60,15 +99,30 @@ export function DefinitionCard({
             disabled={saved || isSaving}
             onClick={() => {
               const data = lookup.data;
+              setError(null);
               startSaving(async () => {
-                await saveWord({ phrase: term.phrase, sentence: term.sentence, ...data });
-                setSaved(true);
+                const res = await saveWord({ phrase: term.phrase, sentence: term.sentence, ...data });
+                if (res.ok) setSaved(true);
+                else if (res.error === "subscription_required")
+                  setError("Your trial ended — subscribe to keep saving words.");
+                else setError("Couldn't save that. Try again.");
               });
             }}
-            className="rounded-full bg-ink px-4 py-1.5 text-sm text-paper disabled:opacity-50"
+            data-testid={`save-word-${term.phrase}`}
+            className={`btn-tactile ${
+              saved
+                ? "bg-leaf shadow-tactile shadow-leaf-shadow"
+                : "bg-brand shadow-tactile shadow-brand-shadow"
+            }`}
           >
-            {saved ? "Saved" : isSaving ? "Saving…" : "Save this word"}
+            <BookmarkCheck size={16} />
+            {saved ? "Saved to library" : isSaving ? "Saving…" : "Save this word"}
           </button>
+          {error && (
+            <p className="text-sm font-bold text-cherry" data-testid="save-error">
+              {error}
+            </p>
+          )}
         </div>
       )}
     </div>

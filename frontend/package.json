@@ -1,0 +1,7 @@
+{
+  "name": "frontend-stub",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "cd /app && exec npx next dev -p 3000 -H 0.0.0.0"
+  }
+}

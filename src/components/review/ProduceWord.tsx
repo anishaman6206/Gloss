@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { Volume2, Check } from "lucide-react";
 import { GradeButtons } from "./GradeButtons";
+import { speak } from "@/lib/speak";
 import type { ReviewQuality } from "@/lib/types";
 
 export function ProduceWord({
@@ -19,14 +21,20 @@ export function ProduceWord({
 }) {
   const [value, setValue] = useState("");
   const [checked, setChecked] = useState(false);
-
   const correct = value.trim().toLowerCase() === phrase.trim().toLowerCase();
 
   return (
-    <div className="space-y-4 rounded-2xl border border-ink/10 bg-white/60 p-6">
-      <p className="text-xs uppercase tracking-wide text-ink/50">What&apos;s the word?</p>
-      <p className="text-lg leading-relaxed">{definition}</p>
-      <p className="text-sm italic text-ink/60">{partOfSpeech}</p>
+    <div
+      className="space-y-4 rounded-3xl border-2 border-black/5 bg-white p-6 shadow-tactile shadow-black/5"
+      data-testid="produce-word"
+    >
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-leaf/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-leaf-shadow">
+        What&apos;s the word?
+      </span>
+      <p className="text-xl leading-relaxed">{definition}</p>
+      <p className="text-xs font-bold uppercase tracking-wider text-ink-faint">
+        {partOfSpeech}
+      </p>
 
       {!checked ? (
         <form
@@ -41,19 +49,38 @@ export function ProduceWord({
             value={value}
             onChange={(e) => setValue(e.target.value)}
             placeholder="Type the word…"
-            className="flex-1 rounded-full border border-ink/15 bg-white/70 px-4 py-2 text-sm outline-none focus:border-ink/40"
+            data-testid="produce-input"
+            className="flex-1 rounded-2xl border-2 border-transparent bg-black/[0.04] px-4 py-3 text-base font-medium outline-none focus:border-brand focus:bg-white"
           />
-          <button type="submit" className="rounded-full bg-ink px-4 py-2 text-sm text-paper">
-            Check
+          <button
+            type="submit"
+            data-testid="produce-check"
+            className="btn-tactile bg-brand !py-3 !px-5 shadow-tactile shadow-brand-shadow"
+          >
+            <Check size={16} /> Check
           </button>
         </form>
       ) : (
-        <div className="space-y-3 rounded-xl bg-ink/5 p-4">
-          <p className={correct ? "font-medium text-emerald-700" : "font-medium"}>
-            {correct ? "Correct — " : "It was — "}
-            {phrase}
-          </p>
-          <p className="text-sm text-ink/60">&ldquo;{sentence}&rdquo;</p>
+        <div className={`reveal space-y-3 rounded-2xl p-4 ${correct ? "bg-leaf/10" : "bg-cherry/10"}`}>
+          <div className="flex items-center gap-2">
+            <p
+              className={`font-display text-xl font-bold ${
+                correct ? "text-leaf-shadow" : "text-cherry"
+              }`}
+            >
+              {correct ? "Correct — " : "It was — "}
+              {phrase}
+            </p>
+            <button
+              onClick={() => speak(phrase)}
+              aria-label="Hear pronunciation"
+              data-testid="produce-speak"
+              className="grid h-8 w-8 place-items-center rounded-xl bg-white/70 text-ink hover:bg-white"
+            >
+              <Volume2 size={14} strokeWidth={2.5} />
+            </button>
+          </div>
+          <p className="text-sm italic text-ink-soft">&ldquo;{sentence}&rdquo;</p>
         </div>
       )}
 

@@ -3,12 +3,45 @@ generator client {
 }
 
 datasource db {
+  // Use sqlite locally; swap provider to "postgresql" on Vercel.
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String
+  picture       String?
+  createdAt     DateTime @default(now())
+
+  // Subscription tracking
+  subscriptionStatus String   @default("trialing") // trialing | active | past_due | cancelled | expired
+  trialEndsAt        DateTime? // set at signup: now + 7 days
+  planId             String?   // razorpay plan id
+  razorpaySubId      String?   // razorpay subscription id
+  currentPeriodEnd   DateTime?
+
+  sessions Session[]
+  words    Word[]
+  logs     ReviewLog[]
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionToken String   @unique
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+}
+
 model Word {
   id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   phrase       String
   sentence     String
   definition   String
@@ -17,6 +50,8 @@ model Word {
   examples     String // JSON-encoded string[]
   createdAt    DateTime @default(now())
   review       Review?
+
+  @@index([userId])
 }
 
 model Review {
@@ -31,10 +66,13 @@ model Review {
   lapses         Int       @default(0)
 }
 
-// One row per graded review, kept for the /stats streak and activity chart.
 model ReviewLog {
   id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   wordId     String
   quality    Int
   reviewedAt DateTime @default(now())
+
+  @@index([userId])
 }
