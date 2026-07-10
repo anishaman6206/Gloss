@@ -30,3 +30,11 @@ model Review {
   lastReviewedAt DateTime?
   lapses         Int       @default(0)
 }
+
+// One row per graded review, kept for the /stats streak and activity chart.
+model ReviewLog {
+  id         String   @id @default(cuid())
+  wordId     String
+  quality    Int
+  reviewedAt DateTime @default(now())
+}
