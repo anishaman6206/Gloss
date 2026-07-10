@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Word {
+  id           String   @id @default(cuid())
+  phrase       String
+  sentence     String
+  definition   String
+  partOfSpeech String
+  synonyms     String // JSON-encoded string[]
+  examples     String // JSON-encoded string[]
+  createdAt    DateTime @default(now())
+  review       Review?
+}
+
+model Review {
+  id             String    @id @default(cuid())
+  wordId         String    @unique
+  word           Word      @relation(fields: [wordId], references: [id], onDelete: Cascade)
+  easeFactor     Float     @default(2.5)
+  intervalDays   Int       @default(0)
+  repetitions    Int       @default(0)
+  nextReviewAt   DateTime  @default(now())
+  lastReviewedAt DateTime?
+  lapses         Int       @default(0)
+}
