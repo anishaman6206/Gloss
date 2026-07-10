@@ -16,7 +16,7 @@ export default function Landing() {
 
         <div className="relative">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-leaf/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-leaf-shadow">
-            <Zap size={12} /> Scan free · save words after 7‑day trial
+            <Zap size={12} /> Scan free · save words
           </span>
           <h1 className="mt-4 font-display text-4xl font-bold leading-[1.05] tracking-tight md:text-6xl">
             Learn every word
