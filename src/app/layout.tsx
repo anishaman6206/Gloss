@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Fredoka, Nunito } from "next/font/google";
 import "./globals.css";
 import { NavBar } from "@/components/ui/NavBar";
-import { Footer } from \"@/components/ui/Footer";
+import { Footer } from "@/components/ui/Footer";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { AuthCallbackHandler } from "@/components/auth/AuthCallbackHandler";
 
