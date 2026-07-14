@@ -46,9 +46,9 @@ export default async function PaymentSuccessPage({
 
           <p className="mt-2 text-lg text-ink-soft">
             {plan} subscription active
-            {sub?.currentPeriodEnd
+            {sub?.isPaid && user?.currentPeriodEnd
               ? ` — renews on ${new Date(
-                  sub.currentPeriodEnd
+                  user.currentPeriodEnd
                 ).toLocaleDateString("en-IN", {
                   day: "numeric",
                   month: "short",
