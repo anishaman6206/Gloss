@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Fredoka, Nunito } from "next/font/google";
 import "./globals.css";
 import { NavBar } from "@/components/ui/NavBar";
+import { Footer } from \"@/components/ui/Footer";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { AuthCallbackHandler } from "@/components/auth/AuthCallbackHandler";
 
@@ -51,9 +52,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AuthProvider>
           <AuthCallbackHandler />
           <NavBar />
-          <main className="mx-auto max-w-3xl px-4 pb-32 pt-6" data-testid="app-main">
+          <main className="mx-auto max-w-3xl px-4 pb-6 pt-6" data-testid="app-main">
             {children}
           </main>
+          <Footer />
         </AuthProvider>
       </body>
     </html>
