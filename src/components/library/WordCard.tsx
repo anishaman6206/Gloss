@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, Volume2, Sparkles } from "lucide-react";
+import { ChevronDown, Volume2, Sparkles, Trash2 } from "lucide-react";
 import { speak } from "@/lib/speak";
 import type { WordStatus } from "@/lib/types";
 
@@ -25,6 +25,7 @@ export function WordCard({
   synonyms,
   examples,
   status,
+  onDelete,
 }: {
   phrase: string;
   sentence: string;
@@ -33,6 +34,7 @@ export function WordCard({
   synonyms: string[];
   examples: string[];
   status: WordStatus;
+  onDelete?: () => void;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -115,6 +117,17 @@ export function WordCard({
           <p className="rounded-2xl bg-black/[0.03] p-3 text-xs text-ink-faint">
             From: &ldquo;{sentence}&rdquo;
           </p>
+
+          {onDelete && (
+            <button
+              type="button"
+              onClick={onDelete}
+              data-testid={`delete-word-${phrase}`}
+              className="flex items-center gap-1.5 text-xs font-bold text-cherry hover:text-cherry-shadow"
+            >
+              <Trash2 size={13} /> Delete from library
+            </button>
+          )}
         </div>
       )}
     </div>

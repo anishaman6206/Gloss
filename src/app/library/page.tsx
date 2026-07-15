@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { wordStatus } from "@/lib/sm2";
 import { getCurrentUser } from "@/lib/auth";
 import { SearchBar } from "@/components/library/SearchBar";
-import { WordCard } from "@/components/library/WordCard";
+import { LibraryList } from "@/components/library/LibraryList";
 import { AuthGate } from "@/components/auth/AuthGate";
 import { BookOpen, Sparkles } from "lucide-react";
 import Link from "next/link";
@@ -90,20 +90,18 @@ export default async function LibraryPage({
           )}
         </div>
       ) : (
-        <div className="space-y-3">
-          {words.map((word) => (
-            <WordCard
-              key={word.id}
-              phrase={word.phrase}
-              sentence={word.sentence}
-              definition={word.definition}
-              partOfSpeech={word.partOfSpeech}
-              synonyms={JSON.parse(word.synonyms)}
-              examples={JSON.parse(word.examples)}
-              status={wordStatus(word.review)}
-            />
-          ))}
-        </div>
+        <LibraryList
+          initialWords={words.map((word) => ({
+            id: word.id,
+            phrase: word.phrase,
+            sentence: word.sentence,
+            definition: word.definition,
+            partOfSpeech: word.partOfSpeech,
+            synonyms: JSON.parse(word.synonyms),
+            examples: JSON.parse(word.examples),
+            status: wordStatus(word.review),
+          }))}
+        />
       )}
     </div>
   );
