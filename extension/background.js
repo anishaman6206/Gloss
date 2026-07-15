@@ -45,6 +45,19 @@ async function saveWord(payload) {
   }
 }
 
+async function getStatsSummary() {
+  try {
+    const res = await fetch(`${API_BASE}/api/stats/summary`, {
+      method: "GET",
+      credentials: "include",
+    });
+    if (!res.ok) return { ok: false };
+    return await res.json();
+  } catch {
+    return { ok: false };
+  }
+}
+
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message?.type === "define") {
     defineLookup(message.payload).then(sendResponse);
@@ -52,6 +65,10 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   }
   if (message?.type === "save") {
     saveWord(message.payload).then(sendResponse);
+    return true;
+  }
+  if (message?.type === "stats") {
+    getStatsSummary().then(sendResponse);
     return true;
   }
   return false;

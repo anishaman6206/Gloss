@@ -23,6 +23,21 @@ async function renderRecentList() {
     .join("");
 }
 
+function renderStats(res) {
+  const statsRow = document.getElementById("stats-row");
+  const signInPrompt = document.getElementById("stats-signin-prompt");
+
+  if (res?.ok) {
+    document.getElementById("stat-streak").textContent = res.streak;
+    document.getElementById("stat-today").textContent = res.wordsToday;
+    statsRow.classList.remove("hidden");
+    signInPrompt.classList.add("hidden");
+  } else {
+    statsRow.classList.add("hidden");
+    signInPrompt.classList.remove("hidden");
+  }
+}
+
 async function render() {
   const { hasOnboarded } = await chrome.storage.local.get("hasOnboarded");
   const onboardingView = document.getElementById("onboarding-view");
@@ -32,6 +47,7 @@ async function render() {
     onboardingView.classList.add("hidden");
     recentView.classList.remove("hidden");
     await renderRecentList();
+    chrome.runtime.sendMessage({ type: "stats" }, renderStats);
   } else {
     onboardingView.classList.remove("hidden");
     recentView.classList.add("hidden");
@@ -40,6 +56,10 @@ async function render() {
 
 document.getElementById("open-library").addEventListener("click", () => {
   chrome.tabs.create({ url: `${API_BASE}/library` });
+});
+
+document.getElementById("open-review").addEventListener("click", () => {
+  chrome.tabs.create({ url: `${API_BASE}/review` });
 });
 
 document.getElementById("open-settings").addEventListener("click", () => {

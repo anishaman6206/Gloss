@@ -30,10 +30,29 @@
       </section>
 
       <section id="recent-view" class="hidden">
+        <div class="stats-row hidden" id="stats-row">
+          <div class="stat-tile">
+            <div class="stat-value" id="stat-streak">–</div>
+            <div class="stat-label">🔥 Day streak</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-value" id="stat-today">–</div>
+            <div class="stat-label">Saved today</div>
+          </div>
+        </div>
+        <p class="stats-signin-prompt hidden" id="stats-signin-prompt">
+          <a href="https://gloss-theta.vercel.app" target="_blank" rel="noopener noreferrer">Sign in to Gloss</a>
+          to see your streak
+        </p>
+
+        <p class="section-label">Recent lookups</p>
         <ul id="recent-list" class="toolbar-list"></ul>
       </section>
 
-      <button id="open-library" class="toolbar-link-btn" type="button">Open your Gloss library</button>
+      <div class="toolbar-btn-row">
+        <button id="open-library" class="toolbar-link-btn" type="button">Open library</button>
+        <button id="open-review" class="toolbar-ghost-btn" type="button">Review words</button>
+      </div>
     </div>
     <script src="popup.js"></script>
   </body>
