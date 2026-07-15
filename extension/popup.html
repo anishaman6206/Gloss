@@ -11,9 +11,28 @@
     </style>
   </head>
   <body>
-    <div class="toolbar-popup">
-      <div class="toolbar-title">Gloss</div>
-      <ul id="recent-list" class="toolbar-list"></ul>
+    <div class="popup-root">
+      <div class="toolbar-title-row">
+        <span class="toolbar-title">Gloss</span>
+        <button id="open-settings" class="toolbar-icon-btn" type="button" title="Settings" aria-label="Settings">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </button>
+      </div>
+
+      <section id="onboarding-view" class="onboarding hidden">
+        <div class="onboarding-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#1cb0f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+        </div>
+        <p class="onboarding-copy">
+          Select any word while you're reading — Gloss shows you what it means right on the page.
+        </p>
+        <div class="onboarding-hint">Highlight a word on this page to try it</div>
+      </section>
+
+      <section id="recent-view" class="hidden">
+        <ul id="recent-list" class="toolbar-list"></ul>
+      </section>
+
       <button id="open-library" class="toolbar-link-btn" type="button">Open your Gloss library</button>
     </div>
     <script src="popup.js"></script>

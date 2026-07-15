@@ -6,7 +6,7 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
-async function renderRecent() {
+async function renderRecentList() {
   const listEl = document.getElementById("recent-list");
   const { recentLookups = [] } = await chrome.storage.session.get("recentLookups");
 
@@ -23,8 +23,27 @@ async function renderRecent() {
     .join("");
 }
 
+async function render() {
+  const { hasOnboarded } = await chrome.storage.local.get("hasOnboarded");
+  const onboardingView = document.getElementById("onboarding-view");
+  const recentView = document.getElementById("recent-view");
+
+  if (hasOnboarded) {
+    onboardingView.classList.add("hidden");
+    recentView.classList.remove("hidden");
+    await renderRecentList();
+  } else {
+    onboardingView.classList.remove("hidden");
+    recentView.classList.add("hidden");
+  }
+}
+
 document.getElementById("open-library").addEventListener("click", () => {
   chrome.tabs.create({ url: `${API_BASE}/library` });
 });
 
-renderRecent();
+document.getElementById("open-settings").addEventListener("click", () => {
+  chrome.runtime.openOptionsPage();
+});
+
+render();

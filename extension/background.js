@@ -6,6 +6,9 @@ async function recordRecent(phrase, definition) {
   const { recentLookups = [] } = await chrome.storage.session.get("recentLookups");
   const updated = [{ phrase, definition, at: Date.now() }, ...recentLookups].slice(0, MAX_RECENT);
   await chrome.storage.session.set({ recentLookups: updated });
+  // Persistent (unlike recentLookups) so the popup only shows the welcome
+  // screen before a person's very first successful lookup, ever.
+  await chrome.storage.local.set({ hasOnboarded: true });
 }
 
 async function defineLookup(payload) {

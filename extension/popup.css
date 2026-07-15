@@ -191,16 +191,89 @@
 }
 
 /* Toolbar popup (popup.html) */
-.toolbar-popup {
+.hidden {
+  display: none !important;
+}
+
+.popup-root {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  padding: 12px;
+  padding: 14px;
   color: #1a1a24;
+}
+
+.toolbar-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
 }
 
 .toolbar-title {
   font-weight: 800;
   font-size: 15px;
-  margin-bottom: 8px;
+}
+
+.toolbar-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #8f90a6;
+  cursor: pointer;
+}
+
+.toolbar-icon-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #1a1a24;
+}
+
+.onboarding {
+  text-align: center;
+  padding: 4px 4px 16px;
+}
+
+.onboarding-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 12px;
+  border-radius: 16px;
+  background: rgba(28, 176, 246, 0.12);
+  animation: gloss-ext-float 3s ease-in-out infinite;
+}
+
+@keyframes gloss-ext-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.onboarding-copy {
+  margin: 0 0 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #525266;
+}
+
+.onboarding-hint {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 150, 0, 0.12);
+  color: #cc7800;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .toolbar-list {
