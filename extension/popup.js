@@ -48,17 +48,27 @@ async function render() {
   const { hasOnboarded } = await chrome.storage.local.get("hasOnboarded");
   const onboardingView = document.getElementById("onboarding-view");
   const recentView = document.getElementById("recent-view");
+  const footerOnboarding = document.getElementById("footer-onboarding");
+  const footerDashboard = document.getElementById("footer-dashboard");
 
   if (hasOnboarded) {
     onboardingView.classList.add("hidden");
     recentView.classList.remove("hidden");
+    footerOnboarding.classList.add("hidden");
+    footerDashboard.classList.remove("hidden");
     await renderRecentList();
     chrome.runtime.sendMessage({ type: "stats" }, renderStats);
   } else {
     onboardingView.classList.remove("hidden");
     recentView.classList.add("hidden");
+    footerOnboarding.classList.remove("hidden");
+    footerDashboard.classList.add("hidden");
   }
 }
+
+document.getElementById("open-library-onboarding").addEventListener("click", () => {
+  chrome.tabs.create({ url: `${API_BASE}/library` });
+});
 
 document.getElementById("open-library").addEventListener("click", () => {
   chrome.tabs.create({ url: `${API_BASE}/library` });

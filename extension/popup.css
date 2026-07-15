@@ -275,7 +275,7 @@ body {
 
 .popup-root {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  padding: 14px;
+  padding: 16px;
   color: var(--gloss-fg);
   background: var(--gloss-bg);
 }
@@ -284,26 +284,44 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 14px;
+}
+
+.toolbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.toolbar-brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 7px;
+  background: var(--gloss-accent);
 }
 
 .toolbar-title {
   font-weight: 800;
   font-size: 15px;
+  letter-spacing: -0.01em;
 }
 
 .toolbar-icon-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   padding: 0;
   border: none;
   border-radius: 8px;
   background: transparent;
   color: var(--gloss-fg-faint);
   cursor: pointer;
+  transition: background 120ms ease, color 120ms ease, transform 120ms ease;
 }
 
 .toolbar-icon-btn:hover {
@@ -311,19 +329,53 @@ body {
   color: var(--gloss-fg);
 }
 
+.toolbar-icon-btn:active {
+  transform: scale(0.92);
+}
+
 .onboarding {
   text-align: center;
-  padding: 4px 4px 16px;
+  padding: 6px 2px 18px;
+}
+
+.onboarding-icon-wrap {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  margin: 4px auto 16px;
+}
+
+.onboarding-blob {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(14px);
+  opacity: 0.5;
+}
+
+.onboarding-blob-a {
+  width: 44px;
+  height: 44px;
+  top: -10px;
+  left: -14px;
+  background: var(--gloss-accent);
+}
+
+.onboarding-blob-b {
+  width: 36px;
+  height: 36px;
+  bottom: -10px;
+  right: -12px;
+  background: #ff9600;
 }
 
 .onboarding-icon {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 60px;
-  height: 60px;
-  margin: 0 auto 12px;
-  border-radius: 16px;
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
   background: var(--gloss-accent-bg);
   animation: gloss-ext-float 3s ease-in-out infinite;
 }
@@ -338,21 +390,68 @@ body {
   }
 }
 
+.onboarding-title {
+  margin: 0 0 8px;
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  animation: gloss-ext-fade-up 320ms ease both;
+  animation-delay: 40ms;
+}
+
 .onboarding-copy {
-  margin: 0 0 12px;
+  margin: 0 0 16px;
   font-size: 13px;
   line-height: 1.5;
   color: var(--gloss-fg-soft);
+  animation: gloss-ext-fade-up 320ms ease both;
+  animation-delay: 100ms;
 }
 
 .onboarding-hint {
-  display: inline-block;
-  padding: 6px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
   border-radius: 999px;
   background: rgba(255, 150, 0, 0.12);
   color: #cc7800;
   font-size: 12px;
   font-weight: 700;
+  animation: gloss-ext-fade-up 320ms ease both;
+  animation-delay: 160ms;
+}
+
+.onboarding-hint-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #ff9600;
+  animation: gloss-ext-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes gloss-ext-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes gloss-ext-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
 }
 
 .toolbar-list {
@@ -361,14 +460,22 @@ body {
   padding: 0;
   max-height: 220px;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .toolbar-list li {
   display: flex;
   flex-direction: column;
-  padding: 6px 0;
-  border-bottom: 1px solid var(--gloss-divider);
+  padding: 8px 9px;
+  border-radius: 9px;
   font-size: 12px;
+  transition: background 120ms ease;
+}
+
+.toolbar-list li:hover {
+  background: var(--gloss-hover-bg);
 }
 
 .toolbar-phrase {
@@ -442,17 +549,35 @@ body {
   color: var(--gloss-fg-faint);
 }
 
+.toolbar-footer {
+  margin-top: 4px;
+}
+
 .toolbar-btn-row {
   display: flex;
   gap: 8px;
 }
 
+.toolbar-link-btn,
+.toolbar-ghost-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: transform 100ms ease, background 120ms ease;
+}
+
+.toolbar-link-btn:active,
+.toolbar-ghost-btn:active,
+.toolbar-text-link:active {
+  transform: scale(0.97);
+}
+
 .toolbar-link-btn {
-  display: block;
   flex: 1;
-  padding: 8px 10px;
+  padding: 9px 10px;
   border: none;
-  border-radius: 8px;
+  border-radius: 9px;
   background: var(--gloss-accent);
   color: #fff;
   font-weight: 700;
@@ -462,9 +587,9 @@ body {
 
 .toolbar-ghost-btn {
   flex: 1;
-  padding: 8px 10px;
+  padding: 9px 10px;
   border: 1.5px solid rgba(28, 176, 246, 0.35);
-  border-radius: 8px;
+  border-radius: 9px;
   background: transparent;
   color: var(--gloss-accent);
   font-weight: 700;
@@ -474,6 +599,23 @@ body {
 
 .toolbar-ghost-btn:hover {
   background: var(--gloss-accent-bg);
+}
+
+.toolbar-text-link {
+  display: block;
+  width: 100%;
+  padding: 8px 0 2px;
+  border: none;
+  background: transparent;
+  color: var(--gloss-accent);
+  font-weight: 700;
+  font-size: 12.5px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.toolbar-text-link:hover {
+  text-decoration: underline;
 }
 
 /* Settings (options.html) */
