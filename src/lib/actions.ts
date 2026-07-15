@@ -43,6 +43,27 @@ export async function saveWord(input: { phrase: string; sentence: string } & Def
   return { ok: true as const, wordId: word.id, alreadyExisted: false as const };
 }
 
+export async function deleteWord(wordId: string) {
+  const user = await getCurrentUser();
+  if (!user) {
+    return { ok: false as const, error: "unauthorized" };
+  }
+
+  // deleteMany (rather than delete) folds the ownership check into the
+  // query itself: a wordId belonging to someone else just matches zero rows.
+  const { count } = await prisma.word.deleteMany({
+    where: { id: wordId, userId: user.id },
+  });
+  if (count === 0) {
+    return { ok: false as const, error: "not_found" };
+  }
+
+  revalidatePath("/library");
+  revalidatePath("/review");
+  revalidatePath("/stats");
+  return { ok: true as const };
+}
+
 export async function gradeReview(wordId: string, quality: ReviewQuality) {
   const user = await requireUser();
   const sub = subscriptionStatus(user);
