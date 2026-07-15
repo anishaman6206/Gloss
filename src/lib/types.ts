@@ -30,7 +30,7 @@ export type DefineRequest = {
 };
 
 export type DefineResult =
-  | { ok: true; data: Definition; alreadySaved?: boolean }
+  | { ok: true; data: Definition; savedWordId?: string | null }
   | { ok: false; error: string; code?: string };
 
 export type WordStatus = "new" | "learning" | "learned";

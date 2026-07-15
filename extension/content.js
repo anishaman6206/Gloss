@@ -123,7 +123,7 @@
     `;
   }
 
-  function renderResult(info, data, alreadySaved) {
+  function renderResult(info, data, savedWordId) {
     if (!popupEl) return;
 
     const synonyms = (data.synonyms || []).slice(0, 3).join(", ");
@@ -139,7 +139,7 @@
       ${synonyms ? `<div class="gloss-ext-syn">${escapeHtml(synonyms)}</div>` : ""}
       ${example ? `<div class="gloss-ext-example">"${escapeHtml(example)}"</div>` : ""}
       <div class="gloss-ext-actions">
-        ${alreadySaved ? savedActionsMarkup() : `<button class="gloss-ext-save-btn" type="button">Save to Gloss</button>`}
+        ${savedWordId ? savedActionsMarkup() : `<button class="gloss-ext-save-btn" type="button">Save to Gloss</button>`}
       </div>
       <div class="gloss-ext-status"></div>
     `;
@@ -204,7 +204,7 @@
         renderError(res?.error || GENERIC_LOOKUP_ERROR);
         return;
       }
-      renderResult(info, res.data, res.alreadySaved);
+      renderResult(info, res.data, res.savedWordId);
     });
   }
 

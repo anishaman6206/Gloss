@@ -16,7 +16,15 @@ export async function saveWord(input: { phrase: string; sentence: string } & Def
     return { ok: false as const, error: "subscription_required" };
   }
 
-  await prisma.word.create({
+  const existing = await prisma.word.findFirst({
+    where: { userId: user.id, phrase: { equals: input.phrase, mode: "insensitive" } },
+    select: { id: true },
+  });
+  if (existing) {
+    return { ok: true as const, wordId: existing.id, alreadyExisted: true as const };
+  }
+
+  const word = await prisma.word.create({
     data: {
       userId: user.id,
       phrase: input.phrase,
@@ -27,11 +35,12 @@ export async function saveWord(input: { phrase: string; sentence: string } & Def
       examples: JSON.stringify(input.examples),
       review: { create: {} },
     },
+    select: { id: true },
   });
 
   revalidatePath("/library");
   revalidatePath("/review");
-  return { ok: true as const };
+  return { ok: true as const, wordId: word.id, alreadyExisted: false as const };
 }
 
 export async function gradeReview(wordId: string, quality: ReviewQuality) {
