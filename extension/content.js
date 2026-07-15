@@ -2,6 +2,7 @@
   const MAX_PHRASE_LEN = 60;
   const SELECTION_DEBOUNCE_MS = 300;
   const GENERIC_LOOKUP_ERROR = "Couldn't get a definition — try again";
+  const GENERIC_SAVE_ERROR = "Couldn't save that — try again";
   const LIBRARY_URL = "https://gloss-theta.vercel.app/library";
   const EXIT_ANIMATION_MS = 140;
 
@@ -97,6 +98,9 @@
     const el = document.createElement("div");
     el.className = "gloss-ext-popup";
     el.dataset.theme = glossResolveTheme(settings.theme);
+    el.setAttribute("role", "region");
+    el.setAttribute("aria-label", `Gloss definition for "${info.phrase}"`);
+    el.setAttribute("aria-live", "polite");
     el.innerHTML = `
       <div class="gloss-ext-skeleton-line gloss-ext-skeleton-title"></div>
       <div class="gloss-ext-skeleton-line"></div>
@@ -187,7 +191,7 @@
 
         btn.disabled = false;
         btn.textContent = "Save to Gloss";
-        statusEl.textContent = GENERIC_LOOKUP_ERROR;
+        statusEl.textContent = res?.message || GENERIC_SAVE_ERROR;
       }
     );
   }

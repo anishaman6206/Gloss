@@ -16,5 +16,11 @@
   ],
   "action": { "default_popup": "popup.html" },
   "options_ui": { "page": "options.html", "open_in_tab": true },
-  "icons": { "128": "icon128.png" }
+  "icons": { "128": "icon128.png" },
+  "commands": {
+    "_execute_action": {
+      "suggested_key": { "default": "Ctrl+Shift+G", "mac": "Command+Shift+G" },
+      "description": "Open Gloss"
+    }
+  }
 }

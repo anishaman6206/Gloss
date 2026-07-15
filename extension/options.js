@@ -1,6 +1,8 @@
 function setActiveThemeButton(theme) {
   document.querySelectorAll("#theme-switch button").forEach((btn) => {
-    btn.classList.toggle("active", btn.dataset.themeChoice === theme);
+    const isActive = btn.dataset.themeChoice === theme;
+    btn.classList.toggle("active", isActive);
+    btn.setAttribute("aria-pressed", String(isActive));
   });
 }
 

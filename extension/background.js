@@ -1,6 +1,7 @@
 const API_BASE = "https://gloss-theta.vercel.app";
 const MAX_RECENT = 20;
 const GENERIC_LOOKUP_ERROR = "Couldn't get a definition — try again";
+const OFFLINE_ERROR = "You're offline — try again once you're back online";
 
 async function recordRecent(phrase, definition) {
   const { recentLookups = [] } = await chrome.storage.session.get("recentLookups");
@@ -12,6 +13,7 @@ async function recordRecent(phrase, definition) {
 }
 
 async function defineLookup(payload) {
+  if (!navigator.onLine) return { ok: false, error: OFFLINE_ERROR };
   try {
     const res = await fetch(`${API_BASE}/api/define`, {
       method: "POST",
@@ -24,11 +26,12 @@ async function defineLookup(payload) {
     }
     return data;
   } catch {
-    return { ok: false, error: GENERIC_LOOKUP_ERROR };
+    return { ok: false, error: OFFLINE_ERROR };
   }
 }
 
 async function saveWord(payload) {
+  if (!navigator.onLine) return { status: "error", message: OFFLINE_ERROR };
   try {
     const res = await fetch(`${API_BASE}/api/words`, {
       method: "POST",
@@ -41,7 +44,7 @@ async function saveWord(payload) {
     if (res.ok) return { status: "success" };
     return { status: "error" };
   } catch {
-    return { status: "error" };
+    return { status: "error", message: OFFLINE_ERROR };
   }
 }
 
