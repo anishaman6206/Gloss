@@ -9,6 +9,17 @@
 
   let popupEl = null;
   let debounceTimer = null;
+  let settings = GLOSS_DEFAULT_SETTINGS;
+
+  glossGetSettings().then((s) => {
+    settings = s;
+  });
+
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area !== "local") return;
+    if (changes.enabled) settings = { ...settings, enabled: changes.enabled.newValue };
+    if (changes.theme) settings = { ...settings, theme: changes.theme.newValue };
+  });
 
   function escapeHtml(str) {
     const div = document.createElement("div");
@@ -85,6 +96,7 @@
     removePopup();
     const el = document.createElement("div");
     el.className = "gloss-ext-popup";
+    el.dataset.theme = glossResolveTheme(settings.theme);
     el.innerHTML = `
       <div class="gloss-ext-skeleton-line gloss-ext-skeleton-title"></div>
       <div class="gloss-ext-skeleton-line"></div>
@@ -193,6 +205,7 @@
   }
 
   document.addEventListener("selectionchange", () => {
+    if (!settings.enabled) return;
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
       const info = getSelectionInfo();

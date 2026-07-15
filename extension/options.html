@@ -16,9 +16,31 @@
       <div class="toolbar-title-row">
         <span class="toolbar-title">Gloss settings</span>
       </div>
-      <p class="onboarding-copy">
-        Theme and per-site controls are coming soon.
-      </p>
+
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">Enable Gloss</div>
+          <div class="settings-row-hint">Turn word lookups on or off in this browser</div>
+        </div>
+        <label class="enable-toggle">
+          <input type="checkbox" id="enabled-toggle" />
+          <span class="enable-toggle-track"></span>
+        </label>
+      </div>
+
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">Theme</div>
+          <div class="settings-row-hint">Applies to the lookup card and this popup</div>
+        </div>
+        <div class="theme-switch" id="theme-switch">
+          <button type="button" data-theme-choice="auto">Auto</button>
+          <button type="button" data-theme-choice="light">Light</button>
+          <button type="button" data-theme-choice="dark">Dark</button>
+        </div>
+      </div>
     </div>
+    <script src="shared.js"></script>
+    <script src="options.js"></script>
   </body>
 </html>

@@ -38,7 +38,13 @@ function renderStats(res) {
   }
 }
 
+async function applyTheme() {
+  const { theme } = await glossGetSettings();
+  document.documentElement.dataset.theme = glossResolveTheme(theme);
+}
+
 async function render() {
+  await applyTheme();
   const { hasOnboarded } = await chrome.storage.local.get("hasOnboarded");
   const onboardingView = document.getElementById("onboarding-view");
   const recentView = document.getElementById("recent-view");
