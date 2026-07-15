@@ -1,7 +1,12 @@
 const API_BASE = "https://gloss-theta.vercel.app";
 const MAX_RECENT = 20;
+const DEFINE_CACHE_LIMIT = 50;
 const GENERIC_LOOKUP_ERROR = "Couldn't get a definition — try again";
 const OFFLINE_ERROR = "You're offline — try again once you're back online";
+
+function normalizePhrase(phrase) {
+  return phrase.trim().toLowerCase();
+}
 
 async function recordRecent(phrase, definition) {
   const { recentLookups = [] } = await chrome.storage.session.get("recentLookups");
@@ -12,7 +17,43 @@ async function recordRecent(phrase, definition) {
   await chrome.storage.local.set({ hasOnboarded: true });
 }
 
+async function getCachedDefine(phrase) {
+  const { defineCache = {} } = await chrome.storage.session.get("defineCache");
+  return defineCache[normalizePhrase(phrase)] || null;
+}
+
+// Same-tab-session cache of successful /api/define responses, keyed by
+// normalized phrase. Re-selecting a word you already looked up a minute ago
+// shouldn't cost another network round trip (or, for unsaved words, another
+// Groq call).
+async function setCachedDefine(phrase, result) {
+  const { defineCache = {} } = await chrome.storage.session.get("defineCache");
+  const key = normalizePhrase(phrase);
+  const keys = Object.keys(defineCache);
+  if (keys.length >= DEFINE_CACHE_LIMIT && !(key in defineCache)) {
+    delete defineCache[keys[0]]; // simple FIFO eviction
+  }
+  defineCache[key] = result;
+  await chrome.storage.session.set({ defineCache });
+}
+
+// A cached response can carry a savedWordId — saving or deleting that exact
+// word makes the cached entry wrong (it would claim the old saved state),
+// so both mutations below drop the cache entry rather than let it go stale.
+// This only catches saves/deletes made through the extension itself in this
+// browser session — the website saving/deleting the same word in another
+// tab won't invalidate an entry already cached here. Rare enough, and not
+// worth a cross-surface sync mechanism to close.
+async function invalidateCachedDefine(phrase) {
+  const { defineCache = {} } = await chrome.storage.session.get("defineCache");
+  delete defineCache[normalizePhrase(phrase)];
+  await chrome.storage.session.set({ defineCache });
+}
+
 async function defineLookup(payload) {
+  const cached = await getCachedDefine(payload.phrase);
+  if (cached) return cached;
+
   if (!navigator.onLine) return { ok: false, error: OFFLINE_ERROR };
   try {
     const res = await fetch(`${API_BASE}/api/define`, {
@@ -23,6 +64,7 @@ async function defineLookup(payload) {
     const data = await res.json();
     if (data.ok) {
       await recordRecent(payload.phrase, data.data.definition);
+      await setCachedDefine(payload.phrase, data);
     }
     return data;
   } catch {
@@ -43,6 +85,7 @@ async function saveWord(payload) {
     if (res.status === 402) return { status: "subscription_required" };
     if (res.ok) {
       const data = await res.json().catch(() => ({}));
+      await invalidateCachedDefine(payload.phrase);
       return { status: "success", wordId: data.wordId };
     }
     return { status: "error" };
@@ -51,13 +94,14 @@ async function saveWord(payload) {
   }
 }
 
-async function deleteWord(wordId) {
+async function deleteWord(wordId, phrase) {
   if (!navigator.onLine) return { ok: false, message: OFFLINE_ERROR };
   try {
     const res = await fetch(`${API_BASE}/api/words/${encodeURIComponent(wordId)}`, {
       method: "DELETE",
       credentials: "include",
     });
+    if (res.ok && phrase) await invalidateCachedDefine(phrase);
     return { ok: res.ok };
   } catch {
     return { ok: false, message: OFFLINE_ERROR };
@@ -87,7 +131,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     return true;
   }
   if (message?.type === "delete") {
-    deleteWord(message.payload.wordId).then(sendResponse);
+    deleteWord(message.payload.wordId, message.payload.phrase).then(sendResponse);
     return true;
   }
   if (message?.type === "stats") {

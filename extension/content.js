@@ -119,7 +119,7 @@
 
   function savedActionsMarkup(wordId) {
     return `
-      <span class="gloss-ext-saved-badge">Saved ✓</span>
+      <span class="gloss-ext-saved-badge gloss-ext-badge-pop">Saved ✓</span>
       <a class="gloss-ext-open-link" href="${LIBRARY_URL}" target="_blank" rel="noopener noreferrer">Open full definition</a>
       <button class="gloss-ext-delete-btn" type="button" data-word-id="${escapeHtml(wordId ?? "")}" title="Delete from Library" aria-label="Delete from Library">${TRASH_ICON}</button>
     `;
@@ -208,7 +208,7 @@
     if (!wordId) return;
     btn.disabled = true;
 
-    chrome.runtime.sendMessage({ type: "delete", payload: { wordId } }, (res) => {
+    chrome.runtime.sendMessage({ type: "delete", payload: { wordId, phrase: info.phrase } }, (res) => {
       if (!popupEl) return;
       const actionsEl = popupEl.querySelector(".gloss-ext-actions");
       const statusEl = popupEl.querySelector(".gloss-ext-status");
@@ -254,6 +254,9 @@
   });
 
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") removePopup();
+    if (e.key !== "Escape" || !popupEl) return;
+    removePopup();
+    // Otherwise the text stays visibly highlighted after the card it opened is gone.
+    window.getSelection()?.removeAllRanges();
   });
 })();
