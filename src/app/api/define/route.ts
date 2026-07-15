@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { generateDefinition } from "@/lib/groq";
 import { getCurrentUser } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { ANON_DAILY_LIMIT, consumeAnonDefine, getClientIp } from "@/lib/rate-limit";
 import type { DefineRequest, DefineResult } from "@/lib/types";
 
@@ -44,7 +45,17 @@ export async function POST(request: Request) {
 
   try {
     const data = await generateDefinition(phrase, sentence);
-    return NextResponse.json<DefineResult>({ ok: true, data }, { headers: rlHeaders });
+
+    let alreadySaved: boolean | undefined;
+    if (user) {
+      const existing = await prisma.word.findFirst({
+        where: { userId: user.id, phrase: { equals: phrase, mode: "insensitive" } },
+        select: { id: true },
+      });
+      alreadySaved = !!existing;
+    }
+
+    return NextResponse.json<DefineResult>({ ok: true, data, alreadySaved }, { headers: rlHeaders });
   } catch (err) {
     const code = err instanceof Error ? err.message : "request_failed";
 

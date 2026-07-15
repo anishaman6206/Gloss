@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
+import { computeStreak, dateKey } from "@/lib/stats";
 import { AuthGate } from "@/components/auth/AuthGate";
 import { Flame, BarChart3, Trophy, Zap } from "lucide-react";
 
@@ -7,23 +8,6 @@ export const dynamic = "force-dynamic";
 
 const DAYS = 14;
 const CHART_HEIGHT = 120;
-
-function dateKey(date: Date): string {
-  return date.toISOString().slice(0, 10);
-}
-
-function computeStreak(counts: Map<string, number>): number {
-  let streak = 0;
-  const cursor = new Date();
-  if (!counts.get(dateKey(cursor))) {
-    cursor.setDate(cursor.getDate() - 1);
-  }
-  while (counts.get(dateKey(cursor))) {
-    streak += 1;
-    cursor.setDate(cursor.getDate() - 1);
-  }
-  return streak;
-}
 
 const MILESTONES = [
   { count: 3, label: "3‑day fire", icon: Flame, tint: "mango" },
