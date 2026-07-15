@@ -205,6 +205,32 @@
   text-decoration: underline;
 }
 
+.gloss-ext-delete-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--gloss-fg-faint);
+  cursor: pointer;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.gloss-ext-delete-btn:hover {
+  background: rgba(255, 75, 75, 0.12);
+  color: #ff4b4b;
+}
+
+.gloss-ext-delete-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 .gloss-ext-status {
   margin-top: 6px;
   font-size: 12px;

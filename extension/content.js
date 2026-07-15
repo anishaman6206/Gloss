@@ -7,6 +7,7 @@
   const EXIT_ANIMATION_MS = 140;
 
   const SPEAKER_ICON = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 9 3 15 8 15 13 20 13 4 8 9 3 9"></polygon><path d="M16 8a5 5 0 0 1 0 8"></path></svg>`;
+  const TRASH_ICON = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
 
   let popupEl = null;
   let debounceTimer = null;
@@ -116,10 +117,11 @@
     popupEl.innerHTML = `<div class="gloss-ext-error">${escapeHtml(message)}</div>`;
   }
 
-  function savedActionsMarkup() {
+  function savedActionsMarkup(wordId) {
     return `
       <span class="gloss-ext-saved-badge">Saved ✓</span>
       <a class="gloss-ext-open-link" href="${LIBRARY_URL}" target="_blank" rel="noopener noreferrer">Open full definition</a>
+      <button class="gloss-ext-delete-btn" type="button" data-word-id="${escapeHtml(wordId ?? "")}" title="Delete from Library" aria-label="Delete from Library">${TRASH_ICON}</button>
     `;
   }
 
@@ -139,7 +141,7 @@
       ${synonyms ? `<div class="gloss-ext-syn">${escapeHtml(synonyms)}</div>` : ""}
       ${example ? `<div class="gloss-ext-example">"${escapeHtml(example)}"</div>` : ""}
       <div class="gloss-ext-actions">
-        ${savedWordId ? savedActionsMarkup() : `<button class="gloss-ext-save-btn" type="button">Save to Gloss</button>`}
+        ${savedWordId ? savedActionsMarkup(savedWordId) : `<button class="gloss-ext-save-btn" type="button">Save to Gloss</button>`}
       </div>
       <div class="gloss-ext-status"></div>
     `;
@@ -148,6 +150,9 @@
 
     const saveBtn = popupEl.querySelector(".gloss-ext-save-btn");
     if (saveBtn) saveBtn.addEventListener("click", () => handleSave(info, data, saveBtn));
+
+    const deleteBtn = popupEl.querySelector(".gloss-ext-delete-btn");
+    if (deleteBtn) deleteBtn.addEventListener("click", () => handleDelete(info, data, deleteBtn));
   }
 
   function handleSave(info, data, btn) {
@@ -173,7 +178,9 @@
         if (!actionsEl || !statusEl) return;
 
         if (res?.status === "success") {
-          actionsEl.innerHTML = savedActionsMarkup();
+          actionsEl.innerHTML = savedActionsMarkup(res.wordId);
+          const deleteBtn = actionsEl.querySelector(".gloss-ext-delete-btn");
+          if (deleteBtn) deleteBtn.addEventListener("click", () => handleDelete(info, data, deleteBtn));
           return;
         }
         if (res?.status === "auth_required") {
@@ -194,6 +201,31 @@
         statusEl.textContent = res?.message || GENERIC_SAVE_ERROR;
       }
     );
+  }
+
+  function handleDelete(info, data, btn) {
+    const wordId = btn.dataset.wordId;
+    if (!wordId) return;
+    btn.disabled = true;
+
+    chrome.runtime.sendMessage({ type: "delete", payload: { wordId } }, (res) => {
+      if (!popupEl) return;
+      const actionsEl = popupEl.querySelector(".gloss-ext-actions");
+      const statusEl = popupEl.querySelector(".gloss-ext-status");
+      if (!actionsEl || !statusEl) return;
+
+      if (res?.ok) {
+        actionsEl.innerHTML = `<button class="gloss-ext-save-btn" type="button">Save to Gloss</button>`;
+        actionsEl
+          .querySelector(".gloss-ext-save-btn")
+          .addEventListener("click", (e) => handleSave(info, data, e.currentTarget));
+        statusEl.textContent = "Removed from library";
+        return;
+      }
+
+      btn.disabled = false;
+      statusEl.textContent = res?.message || "Couldn't delete that — try again";
+    });
   }
 
   function lookup(info) {

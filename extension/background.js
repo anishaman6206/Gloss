@@ -41,10 +41,26 @@ async function saveWord(payload) {
     });
     if (res.status === 401) return { status: "auth_required" };
     if (res.status === 402) return { status: "subscription_required" };
-    if (res.ok) return { status: "success" };
+    if (res.ok) {
+      const data = await res.json().catch(() => ({}));
+      return { status: "success", wordId: data.wordId };
+    }
     return { status: "error" };
   } catch {
     return { status: "error", message: OFFLINE_ERROR };
+  }
+}
+
+async function deleteWord(wordId) {
+  if (!navigator.onLine) return { ok: false, message: OFFLINE_ERROR };
+  try {
+    const res = await fetch(`${API_BASE}/api/words/${encodeURIComponent(wordId)}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+    return { ok: res.ok };
+  } catch {
+    return { ok: false, message: OFFLINE_ERROR };
   }
 }
 
@@ -68,6 +84,10 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   }
   if (message?.type === "save") {
     saveWord(message.payload).then(sendResponse);
+    return true;
+  }
+  if (message?.type === "delete") {
+    deleteWord(message.payload.wordId).then(sendResponse);
     return true;
   }
   if (message?.type === "stats") {
