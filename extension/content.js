@@ -2,6 +2,10 @@
   const MAX_PHRASE_LEN = 60;
   const SELECTION_DEBOUNCE_MS = 300;
   const GENERIC_LOOKUP_ERROR = "Couldn't get a definition — try again";
+  const LIBRARY_URL = "https://gloss-theta.vercel.app/library";
+  const EXIT_ANIMATION_MS = 140;
+
+  const SPEAKER_ICON = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 9 3 15 8 15 13 20 13 4 8 9 3 9"></polygon><path d="M16 8a5 5 0 0 1 0 8"></path></svg>`;
 
   let popupEl = null;
   let debounceTimer = null;
@@ -42,36 +46,50 @@
   }
 
   function removePopup() {
-    if (popupEl) {
-      popupEl.remove();
-      popupEl = null;
-    }
+    if (!popupEl) return;
+    const el = popupEl;
+    popupEl = null;
+    el.classList.add("gloss-ext-exit");
+    setTimeout(() => el.remove(), EXIT_ANIMATION_MS);
   }
 
+  // Measures the element's real rendered size (after it's in the DOM) rather
+  // than guessing, and only ever sets top/left — transform is left free for
+  // the entrance/exit animation.
   function positionPopup(el, rect) {
     const margin = 8;
-    const estWidth = 280;
-    const estHeight = 160;
+    const elRect = el.getBoundingClientRect();
 
-    const openAbove = rect.bottom + estHeight > window.innerHeight;
+    const openAbove = rect.bottom + elRect.height + margin > window.innerHeight;
     const top = openAbove
-      ? rect.top + window.scrollY - margin
+      ? rect.top + window.scrollY - elRect.height - margin
       : rect.bottom + window.scrollY + margin;
 
     let left = rect.left + window.scrollX;
-    const maxLeft = window.scrollX + window.innerWidth - estWidth - margin;
+    const maxLeft = window.scrollX + window.innerWidth - elRect.width - margin;
     if (left > maxLeft) left = Math.max(window.scrollX + margin, maxLeft);
 
     el.style.left = `${left}px`;
-    el.style.top = `${top}px`;
-    el.style.transform = openAbove ? "translateY(-100%)" : "none";
+    el.style.top = `${Math.max(window.scrollY + margin, top)}px`;
+  }
+
+  function speak(text) {
+    if (!("speechSynthesis" in window)) return;
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.rate = 0.95;
+    window.speechSynthesis.speak(utter);
   }
 
   function renderLoading(info) {
     removePopup();
     const el = document.createElement("div");
     el.className = "gloss-ext-popup";
-    el.innerHTML = `<div class="gloss-ext-loading">Looking that up…</div>`;
+    el.innerHTML = `
+      <div class="gloss-ext-skeleton-line gloss-ext-skeleton-title"></div>
+      <div class="gloss-ext-skeleton-line"></div>
+      <div class="gloss-ext-skeleton-line gloss-ext-skeleton-short"></div>
+    `;
     document.body.appendChild(el);
     positionPopup(el, info.rect);
     popupEl = el;
@@ -82,7 +100,14 @@
     popupEl.innerHTML = `<div class="gloss-ext-error">${escapeHtml(message)}</div>`;
   }
 
-  function renderResult(info, data) {
+  function savedActionsMarkup() {
+    return `
+      <span class="gloss-ext-saved-badge">Saved ✓</span>
+      <a class="gloss-ext-open-link" href="${LIBRARY_URL}" target="_blank" rel="noopener noreferrer">Open full definition</a>
+    `;
+  }
+
+  function renderResult(info, data, alreadySaved) {
     if (!popupEl) return;
 
     const synonyms = (data.synonyms || []).slice(0, 3).join(", ");
@@ -91,17 +116,22 @@
     popupEl.innerHTML = `
       <div class="gloss-ext-header">
         <span class="gloss-ext-phrase">${escapeHtml(info.phrase)}</span>
+        <button class="gloss-ext-say-btn" type="button" title="Listen" aria-label="Pronounce ${escapeHtml(info.phrase)}">${SPEAKER_ICON}</button>
         ${data.partOfSpeech ? `<span class="gloss-ext-pos">${escapeHtml(data.partOfSpeech)}</span>` : ""}
       </div>
       <div class="gloss-ext-def">${escapeHtml(data.definition)}</div>
       ${synonyms ? `<div class="gloss-ext-syn">${escapeHtml(synonyms)}</div>` : ""}
       ${example ? `<div class="gloss-ext-example">"${escapeHtml(example)}"</div>` : ""}
-      <button class="gloss-ext-save-btn" type="button">Save to Gloss</button>
+      <div class="gloss-ext-actions">
+        ${alreadySaved ? savedActionsMarkup() : `<button class="gloss-ext-save-btn" type="button">Save to Gloss</button>`}
+      </div>
       <div class="gloss-ext-status"></div>
     `;
 
-    const btn = popupEl.querySelector(".gloss-ext-save-btn");
-    btn.addEventListener("click", () => handleSave(info, data, btn));
+    popupEl.querySelector(".gloss-ext-say-btn").addEventListener("click", () => speak(info.phrase));
+
+    const saveBtn = popupEl.querySelector(".gloss-ext-save-btn");
+    if (saveBtn) saveBtn.addEventListener("click", () => handleSave(info, data, saveBtn));
   }
 
   function handleSave(info, data, btn) {
@@ -122,21 +152,22 @@
       },
       (res) => {
         if (!popupEl) return;
+        const actionsEl = popupEl.querySelector(".gloss-ext-actions");
         const statusEl = popupEl.querySelector(".gloss-ext-status");
-        if (!statusEl) return;
+        if (!actionsEl || !statusEl) return;
 
         if (res?.status === "success") {
-          btn.textContent = "Saved ✓";
+          actionsEl.innerHTML = savedActionsMarkup();
           return;
         }
         if (res?.status === "auth_required") {
-          btn.style.display = "none";
+          actionsEl.innerHTML = "";
           statusEl.innerHTML =
             'Sign in to Gloss to save this — <a href="https://gloss-theta.vercel.app" target="_blank" rel="noopener noreferrer">open Gloss</a>';
           return;
         }
         if (res?.status === "subscription_required") {
-          btn.style.display = "none";
+          actionsEl.innerHTML = "";
           statusEl.innerHTML =
             'Your trial\'s ended — <a href="https://gloss-theta.vercel.app/subscribe" target="_blank" rel="noopener noreferrer">subscribe to keep saving words</a>';
           return;
@@ -157,7 +188,7 @@
         renderError(res?.error || GENERIC_LOOKUP_ERROR);
         return;
       }
-      renderResult(info, res.data);
+      renderResult(info, res.data, res.alreadySaved);
     });
   }
 
