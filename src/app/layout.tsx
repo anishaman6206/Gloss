@@ -4,7 +4,6 @@ import "./globals.css";
 import { NavBar } from "@/components/ui/NavBar";
 import { Footer } from "@/components/ui/Footer";
 import { AuthProvider } from "@/components/auth/AuthProvider";
-import { AuthCallbackHandler } from "@/components/auth/AuthCallbackHandler";
 
 const fredoka = Fredoka({
   subsets: ["latin"],
@@ -50,7 +49,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${fredoka.variable} ${nunito.variable}`}>
       <body className="min-h-screen font-body text-ink antialiased">
         <AuthProvider>
-          <AuthCallbackHandler />
           <NavBar />
           <main className="mx-auto max-w-3xl px-4 pb-6 pt-6" data-testid="app-main">
             {children}
