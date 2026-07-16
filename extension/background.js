@@ -1,8 +1,8 @@
 const API_BASE = "https://gloss-theta.vercel.app";
 const MAX_RECENT = 20;
 const DEFINE_CACHE_LIMIT = 50;
-const GENERIC_LOOKUP_ERROR = "Couldn't get a definition — try again";
-const OFFLINE_ERROR = "You're offline — try again once you're back online";
+const GENERIC_LOOKUP_ERROR = "Couldn't get a definition. Try again";
+const OFFLINE_ERROR = "You're offline. Try again once you're back online";
 const PDF_REDIRECT_RULE_ID = 1;
 
 // Chrome's built-in PDF viewer is a separate, unreachable extension — this

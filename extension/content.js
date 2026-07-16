@@ -1,8 +1,8 @@
 (() => {
   const MAX_PHRASE_LEN = 60;
   const SELECTION_DEBOUNCE_MS = 300;
-  const GENERIC_LOOKUP_ERROR = "Couldn't get a definition — try again";
-  const GENERIC_SAVE_ERROR = "Couldn't save that — try again";
+  const GENERIC_LOOKUP_ERROR = "Couldn't get a definition. Try again";
+  const GENERIC_SAVE_ERROR = "Couldn't save that. Try again";
   const LIBRARY_URL = "https://gloss-theta.vercel.app/library";
   const EXIT_ANIMATION_MS = 140;
 
@@ -184,15 +184,19 @@
           return;
         }
         if (res?.status === "auth_required") {
-          actionsEl.innerHTML = "";
-          statusEl.innerHTML =
-            'Sign in to Gloss to save this — <a href="https://gloss-theta.vercel.app" target="_blank" rel="noopener noreferrer">open Gloss</a>';
+          actionsEl.innerHTML = `
+            <a class="gloss-ext-open-link" href="https://gloss-theta.vercel.app" target="_blank" rel="noopener noreferrer">Sign in to Gloss</a>
+            <button class="gloss-ext-retry-btn" type="button">Retry</button>
+          `;
+          statusEl.textContent = "Saving needs a free Gloss account.";
+          const retryBtn = actionsEl.querySelector(".gloss-ext-retry-btn");
+          retryBtn.addEventListener("click", () => handleSave(info, data, retryBtn));
           return;
         }
         if (res?.status === "subscription_required") {
-          actionsEl.innerHTML = "";
-          statusEl.innerHTML =
-            'Your trial\'s ended — <a href="https://gloss-theta.vercel.app/subscribe" target="_blank" rel="noopener noreferrer">subscribe to keep saving words</a>';
+          actionsEl.innerHTML =
+            '<a class="gloss-ext-open-link" href="https://gloss-theta.vercel.app/subscribe" target="_blank" rel="noopener noreferrer">Subscribe to keep saving words</a>';
+          statusEl.textContent = "Your trial's ended.";
           return;
         }
 
@@ -224,7 +228,7 @@
       }
 
       btn.disabled = false;
-      statusEl.textContent = res?.message || "Couldn't delete that — try again";
+      statusEl.textContent = res?.message || "Couldn't delete that. Try again";
     });
   }
 

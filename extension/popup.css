@@ -227,6 +227,27 @@
   text-decoration: underline;
 }
 
+.gloss-ext-retry-btn {
+  flex-shrink: 0;
+  padding: 5px 10px;
+  border: 1.5px solid var(--gloss-accent);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--gloss-accent);
+  font-weight: 700;
+  font-size: 11.5px;
+  cursor: pointer;
+}
+
+.gloss-ext-retry-btn:hover {
+  background: var(--gloss-accent-bg);
+}
+
+.gloss-ext-retry-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 .gloss-ext-delete-btn {
   display: inline-flex;
   align-items: center;
@@ -423,12 +444,20 @@ body {
 }
 
 .onboarding-copy {
-  margin: 0 0 16px;
+  margin: 0 0 8px;
   font-size: 13px;
   line-height: 1.5;
   color: var(--gloss-fg-soft);
   animation: gloss-ext-fade-up 320ms ease both;
   animation-delay: 100ms;
+}
+
+.onboarding-note {
+  margin: 0 0 16px;
+  font-size: 11.5px;
+  color: var(--gloss-fg-faint);
+  animation: gloss-ext-fade-up 320ms ease both;
+  animation-delay: 130ms;
 }
 
 .onboarding-hint {
@@ -442,7 +471,7 @@ body {
   font-size: 12px;
   font-weight: 700;
   animation: gloss-ext-fade-up 320ms ease both;
-  animation-delay: 160ms;
+  animation-delay: 190ms;
 }
 
 .onboarding-hint-dot {

@@ -198,7 +198,7 @@ function titleFromUrl(url) {
 
 async function loadAndRender() {
   if (!fileUrl) {
-    showError("No PDF was specified — open a PDF link with Gloss to view it here.");
+    showError("No PDF was specified. Open a PDF link with Gloss to view it here.");
     return;
   }
 
@@ -221,7 +221,7 @@ async function loadAndRender() {
     await renderAllPages();
   } catch (err) {
     console.error("[Gloss PDF Reader] failed to load PDF", err);
-    showError("Couldn't load this PDF — it may be protected, corrupted, or blocked by the site it's hosted on.");
+    showError("Couldn't load this PDF. It may be protected, corrupted, or blocked by the site it's hosted on.");
   }
 }
 
