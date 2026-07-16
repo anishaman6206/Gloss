@@ -2,6 +2,13 @@
 
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+
+// The Median wrapper injects "median" into the in-app webview's user agent.
+// Absent in every regular desktop/mobile browser.
+function isMedianApp() {
+  return typeof navigator !== "undefined" && navigator.userAgent.indexOf("median") >= 0;
+}
 
 export type AuthUser = {
   id: string;
@@ -40,6 +47,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [sub, setSub] = useState<SubStatus | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   const refresh = useCallback(async () => {
     try {
@@ -67,9 +75,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setSub(null);
   }, []);
 
+  // Native Google sign-in via the Median JS Bridge: no OAuth redirect exists
+  // inside the wrapper's webview, so we get an ID token straight into this
+  // callback and hand it to our own verifier instead of NextAuth's.
+  const loginNative = useCallback(() => {
+    window.median?.socialLogin.google.login({
+      callback: async (response) => {
+        if (!("idToken" in response)) {
+          console.log("User cancelled login or did not fully authorize.");
+          return;
+        }
+
+        const res = await fetch("/api/auth/native/google", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ idToken: response.idToken }),
+        }).catch(() => null);
+
+        if (res?.ok) {
+          await refresh();
+          router.push("/scan");
+        }
+      },
+    });
+  }, [refresh, router]);
+
   const login = useCallback(() => {
-    signIn("google", { callbackUrl: "/api/auth/bootstrap" });
-  }, []);
+    if (isMedianApp()) {
+      loginNative();
+    } else {
+      signIn("google", { callbackUrl: "/api/auth/bootstrap" });
+    }
+  }, [loginNative]);
 
   return (
     <AuthCtx.Provider value={{ user, sub, loading, refresh, logout, login }}>

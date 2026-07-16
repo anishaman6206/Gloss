@@ -1,8 +1,60 @@
 import "server-only";
 import { cookies } from "next/headers";
+import { randomUUID } from "crypto";
 import { prisma } from "./prisma";
 
 export const SESSION_COOKIE = "session_token";
+
+// Shared by every login path (browser OAuth via bootstrap, native Google
+// sign-in via Median) once each has independently verified the user's
+// identity. Upserts the User row, opens a new Session row, and sets the
+// cookie getCurrentUser() reads — this is the one place "being logged in"
+// actually means anything, regardless of how the identity was verified.
+export async function establishSession(profile: {
+  email: string;
+  name: string;
+  picture: string | null;
+}) {
+  const trialEndsAt = new Date();
+  trialEndsAt.setDate(trialEndsAt.getDate() + 7);
+
+  const user = await prisma.user.upsert({
+    where: { email: profile.email },
+    update: {
+      name: profile.name,
+      picture: profile.picture,
+    },
+    create: {
+      email: profile.email,
+      name: profile.name,
+      picture: profile.picture,
+      subscriptionStatus: "trialing",
+      trialEndsAt,
+    },
+  });
+
+  const sessionToken = randomUUID();
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + 7);
+
+  await prisma.session.create({
+    data: {
+      userId: user.id,
+      sessionToken,
+      expiresAt,
+    },
+  });
+
+  cookies().set(SESSION_COOKIE, sessionToken, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    path: "/",
+    expires: expiresAt,
+  });
+
+  return user;
+}
 
 export async function getCurrentUser() {
   const token = cookies().get(SESSION_COOKIE)?.value;
