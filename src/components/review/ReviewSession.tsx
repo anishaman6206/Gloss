@@ -26,12 +26,21 @@ function shuffle<T>(items: T[]): T[] {
 }
 
 const MODES: ReviewMode[] = ["recall-flip", "fill-blank", "produce-word"];
+const FALLBACK_MODES: ReviewMode[] = ["recall-flip", "produce-word"];
 
+// Picks each mode with equal 1-in-3 odds regardless of how often fill-blank
+// happens to have a usable blanked sentence, so a better (or worse) blank
+// match rate never dilutes how often recall-flip/produce-word show up.
+// Only when fill-blank is picked but has no valid blank do we redraw between
+// the other two modes.
 function buildQueue(words: WordWithReview[]): QueueItem[] {
   return shuffle(words).map((word) => {
     const blanked = pickFillBlankSentence(word.examples, word.sentence, word.phrase);
-    const available = MODES.filter((mode) => mode !== "fill-blank" || blanked !== null);
-    const mode = available[Math.floor(Math.random() * available.length)] ?? "recall-flip";
+    const intended = MODES[Math.floor(Math.random() * MODES.length)];
+    const mode =
+      intended === "fill-blank" && blanked === null
+        ? FALLBACK_MODES[Math.floor(Math.random() * FALLBACK_MODES.length)]
+        : intended;
     return { word, mode, blanked };
   });
 }
