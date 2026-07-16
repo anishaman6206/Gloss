@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <title>Gloss PDF Reader</title>
     <link rel="stylesheet" href="viewer.css" />
+    <link rel="stylesheet" href="popup.css" />
   </head>
   <body>
     <header class="pdf-toolbar">
@@ -22,5 +23,10 @@
 
     <script src="shared.js"></script>
     <script type="module" src="viewer.js"></script>
+    <!-- Same content script the rest of the web uses for the lookup popup —
+         it's plain page script here (content_scripts can't target
+         chrome-extension:// pages), but unmodified: selecting rendered PDF
+         text is indistinguishable from selecting any other page's text. -->
+    <script src="content.js"></script>
   </body>
 </html>
