@@ -213,34 +213,13 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 // keyboard shortcut) fires this instead of opening a native dropdown. We
 // hand off to the content script so it can render the panel floating in the
 // page itself, like Grammarly/Apollo, rather than anchored outside it.
-//
-// The first sendMessage fails whenever there's no live content script to
-// hear it — most commonly a tab that was already open before this extension
-// was (re)loaded, since Chrome doesn't retroactively inject content scripts
-// into existing tabs. Rather than treat that as "unsupported page" (which is
-// what a full-tab popup.html fallback used to do — jarring, and it fired on
-// every ordinary tab left open across a dev reload), force a fresh copy of
-// the content script into that exact tab and retry.
+// Falls back to a full-tab view of popup.html on pages with no content
+// script listening — chrome:// pages, the Web Store, or a tab that was
+// already open before the extension loaded.
 chrome.action.onClicked.addListener(async (tab) => {
   try {
     await chrome.tabs.sendMessage(tab.id, { type: "toggle-panel" });
-    return;
   } catch {
-    // no live content script in this tab — fall through and (re)inject one
-  }
-
-  try {
-    await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ["shared.js", "content.js"] });
-  } catch {
-    // Genuinely can't inject here — chrome://, the Web Store, etc. Only now
-    // fall back to a full-tab view.
     chrome.tabs.create({ url: chrome.runtime.getURL("popup.html") });
-    return;
   }
-
-  // The injection above succeeded, so the panel toggle itself works from
-  // here. A stale onMessage listener left behind by a prior reload of this
-  // extension can still make Chrome report the reply port closing early —
-  // that's not a real failure, so it isn't sent to the popup.html fallback.
-  chrome.tabs.sendMessage(tab.id, { type: "toggle-panel" }).catch(() => {});
 });
