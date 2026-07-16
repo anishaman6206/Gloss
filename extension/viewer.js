@@ -3,13 +3,34 @@ import * as pdfjsLib from "./vendor/pdfjs/build/pdf.mjs";
 const VENDOR_BASE = chrome.runtime.getURL("vendor/pdfjs/");
 pdfjsLib.GlobalWorkerOptions.workerSrc = `${VENDOR_BASE}build/pdf.worker.mjs`;
 
-const params = new URLSearchParams(location.search);
-const fileUrl = params.get("file");
+// The original PDF URL lives in the fragment (set that way by background.js's
+// redirect rule) rather than a query param, so it survives untouched even
+// when it has its own "&"/"="-laden query string. Falls back to ?file= for
+// manual testing (e.g. opening viewer.html directly while developing).
+const fileUrl = location.hash ? location.hash.slice(1) : new URLSearchParams(location.search).get("file");
 
 const statusEl = document.getElementById("status");
 const viewerEl = document.getElementById("viewer");
 const titleEl = document.getElementById("doc-title");
 const openOriginalLink = document.getElementById("open-original");
+const pageControls = document.getElementById("page-controls");
+const zoomControls = document.getElementById("zoom-controls");
+const pageIndicator = document.getElementById("page-indicator");
+const zoomIndicator = document.getElementById("zoom-indicator");
+const prevPageBtn = document.getElementById("prev-page");
+const nextPageBtn = document.getElementById("next-page");
+const zoomOutBtn = document.getElementById("zoom-out");
+const zoomInBtn = document.getElementById("zoom-in");
+
+const MIN_SCALE = 0.6;
+const MAX_SCALE = 3;
+const ZOOM_STEP = 0.15;
+
+let pdfDoc = null;
+let cssScale = 1.5;
+let pageEls = [];
+let currentPage = 1;
+let pageObserver = null;
 
 glossGetSettings().then(({ theme }) => {
   document.documentElement.dataset.theme = glossResolveTheme(theme);
@@ -18,6 +39,8 @@ glossGetSettings().then(({ theme }) => {
 function showLoading() {
   statusEl.hidden = false;
   viewerEl.hidden = true;
+  pageControls.hidden = true;
+  zoomControls.hidden = true;
   statusEl.innerHTML = `
     <div class="pdf-spinner" aria-hidden="true"></div>
     <p>Loading PDF…</p>
@@ -27,22 +50,32 @@ function showLoading() {
 function showError(message) {
   statusEl.hidden = false;
   viewerEl.hidden = true;
+  pageControls.hidden = true;
+  zoomControls.hidden = true;
   statusEl.innerHTML = `<p class="pdf-error">${message}</p>`;
 }
 
-const CSS_SCALE = 1.5; // fixed for now; becomes the user-adjustable zoom level in the next commit
+function updatePageIndicator() {
+  pageIndicator.textContent = `${currentPage} / ${pdfDoc.numPages}`;
+  prevPageBtn.disabled = currentPage <= 1;
+  nextPageBtn.disabled = currentPage >= pdfDoc.numPages;
+}
 
-// Renders every page up front. Fine for typical papers/articles; a large
-// scanned book would be worth switching to lazy, viewport-driven rendering —
-// revisit if that turns out to matter in practice.
-async function renderPage(pdf, pageNumber) {
-  const page = await pdf.getPage(pageNumber);
+function updateZoomIndicator() {
+  zoomIndicator.textContent = `${Math.round((cssScale / 1.5) * 100)}%`;
+  zoomOutBtn.disabled = cssScale <= MIN_SCALE;
+  zoomInBtn.disabled = cssScale >= MAX_SCALE;
+}
+
+async function renderPage(pageNumber) {
+  const page = await pdfDoc.getPage(pageNumber);
   const pixelRatio = window.devicePixelRatio || 1;
-  const cssViewport = page.getViewport({ scale: CSS_SCALE });
-  const canvasViewport = page.getViewport({ scale: CSS_SCALE * pixelRatio });
+  const cssViewport = page.getViewport({ scale: cssScale });
+  const canvasViewport = page.getViewport({ scale: cssScale * pixelRatio });
 
   const pageWrap = document.createElement("div");
   pageWrap.className = "pdf-page";
+  pageWrap.dataset.pageNumber = String(pageNumber);
   pageWrap.style.width = `${cssViewport.width}px`;
   pageWrap.style.height = `${cssViewport.height}px`;
   viewerEl.appendChild(pageWrap);
@@ -61,7 +94,7 @@ async function renderPage(pdf, pageNumber) {
   // pdf.js's TextLayer sizes itself via CSS calc() against these two custom
   // properties (see setLayerDimensions in pdf.mjs) — without them its width/
   // height resolve to nothing and every span collapses to the page's origin.
-  pageWrap.style.setProperty("--total-scale-factor", String(CSS_SCALE));
+  pageWrap.style.setProperty("--total-scale-factor", String(cssScale));
   pageWrap.style.setProperty("--scale-round-x", "1px");
   pageWrap.style.setProperty("--scale-round-y", "1px");
 
@@ -75,7 +108,55 @@ async function renderPage(pdf, pageNumber) {
     viewport: cssViewport,
   });
   await textLayer.render();
+
+  return pageWrap;
 }
+
+// Renders every page up front. Fine for typical papers/articles; a large
+// scanned book would be worth switching to lazy, viewport-driven rendering —
+// revisit if that turns out to matter in practice.
+async function renderAllPages() {
+  pageObserver?.disconnect();
+  viewerEl.innerHTML = "";
+  pageEls = [];
+
+  for (let pageNumber = 1; pageNumber <= pdfDoc.numPages; pageNumber++) {
+    pageEls.push(await renderPage(pageNumber));
+  }
+
+  pageObserver = new IntersectionObserver(
+    (entries) => {
+      const visible = entries.filter((e) => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (visible) {
+        currentPage = Number(visible.target.dataset.pageNumber);
+        updatePageIndicator();
+      }
+    },
+    { threshold: [0.5] }
+  );
+  pageEls.forEach((el) => pageObserver.observe(el));
+
+  updatePageIndicator();
+  updateZoomIndicator();
+  pageControls.hidden = pdfDoc.numPages <= 1;
+  zoomControls.hidden = false;
+}
+
+function goToPage(pageNumber) {
+  const el = pageEls[pageNumber - 1];
+  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+async function setZoom(newScale) {
+  cssScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, newScale));
+  await renderAllPages();
+  goToPage(currentPage);
+}
+
+prevPageBtn.addEventListener("click", () => goToPage(currentPage - 1));
+nextPageBtn.addEventListener("click", () => goToPage(currentPage + 1));
+zoomOutBtn.addEventListener("click", () => setZoom(cssScale - ZOOM_STEP));
+zoomInBtn.addEventListener("click", () => setZoom(cssScale + ZOOM_STEP));
 
 function titleFromUrl(url) {
   try {
@@ -104,14 +185,11 @@ async function loadAndRender() {
       standardFontDataUrl: `${VENDOR_BASE}standard_fonts/`,
       wasmUrl: `${VENDOR_BASE}wasm/`,
       isEvalSupported: false, // MV3 extension pages forbid eval; pdf.js must not fall back to it
+      withCredentials: true, // send the site's own cookies, so session-gated PDFs still load
     });
 
-    const pdf = await loadingTask.promise;
-
-    viewerEl.innerHTML = "";
-    for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
-      await renderPage(pdf, pageNumber);
-    }
+    pdfDoc = await loadingTask.promise;
+    await renderAllPages();
 
     statusEl.hidden = true;
     viewerEl.hidden = false;

@@ -3,8 +3,8 @@
   "name": "Gloss",
   "description": "Look up any word in context while you read — syncs with your Gloss library.",
   "version": "0.1.0",
-  "permissions": ["storage", "cookies", "scripting", "activeTab"],
-  "host_permissions": ["https://gloss-theta.vercel.app/*"],
+  "permissions": ["storage", "cookies", "scripting", "activeTab", "declarativeNetRequest", "declarativeNetRequestWithHostAccess"],
+  "host_permissions": ["http://*/*", "https://*/*"],
   "background": { "service_worker": "background.js" },
   "content_scripts": [
     {
@@ -12,6 +12,12 @@
       "js": ["shared.js", "content.js"],
       "css": ["popup.css"],
       "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["viewer.html"],
+      "matches": ["<all_urls>"]
     }
   ],
   "action": { "default_popup": "popup.html" },

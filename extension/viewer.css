@@ -84,6 +84,47 @@ body {
   text-decoration: underline;
 }
 
+.pdf-toolbar-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.pdf-toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--gloss-fg-soft);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.pdf-toolbar-btn:hover:not(:disabled) {
+  background: var(--gloss-accent-bg);
+  color: var(--gloss-fg);
+}
+
+.pdf-toolbar-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.pdf-page-indicator {
+  min-width: 44px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--gloss-fg-soft);
+  white-space: nowrap;
+}
+
 .pdf-status {
   display: flex;
   flex-direction: column;

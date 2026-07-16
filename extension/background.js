@@ -3,6 +3,43 @@ const MAX_RECENT = 20;
 const DEFINE_CACHE_LIMIT = 50;
 const GENERIC_LOOKUP_ERROR = "Couldn't get a definition — try again";
 const OFFLINE_ERROR = "You're offline — try again once you're back online";
+const PDF_REDIRECT_RULE_ID = 1;
+
+// Chrome's built-in PDF viewer is a separate, unreachable extension — this
+// rule intercepts a direct PDF navigation before that viewer ever engages
+// and sends it to our own viewer.html instead. The original URL rides in
+// the URL *fragment* (after #), not a query param: fragments are opaque to
+// URL parsing, so a PDF link whose own query string contains "&" or "="
+// (signed/tokenized download links) survives intact. A query param would
+// have silently corrupted those.
+//
+// Registered as a *dynamic* rule (not a static rules.json) specifically so
+// this can reference chrome.runtime.getURL(), which only resolves to the
+// correct chrome-extension://<id>/ once the extension is actually running —
+// a static rule file can't know its own id ahead of time.
+async function registerPdfRedirectRule() {
+  await chrome.declarativeNetRequest.updateDynamicRules({
+    removeRuleIds: [PDF_REDIRECT_RULE_ID],
+    addRules: [
+      {
+        id: PDF_REDIRECT_RULE_ID,
+        priority: 1,
+        action: {
+          type: "redirect",
+          redirect: { regexSubstitution: `${chrome.runtime.getURL("viewer.html")}#\\0` },
+        },
+        condition: {
+          regexFilter: "^https?://.+\\.pdf(\\?[^#]*)?(#.*)?$",
+          resourceTypes: ["main_frame"],
+        },
+      },
+    ],
+  });
+}
+
+chrome.runtime.onInstalled.addListener(() => {
+  registerPdfRedirectRule();
+});
 
 function normalizePhrase(phrase) {
   return phrase.trim().toLowerCase();
