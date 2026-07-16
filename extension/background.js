@@ -202,5 +202,24 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     getStatsSummary().then(sendResponse);
     return true;
   }
+  if (message?.type === "open-options") {
+    chrome.runtime.openOptionsPage();
+    return false;
+  }
   return false;
+});
+
+// With no default_popup, clicking the toolbar icon (or the _execute_action
+// keyboard shortcut) fires this instead of opening a native dropdown. We
+// hand off to the content script so it can render the panel floating in the
+// page itself, like Grammarly/Apollo, rather than anchored outside it.
+// Falls back to a full-tab view of popup.html on pages with no content
+// script listening — chrome:// pages, the Web Store, or a tab that was
+// already open before the extension loaded.
+chrome.action.onClicked.addListener(async (tab) => {
+  try {
+    await chrome.tabs.sendMessage(tab.id, { type: "toggle-panel" });
+  } catch {
+    chrome.tabs.create({ url: chrome.runtime.getURL("popup.html") });
+  }
 });

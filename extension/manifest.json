@@ -20,13 +20,13 @@
       "matches": ["<all_urls>"]
     }
   ],
-  "action": { "default_popup": "popup.html" },
+  "action": {},
   "options_ui": { "page": "options.html", "open_in_tab": true },
   "icons": { "128": "icon128.png" },
   "commands": {
     "_execute_action": {
       "suggested_key": { "default": "Ctrl+Shift+G", "mac": "Command+Shift+G" },
-      "description": "Open Gloss"
+      "description": "Toggle Gloss panel"
     }
   }
 }
