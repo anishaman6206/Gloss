@@ -2,7 +2,6 @@
 
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 
 // The Median wrapper injects "median" into the in-app webview's user agent.
 // Absent in every regular desktop/mobile browser.
@@ -47,7 +46,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [sub, setSub] = useState<SubStatus | null>(null);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
 
   const refresh = useCallback(async () => {
     try {
@@ -75,31 +73,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setSub(null);
   }, []);
 
-  // Native Google sign-in via the Median JS Bridge: no OAuth redirect exists
-  // inside the wrapper's webview, so we get an ID token straight into this
-  // callback and hand it to our own verifier instead of NextAuth's.
+  // Native Google sign-in via the Median JS Bridge. Uses redirectUri mode
+  // (a real navigation carrying the verified token to our backend), not the
+  // callback mode: the native account picker can recreate the webview's JS
+  // context, which would silently drop an in-memory callback. The redirect
+  // lands on /api/auth/native/google, which establishes the session and
+  // sends the browser on to /scan — remounting this provider, whose effect
+  // below then picks the new session up via the normal refresh() call.
   const loginNative = useCallback(() => {
     window.median?.socialLogin.google.login({
-      callback: async (response) => {
-        if (!("idToken" in response)) {
-          console.log("User cancelled login or did not fully authorize.");
-          return;
-        }
-
-        const res = await fetch("/api/auth/native/google", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ idToken: response.idToken }),
-        }).catch(() => null);
-
-        if (res?.ok) {
-          await refresh();
-          router.push("/scan");
-        }
-      },
+      redirectUri: `${window.location.origin}/api/auth/native/google`,
     });
-  }, [refresh, router]);
+  }, []);
 
   const login = useCallback(() => {
     if (isMedianApp()) {

@@ -3,16 +3,19 @@ import { OAuth2Client } from "google-auth-library";
 import { establishSession } from "@/lib/auth";
 
 // Counterpart to /api/auth/bootstrap for the Median in-app browser: NextAuth
-// never runs here (there's no OAuth redirect inside the native webview), so
-// the client instead hands us the raw Google ID token it got from
-// median.socialLogin.google.login(), and we verify it ourselves before
-// creating the exact same session bootstrap does.
+// never runs here (there's no OAuth redirect inside the native webview).
+// Median's redirectUri mode is used instead of its JS-callback mode
+// specifically because the native account picker can recreate the webview's
+// JS context, which would silently drop an in-memory callback closure. A
+// real navigation with the token on the URL has no such dependency, and
+// matches bootstrap's own GET-then-redirect shape.
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-export async function POST(req: Request) {
-  const { idToken } = await req.json().catch(() => ({ idToken: null }));
-  if (!idToken || typeof idToken !== "string") {
-    return NextResponse.json({ ok: false, error: "missing_id_token" }, { status: 400 });
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const idToken = searchParams.get("idToken");
+  if (!idToken) {
+    return NextResponse.redirect(new URL("/", req.url));
   }
 
   let payload;
@@ -23,11 +26,11 @@ export async function POST(req: Request) {
     });
     payload = ticket.getPayload();
   } catch {
-    return NextResponse.json({ ok: false, error: "invalid_id_token" }, { status: 401 });
+    return NextResponse.redirect(new URL("/", req.url));
   }
 
   if (!payload?.email || !payload.email_verified) {
-    return NextResponse.json({ ok: false, error: "email_not_verified" }, { status: 401 });
+    return NextResponse.redirect(new URL("/", req.url));
   }
 
   await establishSession({
@@ -36,5 +39,5 @@ export async function POST(req: Request) {
     picture: payload.picture ?? null,
   });
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.redirect(new URL("/scan", req.url));
 }
