@@ -13,6 +13,11 @@ const PDF_REDIRECT_RULE_ID = 1;
 // (signed/tokenized download links) survives intact. A query param would
 // have silently corrupted those.
 //
+// Covers file:// as well as http(s)://, for locally-opened PDFs — this only
+// takes effect once the user separately enables "Allow access to file URLs"
+// for the extension in chrome://extensions, which Chrome requires per-user
+// and can't be granted from the manifest alone.
+//
 // Registered as a *dynamic* rule (not a static rules.json) specifically so
 // this can reference chrome.runtime.getURL(), which only resolves to the
 // correct chrome-extension://<id>/ once the extension is actually running —
@@ -29,7 +34,7 @@ async function registerPdfRedirectRule() {
           redirect: { regexSubstitution: `${chrome.runtime.getURL("viewer.html")}#\\0` },
         },
         condition: {
-          regexFilter: "^https?://.+\\.pdf(\\?[^#]*)?(#.*)?$",
+          regexFilter: "^(https?://|file:///).+\\.pdf(\\?[^#]*)?(#.*)?$",
           resourceTypes: ["main_frame"],
         },
       },
