@@ -25,9 +25,10 @@ const zoomInBtn = document.getElementById("zoom-in");
 const MIN_SCALE = 0.6;
 const MAX_SCALE = 3;
 const ZOOM_STEP = 0.15;
+const DEFAULT_SCALE = 1.5;
 
 let pdfDoc = null;
-let cssScale = 1.5;
+let cssScale = DEFAULT_SCALE;
 let pageEls = [];
 let currentPage = 1;
 let pageObserver = null;
@@ -62,7 +63,7 @@ function updatePageIndicator() {
 }
 
 function updateZoomIndicator() {
-  zoomIndicator.textContent = `${Math.round((cssScale / 1.5) * 100)}%`;
+  zoomIndicator.textContent = `${Math.round((cssScale / DEFAULT_SCALE) * 100)}%`;
   zoomOutBtn.disabled = cssScale <= MIN_SCALE;
   zoomInBtn.disabled = cssScale >= MAX_SCALE;
 }
@@ -115,10 +116,17 @@ async function renderPage(pageNumber) {
 // Renders every page up front. Fine for typical papers/articles; a large
 // scanned book would be worth switching to lazy, viewport-driven rendering —
 // revisit if that turns out to matter in practice.
+//
+// Reveals the viewer before the loop starts and appends pages as each one
+// finishes, rather than waiting for the whole document — on anything past a
+// couple of pages, staring at one spinner for the entire render is worse
+// than watching pages arrive one at a time.
 async function renderAllPages() {
   pageObserver?.disconnect();
   viewerEl.innerHTML = "";
   pageEls = [];
+  statusEl.hidden = true;
+  viewerEl.hidden = false;
 
   for (let pageNumber = 1; pageNumber <= pdfDoc.numPages; pageNumber++) {
     pageEls.push(await renderPage(pageNumber));
@@ -158,6 +166,27 @@ nextPageBtn.addEventListener("click", () => goToPage(currentPage + 1));
 zoomOutBtn.addEventListener("click", () => setZoom(cssScale - ZOOM_STEP));
 zoomInBtn.addEventListener("click", () => setZoom(cssScale + ZOOM_STEP));
 
+// Matches the conventions people already bring from other PDF/image viewers.
+// Left/Right skip a page; Ctrl/Cmd +/-/0 zoom, mirroring the browser's own
+// page-zoom shortcut instead of introducing a new one.
+document.addEventListener("keydown", (e) => {
+  if (e.metaKey || e.ctrlKey) {
+    if (e.key === "+" || e.key === "=") {
+      e.preventDefault();
+      setZoom(cssScale + ZOOM_STEP);
+    } else if (e.key === "-") {
+      e.preventDefault();
+      setZoom(cssScale - ZOOM_STEP);
+    } else if (e.key === "0") {
+      e.preventDefault();
+      setZoom(DEFAULT_SCALE);
+    }
+    return;
+  }
+  if (e.key === "ArrowRight" || e.key === "PageDown") goToPage(currentPage + 1);
+  else if (e.key === "ArrowLeft" || e.key === "PageUp") goToPage(currentPage - 1);
+});
+
 function titleFromUrl(url) {
   try {
     const path = decodeURIComponent(new URL(url).pathname);
@@ -190,9 +219,6 @@ async function loadAndRender() {
 
     pdfDoc = await loadingTask.promise;
     await renderAllPages();
-
-    statusEl.hidden = true;
-    viewerEl.hidden = false;
   } catch (err) {
     console.error("[Gloss PDF Reader] failed to load PDF", err);
     showError("Couldn't load this PDF — it may be protected, corrupted, or blocked by the site it's hosted on.");
