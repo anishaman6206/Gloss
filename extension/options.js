@@ -7,12 +7,11 @@ function setActiveThemeButton(theme) {
 }
 
 async function init() {
-  const rootEl = document.querySelector(".popup-root");
   const settings = await glossGetSettings();
 
   document.getElementById("enabled-toggle").checked = settings.enabled;
   setActiveThemeButton(settings.theme);
-  rootEl.dataset.theme = glossResolveTheme(settings.theme);
+  document.documentElement.dataset.theme = glossResolveTheme(settings.theme);
 
   document.getElementById("enabled-toggle").addEventListener("change", (e) => {
     chrome.storage.local.set({ enabled: e.target.checked });
@@ -24,7 +23,7 @@ async function init() {
     const theme = btn.dataset.themeChoice;
     chrome.storage.local.set({ theme });
     setActiveThemeButton(theme);
-    rootEl.dataset.theme = glossResolveTheme(theme);
+    document.documentElement.dataset.theme = glossResolveTheme(theme);
   });
 }
 
