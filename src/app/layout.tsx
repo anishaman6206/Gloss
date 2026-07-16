@@ -19,13 +19,13 @@ const nunito = Nunito({
 export const metadata: Metadata = {
   metadataBase: new URL("https://gloss.app"),
   title: {
-    default: "Gloss — Learn every word you read",
+    default: "Gloss: Learn every word you read",
     template: "%s · Gloss",
   },
   description:
     "Snap a page, tap a word, and get its meaning in context. Save it, review it with spaced repetition, and finally own the words you read.",
   openGraph: {
-    title: "Gloss — Learn every word you read",
+    title: "Gloss: Learn every word you read",
     description:
       "Snap a page, tap a word, and get its meaning in context. Your personal vocabulary, built from what you actually read.",
     type: "website",

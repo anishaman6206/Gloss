@@ -5,7 +5,7 @@ export const metadata = { title: "Payment failed" };
 
 const REASONS: Record<string, string> = {
   verification:
-    "We received your payment but couldn't confirm it on our end. Please write to us — we'll fix it.",
+    "We received your payment but couldn't confirm it on our end. Please write to us, we'll fix it.",
   network:
     "We couldn't reach the payment provider. Please try again.",
   declined:
@@ -65,7 +65,7 @@ export default function PaymentFailedPage({
             >
               gloss.ai@gmail.com
             </a>{" "}
-            — we usually reply within a day.
+            , we usually reply within a day.
           </p>
         </div>
       </div>

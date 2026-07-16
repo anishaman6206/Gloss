@@ -159,7 +159,7 @@ export function DefinitionCard({
               data-testid="save-error-subscribe"
               className="btn-tactile bg-mango !py-2.5 !px-4 text-sm shadow-tactile shadow-mango-shadow"
             >
-              <Crown size={14} /> Your trial ended — subscribe to keep saving
+              <Crown size={14} /> Your trial ended, subscribe to keep saving
             </a>
           )}
           {error && error !== "auth" && error !== "subscription" && (

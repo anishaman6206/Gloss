@@ -25,7 +25,7 @@ export default function Landing() {
           </h1>
           <p className="mt-4 max-w-xl text-lg text-ink-soft md:text-xl">
             Snap a page. Tap a word. Get its meaning{" "}
-            <em className="rounded bg-mango/25 px-1 not-italic">in context</em> — then keep
+            <em className="rounded bg-mango/25 px-1 not-italic">in context</em>, then keep
             it forever with spaced repetition.
           </p>
 
@@ -35,7 +35,7 @@ export default function Landing() {
               data-testid="cta-scan-free"
               className="btn-tactile bg-brand text-lg shadow-tactile shadow-brand-shadow"
             >
-              <Camera size={18} /> Scan a page — free
+              <Camera size={18} /> Scan a page · free
             </Link>
             {user ? (
               <Link
@@ -76,13 +76,13 @@ export default function Landing() {
               icon: Camera,
               tint: "bg-brand/15 text-brand-shadow",
               title: "Snap it",
-              body: "Take a picture of the page you're reading. Text is OCR'd in your browser — nothing leaves your device.",
+              body: "Take a picture of the page you're reading. Text is OCR'd in your browser, nothing leaves your device.",
             },
             {
               icon: BookOpen,
               tint: "bg-mango/15 text-mango-shadow",
               title: "Tap the word",
-              body: "Tap any word (or phrase) on the image. Get a definition based on the exact sentence — not a random one.",
+              body: "Tap any word (or phrase) on the image. Get a definition based on the exact sentence, not a random one.",
             },
             {
               icon: Repeat2,

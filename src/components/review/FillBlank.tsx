@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Volume2, Check } from "lucide-react";
+import { Volume2, Check, Lightbulb } from "lucide-react";
 import { GradeButtons } from "./GradeButtons";
 import { speak } from "@/lib/speak";
+import { buildHint } from "@/lib/review";
 import type { ReviewQuality } from "@/lib/types";
 
 export function FillBlank({
@@ -19,6 +20,7 @@ export function FillBlank({
 }) {
   const [value, setValue] = useState("");
   const [checked, setChecked] = useState(false);
+  const [showHint, setShowHint] = useState(false);
 
   const correct = value.trim().toLowerCase() === phrase.trim().toLowerCase();
 
@@ -33,29 +35,49 @@ export function FillBlank({
       <p className="text-xl leading-relaxed">{blanked}</p>
 
       {!checked ? (
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            setChecked(true);
-          }}
-          className="flex gap-2"
-        >
-          <input
-            autoFocus
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            placeholder="Type the missing word…"
-            data-testid="fill-blank-input"
-            className="flex-1 rounded-2xl border-2 border-transparent bg-black/[0.04] px-4 py-3 text-base font-medium outline-none focus:border-brand focus:bg-white"
-          />
-          <button
-            type="submit"
-            data-testid="fill-blank-check"
-            className="btn-tactile bg-brand !py-3 !px-5 shadow-tactile shadow-brand-shadow"
+        <>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              setChecked(true);
+            }}
+            className="flex gap-2"
           >
-            <Check size={16} /> Check
-          </button>
-        </form>
+            <input
+              autoFocus
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              placeholder="Type the missing word…"
+              data-testid="fill-blank-input"
+              className="flex-1 rounded-2xl border-2 border-transparent bg-black/[0.04] px-4 py-3 text-base font-medium outline-none focus:border-brand focus:bg-white"
+            />
+            <button
+              type="submit"
+              data-testid="fill-blank-check"
+              className="btn-tactile bg-brand !py-3 !px-5 shadow-tactile shadow-brand-shadow"
+            >
+              <Check size={16} /> Check
+            </button>
+          </form>
+
+          {showHint ? (
+            <p
+              className="font-display text-lg font-bold tracking-[0.2em] text-mango-shadow"
+              data-testid="fill-blank-hint"
+            >
+              {buildHint(phrase)}
+            </p>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setShowHint(true)}
+              data-testid="fill-blank-hint-button"
+              className="inline-flex items-center gap-1.5 text-sm font-bold text-ink-faint hover:text-mango-shadow"
+            >
+              <Lightbulb size={14} /> Show hint
+            </button>
+          )}
+        </>
       ) : (
         <div className={`reveal space-y-3 rounded-2xl p-4 ${correct ? "bg-leaf/10" : "bg-cherry/10"}`}>
           <div className="flex items-center gap-2">
@@ -64,7 +86,7 @@ export function FillBlank({
                 correct ? "text-leaf-shadow" : "text-cherry"
               }`}
             >
-              {correct ? "Correct — " : "It was — "}
+              {correct ? "Correct: " : "It was: "}
               {phrase}
             </p>
             <button

@@ -43,7 +43,7 @@ export default async function ReviewPage() {
           Today&apos;s words are ready.
         </h1>
         <p className="mt-1 text-ink-soft">
-          Three quick modes — recall, fill‑blank, produce the word. Mixed.
+          Three quick modes: recall, fill‑blank, produce the word. Mixed.
         </p>
       </header>
       <ReviewSession words={words} />

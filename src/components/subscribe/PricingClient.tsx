@@ -102,10 +102,10 @@ export function PricingClient({
             if (verifyData.ok) {
               window.location.reload();
             } else {
-              setError("Payment received but activation failed. We'll fix it — contact support.");
+              setError("Payment received but activation failed. We'll fix it, contact support.");
             }
           } catch {
-            setError("Payment received. Activation is retrying — refresh in a moment.");
+            setError("Payment received. Activation is retrying, refresh in a moment.");
           }
         },
       });
@@ -204,7 +204,7 @@ export function PricingClient({
           className="btn-tactile bg-brand text-lg shadow-tactile shadow-brand-shadow"
         >
           {loading ? <Loader2 size={18} className="animate-spin" /> : <Crown size={18} />}
-          {sub.isPaid ? "Manage subscription" : `Continue — ${PLAN_META[selected].price}${PLAN_META[selected].suffix}`}
+          {sub.isPaid ? "Manage subscription" : `Continue · ${PLAN_META[selected].price}${PLAN_META[selected].suffix}`}
         </button>
         {error && (
           <p className="text-sm font-bold text-cherry" data-testid="subscribe-error">

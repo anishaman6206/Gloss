@@ -68,7 +68,7 @@ export function NavBar() {
         className="sticky top-0 z-40 border-b-2 border-black/5 bg-bg/85 backdrop-blur-xl"
         data-testid="top-navbar"
       >
-        <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-3">
+        <div className="relative mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-3">
           <Link
             href="/"
             className="flex items-center gap-2"
@@ -83,8 +83,8 @@ export function NavBar() {
             </span>
           </Link>
 
-          {/* Desktop links */}
-          <div className="hidden items-center gap-1 md:flex">
+          {/* Desktop links, centered independently of the logo/profile widths */}
+          <div className="hidden items-center gap-1 lg:absolute lg:left-1/2 lg:flex lg:-translate-x-1/2">
             {PUBLIC_LINKS.map((link) => {
               const active = pathname === link.href;
 
@@ -189,7 +189,7 @@ export function NavBar() {
             <button
               onClick={() => setMenuOpen((o) => !o)}
               aria-label="Toggle menu"
-              className="grid h-9 w-9 place-items-center rounded-xl border-2 border-black/10 bg-white text-ink md:hidden"
+              className="grid h-9 w-9 place-items-center rounded-xl border-2 border-black/10 bg-white text-ink lg:hidden"
               data-testid="mobile-menu-toggle"
             >
               {menuOpen ? <X size={16} /> : <Menu size={16} />}
@@ -200,7 +200,7 @@ export function NavBar() {
         {/* Mobile menu */}
         {menuOpen && (
           <div
-            className="mx-auto max-w-3xl border-t-2 border-black/5 bg-white px-4 py-3 md:hidden"
+            className="mx-auto max-w-3xl border-t-2 border-black/5 bg-white px-4 py-3 lg:hidden"
             data-testid="mobile-menu"
           >
             <ul className="space-y-1">

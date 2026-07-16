@@ -19,7 +19,7 @@ export function AuthGate() {
         <h2 className="mt-6 font-display text-3xl font-bold tracking-tight">Sign in to Gloss</h2>
         <p className="mt-2 text-ink-soft">
           Your library, streaks & reviews are tied to your account. It&apos;s a one‑tap
-          Google sign‑in — no forms.
+          Google sign‑in, no forms.
         </p>
         <button
           onClick={login}

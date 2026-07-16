@@ -14,7 +14,7 @@ function termKey(term: Term): string {
   return term.words.map((w) => w.id).join(",");
 }
 
-const COULD_NOT_REACH = "Couldn't reach the dictionary right now — try again in a moment.";
+const COULD_NOT_REACH = "Couldn't reach the dictionary right now, try again in a moment.";
 
 export function ScanWorkspace() {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -139,7 +139,7 @@ export function ScanWorkspace() {
 
       {stage === "empty" && (
         <p className="rounded-2xl bg-cherry/10 p-4 text-sm text-cherry" data-testid="scan-empty">
-          Couldn&apos;t find any text on that page — try a clearer or brighter photo.
+          Couldn&apos;t find any text on that page, try a clearer or brighter photo.
         </p>
       )}
 

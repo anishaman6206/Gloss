@@ -51,7 +51,7 @@ export function SessionSummary({
         </span>
         <p className="mt-4 font-display text-2xl font-bold">All caught up!</p>
         <p className="mt-1 text-ink-soft">
-          Nothing&apos;s due right now — go read something and come back.
+          Nothing&apos;s due right now, go read something and come back.
         </p>
         <Link
           href="/scan"

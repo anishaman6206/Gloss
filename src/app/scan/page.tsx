@@ -16,7 +16,7 @@ export default function ScanPage() {
           What are you reading today?
         </h1>
         <p className="mt-1 text-ink-soft">
-          Snap a page. Tap what you don&apos;t know. Meanings arrive in context — free, no
+          Snap a page. Tap what you don&apos;t know. Meanings arrive in context, free, no
           sign‑in needed.
         </p>
       </header>

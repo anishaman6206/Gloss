@@ -5,10 +5,10 @@ import { prisma } from "@/lib/prisma";
 import { ANON_DAILY_LIMIT, consumeAnonDefine, getClientIp } from "@/lib/rate-limit";
 import type { DefineRequest, DefineResult, Definition } from "@/lib/types";
 
-const COULD_NOT_REACH = "Couldn't reach the dictionary right now — try again in a moment.";
-const MALFORMED = "Didn't get a clean answer for that one — try again?";
-const RATE_LIMITED_GROQ = "Too many lookups at once — give it a few seconds.";
-const RATE_LIMITED_ANON = `Free lookups (${ANON_DAILY_LIMIT}/day) used up — sign in for unlimited.`;
+const COULD_NOT_REACH = "Couldn't reach the dictionary right now, try again in a moment.";
+const MALFORMED = "Didn't get a clean answer for that one, try again?";
+const RATE_LIMITED_GROQ = "Too many lookups at once, give it a few seconds.";
+const RATE_LIMITED_ANON = `Free lookups (${ANON_DAILY_LIMIT}/day) used up, sign in for unlimited.`;
 
 export async function POST(request: Request) {
   let body: Partial<DefineRequest>;

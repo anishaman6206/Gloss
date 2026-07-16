@@ -68,7 +68,7 @@ export function ProduceWord({
                 correct ? "text-leaf-shadow" : "text-cherry"
               }`}
             >
-              {correct ? "Correct — " : "It was — "}
+              {correct ? "Correct: " : "It was: "}
               {phrase}
             </p>
             <button

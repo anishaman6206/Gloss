@@ -52,7 +52,7 @@ export function ImageUploader({ onSelect }: { onSelect: (file: File) => void }) 
       <div>
         <p className="font-display text-2xl font-bold">Snap or drop a page</p>
         <p className="mt-1 text-ink-soft">
-          Book, textbook, newspaper — anything with words.
+          Book, textbook, newspaper, anything with words.
         </p>
       </div>
       <span className="inline-flex items-center gap-1.5 rounded-full bg-black/[0.04] px-3 py-1 text-xs font-bold text-ink-soft">
