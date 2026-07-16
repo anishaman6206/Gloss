@@ -41,6 +41,28 @@ chrome.runtime.onInstalled.addListener(() => {
   registerPdfRedirectRule();
 });
 
+// The rule above only catches URLs that literally end in ".pdf" — plenty of
+// real PDFs don't (arXiv serves canonical links like
+// https://arxiv.org/pdf/2301.12345, no extension at all, identified only by
+// its response's Content-Type). A URL-pattern redirect can't see that; only
+// the response headers can. This is the fallback for exactly that case: it
+// reads the incoming Content-Type once headers arrive and hands the tab off
+// to our viewer then. It's inherently a hair slower than the rule above
+// (Chrome's own PDF viewer may already start engaging before this fires),
+// so a brief flash of Chrome's viewer is possible here in a way it isn't for
+// plain ".pdf" links — accepted tradeoff for covering extension-less PDFs at
+// all, given Manifest V3 has no blocking pre-response redirect API left.
+chrome.webRequest.onHeadersReceived.addListener(
+  (details) => {
+    if (details.method !== "GET" || details.statusCode >= 400) return;
+    const contentType = details.responseHeaders?.find((h) => h.name.toLowerCase() === "content-type")?.value || "";
+    if (!contentType.toLowerCase().startsWith("application/pdf")) return;
+    chrome.tabs.update(details.tabId, { url: `${chrome.runtime.getURL("viewer.html")}#${details.url}` });
+  },
+  { urls: ["http://*/*", "https://*/*"], types: ["main_frame"] },
+  ["responseHeaders"]
+);
+
 function normalizePhrase(phrase) {
   return phrase.trim().toLowerCase();
 }
