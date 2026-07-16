@@ -1,0 +1,8 @@
+{
+  "name": "gloss-extension-vendor",
+  "private": true,
+  "description": "Vendored third-party libraries for the Gloss extension (not part of the extension's runtime build process — files are copied into vendor/ and committed).",
+  "dependencies": {
+    "pdfjs-dist": "6.1.200"
+  }
+}
