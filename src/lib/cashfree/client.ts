@@ -23,19 +23,21 @@ export function isCashfreeConfigured() {
 }
 
 // Plan catalog. Amount is in rupees (Cashfree's order_amount, unlike
-// Razorpay, is not in paise). Duration = number of days to extend on success.
+// Razorpay, is not in paise). Duration is in calendar months so renewal
+// lands on the same day-of-month (e.g. 17 Jul -> 17 Aug), not a fixed
+// day-count that drifts against month length.
 export const PLANS = {
   monthly: {
     label: "Monthly",
     price: "₹39",
     amount: 39,
-    durationDays: 30,
+    durationMonths: 1,
   },
   yearly: {
     label: "Yearly",
     price: "₹399",
     amount: 399,
-    durationDays: 365,
+    durationMonths: 12,
   },
 } as const;
 export type PlanKey = keyof typeof PLANS;

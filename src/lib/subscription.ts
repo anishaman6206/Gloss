@@ -2,6 +2,24 @@ import "server-only";
 import { prisma } from "./prisma";
 import { PLANS, type PlanKey } from "./cashfree/client";
 
+// Adds calendar months, landing on the same day-of-month (17 Jul -> 17 Aug)
+// rather than a fixed day-count that drifts against month length. Clamps to
+// the last day of the target month when the original day doesn't exist
+// there (31 Jan -> 28/29 Feb), same convention most billing systems use.
+function addMonths(date: Date, months: number): Date {
+  const result = new Date(date);
+  const day = result.getDate();
+  result.setDate(1);
+  result.setMonth(result.getMonth() + months);
+  const daysInTargetMonth = new Date(
+    result.getFullYear(),
+    result.getMonth() + 1,
+    0
+  ).getDate();
+  result.setDate(Math.min(day, daysInTargetMonth));
+  return result;
+}
+
 // Shared by both the return-URL handler and the webhook — the two places a
 // payment can be confirmed. Extends from max(now, currentPeriodEnd) so
 // re-purchases (including resubscribes after expiry) stack cleanly, and
@@ -33,8 +51,7 @@ export async function activateSubscription({
   const now = new Date();
   const base =
     user.currentPeriodEnd && user.currentPeriodEnd > now ? user.currentPeriodEnd : now;
-  const currentPeriodEnd = new Date(base);
-  currentPeriodEnd.setDate(currentPeriodEnd.getDate() + meta.durationDays);
+  const currentPeriodEnd = addMonths(base, meta.durationMonths);
 
   // A fresh period start only resets if the user wasn't already mid-period
   // (i.e. this is a first purchase or a resubscribe after lapsing/cancelling).

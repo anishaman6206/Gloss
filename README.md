@@ -94,7 +94,7 @@ git add prisma && git commit -m "postgres migration"
    - Cashfree signs webhooks with your **Secret Key** automatically — no separate webhook secret to configure.
 4. No dashboard-side return URL config is needed — it's set per-order by the app (`/api/subscribe/return`).
 
-> The app uses **one-time Cashfree Orders** for ₹79 (30 days) and ₹599 (365 days), mirroring the prior Razorpay Orders design rather than a recurring-billing product — the server tracks `currentPeriodEnd` per user in Prisma so the UX is identical, and "cancel" simply stops nudging renewal rather than calling a Cashfree cancel-subscription API.
+> The app uses **one-time Cashfree Orders** for ₹39 (1 month) and ₹399 (12 months), mirroring the prior Razorpay Orders design rather than a recurring-billing product — the server tracks `currentPeriodEnd` per user in Prisma (extended by calendar months, so renewal lands on the same day-of-month) so the UX is identical, and "cancel" simply stops nudging renewal rather than calling a Cashfree cancel-subscription API.
 
 ### 5. Redeploy
 
