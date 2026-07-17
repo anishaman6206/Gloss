@@ -183,7 +183,7 @@ export default async function ProfilePage() {
 
           <li>
             <a
-              href="mailto:gloss.ai@gmail.com"
+              href="mailto:gloss.theta@gmail.com"
               data-testid="profile-link-contact"
               className="flex items-center gap-2 rounded-2xl bg-black/[0.03] px-4 py-3 text-sm font-bold hover:bg-black/[0.05]"
             >

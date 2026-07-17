@@ -68,10 +68,10 @@ export default function RefundPolicyPage() {
         <p className="text-ink-soft">
           Write to{" "}
           <a
-            href="mailto:gloss.ai@gmail.com"
+            href="mailto:gloss.theta@gmail.com"
             className="font-bold text-brand"
           >
-            gloss.ai@gmail.com
+            gloss.theta@gmail.com
           </a>{" "}
           with the email address associated with your Gloss account and your
           payment reference. Eligible refunds are processed within 5 to 7

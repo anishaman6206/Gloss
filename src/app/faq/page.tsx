@@ -24,10 +24,6 @@ const FAQS = [
     a: "Any page with printed or clearly written text, including novels, textbooks, magazines, articles, and worksheets. Handwriting works best when it's neat and the photo is well lit.",
   },
   {
-    q: "Can I edit saved words?",
-    a: "Yes. Open the word in your Library and expand it. You can update the definition or any notes saved with it.",
-  },
-  {
     q: "Can I delete saved words?",
     a: "Absolutely. Open the word in your Library, tap the delete button, and it will be permanently removed from your account.",
   },
@@ -45,7 +41,7 @@ const FAQS = [
   },
   {
     q: "How can I contact support?",
-    a: "Email us at gloss.ai@gmail.com or use the contact form on the Contact page. We usually reply within a day.",
+    a: "Email us at gloss.theta@gmail.com or use the contact form on the Contact page. We usually reply within a day.",
   },
 ];
 

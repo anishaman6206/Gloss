@@ -25,10 +25,10 @@ export default function TermsPage() {
           By using Gloss you agree to these terms. If anything feels unclear,
           write to us at{" "}
           <a
-            href="mailto:gloss.ai@gmail.com"
+            href="mailto:gloss.theta@gmail.com"
             className="font-bold text-brand"
           >
-            gloss.ai@gmail.com
+            gloss.theta@gmail.com
           </a>{" "}
           and we'll happily explain.
         </p>
@@ -133,10 +133,10 @@ export default function TermsPage() {
         <p className="text-ink-soft">
           Questions about these terms? Write to{" "}
           <a
-            href="mailto:gloss.ai@gmail.com"
+            href="mailto:gloss.theta@gmail.com"
             className="font-bold text-brand"
           >
-            gloss.ai@gmail.com
+            gloss.theta@gmail.com
           </a>
           .
         </p>

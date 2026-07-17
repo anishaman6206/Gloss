@@ -109,10 +109,10 @@ export default function PrivacyPage() {
             You can request deletion of your account and all associated data by
             writing to{" "}
             <a
-              href="mailto:gloss.ai@gmail.com"
+              href="mailto:gloss.theta@gmail.com"
               className="font-bold text-brand"
             >
-              gloss.ai@gmail.com
+              gloss.theta@gmail.com
             </a>
             .
           </li>
@@ -130,10 +130,10 @@ export default function PrivacyPage() {
         <p className="text-ink-soft">
           Questions about privacy? Write to{" "}
           <a
-            href="mailto:gloss.ai@gmail.com"
+            href="mailto:gloss.theta@gmail.com"
             className="font-bold text-brand"
           >
-            gloss.ai@gmail.com
+            gloss.theta@gmail.com
           </a>
           .
         </p>

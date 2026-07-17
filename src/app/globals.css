@@ -64,6 +64,10 @@ body {
 }
 
 /* Reveal animation utility */
+@keyframes revealIn {
+  from { opacity: 0; transform: translateY(-4px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
 .reveal {
-  animation: bounceIn 0.45s cubic-bezier(.34,1.56,.64,1) both;
+  animation: revealIn 0.18s ease-out both;
 }

@@ -91,10 +91,10 @@ export default async function PaymentSuccessPage({
           <p className="mt-6 text-xs text-ink-faint">
             A receipt has been sent to your email. Need help? Write to{" "}
             <a
-              href="mailto:gloss.ai@gmail.com"
+              href="mailto:gloss.theta@gmail.com"
               className="font-bold text-brand"
             >
-              gloss.ai@gmail.com
+              gloss.theta@gmail.com
             </a>
             .
           </p>

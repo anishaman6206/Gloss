@@ -96,12 +96,12 @@ export function Footer() {
             </p>
 
             <a
-              href="mailto:gloss.ai@gmail.com"
+              href="mailto:gloss.theta@gmail.com"
               data-testid="footer-support-email"
               className="mt-3 inline-flex items-center gap-2 rounded-2xl bg-black/[0.03] px-3 py-2 text-sm font-bold text-ink hover:bg-black/[0.05]"
             >
               <Mail size={14} className="text-brand" />
-              gloss.ai@gmail.com
+              gloss.theta@gmail.com
             </a>
           </div>
         </div>

@@ -40,12 +40,12 @@ export default function ContactPage() {
             </p>
 
             <a
-              href="mailto:gloss.ai@gmail.com"
+              href="mailto:gloss.theta@gmail.com"
               data-testid="contact-email"
               className="mt-1 inline-flex items-center gap-2 font-display text-lg font-bold text-brand hover:underline"
             >
               <Mail size={16} />
-              gloss.ai@gmail.com
+              gloss.theta@gmail.com
             </a>
 
             <p className="mt-2 text-sm text-ink-soft">

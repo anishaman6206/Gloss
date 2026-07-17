@@ -60,10 +60,10 @@ export default function PaymentFailedPage({
           <p className="mt-6 text-xs text-ink-faint">
             Still stuck? Email{" "}
             <a
-              href="mailto:gloss.ai@gmail.com"
+              href="mailto:gloss.theta@gmail.com"
               className="font-bold text-brand"
             >
-              gloss.ai@gmail.com
+              gloss.theta@gmail.com
             </a>{" "}
             , we usually reply within a day.
           </p>
