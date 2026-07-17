@@ -41,7 +41,6 @@ export function ImageUploader({ onSelect }: { onSelect: (file: File) => void }) 
         ref={inputRef}
         type="file"
         accept="image/*"
-        capture="environment"
         className="hidden"
         onChange={(e) => handleFiles(e.target.files)}
         data-testid="image-uploader-input"
