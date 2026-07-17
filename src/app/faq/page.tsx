@@ -33,7 +33,7 @@ const FAQS = [
   },
   {
     q: "How do subscriptions work?",
-    a: "Choose either a monthly plan (₹79/month) or a yearly plan (₹599/year) after your 7-day trial. The yearly plan effectively gives you about two months free.",
+    a: "Choose either a monthly plan (₹39/month) or a yearly plan (₹399/year) after your 7-day trial. The yearly plan effectively gives you nearly two months free.",
   },
   {
     q: "Can I cancel anytime?",

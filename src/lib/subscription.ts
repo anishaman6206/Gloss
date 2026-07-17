@@ -22,6 +22,13 @@ export async function activateSubscription({
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) return null;
 
+  // Idempotent per order: the return-URL redirect and the webhook can both
+  // fire for the same payment. Without this guard, the second call would
+  // extend currentPeriodEnd a second time (doubling the period).
+  if (user.cashfreeOrderId === cashfreeOrderId && user.paymentStatus === "PAID") {
+    return user;
+  }
+
   const meta = PLANS[plan];
   const now = new Date();
   const base =

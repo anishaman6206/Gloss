@@ -27,14 +27,14 @@ export function isCashfreeConfigured() {
 export const PLANS = {
   monthly: {
     label: "Monthly",
-    price: "₹79",
-    amount: 79,
+    price: "₹39",
+    amount: 39,
     durationDays: 30,
   },
   yearly: {
     label: "Yearly",
-    price: "₹599",
-    amount: 599,
+    price: "₹399",
+    amount: 399,
     durationDays: 365,
   },
 } as const;

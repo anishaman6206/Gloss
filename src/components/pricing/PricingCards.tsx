@@ -95,7 +95,7 @@ export function PricingCards({
           </p>
 
           <p className="mt-2 font-display text-5xl font-bold leading-none">
-            ₹79
+            ₹39
             <span className="ml-1 text-base font-medium text-ink-soft">
               / month
             </span>
@@ -133,14 +133,14 @@ export function PricingCards({
           </p>
 
           <p className="mt-2 font-display text-5xl font-bold leading-none">
-            ₹599
+            ₹399
             <span className="ml-1 text-base font-medium text-ink-soft">
               / year
             </span>
           </p>
 
           <p className="mt-1 text-sm text-ink-soft">
-            Two months free · works out to ₹49.9/mo.
+            Nearly 2 months free · works out to ₹33.3/mo.
           </p>
 
           <ul className="mt-5 space-y-2 text-sm">

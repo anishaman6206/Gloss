@@ -24,17 +24,17 @@ const META: Record<
 > = {
   monthly: {
     label: "Monthly",
-    price: "₹79",
+    price: "₹39",
     suffix: "/month",
-    amount: 79,
+    amount: 39,
     note: "Billed monthly. Cancel anytime.",
   },
   yearly: {
     label: "Yearly",
-    price: "₹599",
+    price: "₹399",
     suffix: "/year",
-    amount: 599,
-    note: "Two months free. Cancel future renewals anytime.",
+    amount: 399,
+    note: "Nearly 2 months free. Cancel future renewals anytime.",
   },
 };
 

@@ -68,7 +68,7 @@ export default function TermsPage() {
         <ul className="ml-5 list-disc space-y-1.5 text-ink-soft">
           <li>You get a 7-day free trial when you first sign in.</li>
           <li>
-            After the trial, you can subscribe monthly (₹79) or yearly (₹599).
+            After the trial, you can subscribe monthly (₹39) or yearly (₹399).
           </li>
           <li>
             Payments are billed on your selected billing cycle through our

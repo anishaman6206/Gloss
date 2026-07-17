@@ -27,7 +27,7 @@ export default function RefundPolicyPage() {
         </p>
 
         <h2 className="mt-2 font-display text-xl font-bold">
-          Monthly subscription (₹79 / month)
+          Monthly subscription (₹39 / month)
         </h2>
 
         <ul className="ml-5 list-disc space-y-1.5 text-ink-soft">
@@ -40,7 +40,7 @@ export default function RefundPolicyPage() {
         </ul>
 
         <h2 className="mt-4 font-display text-xl font-bold">
-          Yearly subscription (₹599 / year)
+          Yearly subscription (₹399 / year)
         </h2>
 
         <ul className="ml-5 list-disc space-y-1.5 text-ink-soft">

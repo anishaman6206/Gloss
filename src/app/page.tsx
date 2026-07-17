@@ -126,7 +126,7 @@ export default function Landing() {
           >
             <p className="text-sm font-bold uppercase tracking-wider text-ink-faint">Monthly</p>
             <p className="mt-2 font-display text-5xl font-bold">
-              ₹79 <span className="text-lg font-medium text-ink-soft">/ month</span>
+              ₹39 <span className="text-lg font-medium text-ink-soft">/ month</span>
             </p>
             <p className="mt-2 text-ink-soft">Save & review unlimited words.</p>
           </div>
@@ -139,10 +139,10 @@ export default function Landing() {
             </span>
             <p className="text-sm font-bold uppercase tracking-wider text-mango-shadow">Yearly</p>
             <p className="mt-2 font-display text-5xl font-bold">
-              ₹599 <span className="text-lg font-medium text-ink-soft">/ year</span>
+              ₹399 <span className="text-lg font-medium text-ink-soft">/ year</span>
             </p>
             <p className="mt-2 text-ink-soft">
-              Two months free · works out to <b>₹49.9/mo</b>.
+              Nearly 2 months free · works out to <b>₹33.3/mo</b>.
             </p>
           </div>
         </div>
