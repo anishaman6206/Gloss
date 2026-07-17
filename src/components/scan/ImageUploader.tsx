@@ -28,17 +28,21 @@ export function ImageUploader({ onSelect }: { onSelect: (file: File) => void }) 
         setDragging(false);
         handleFiles(e.dataTransfer.files);
       }}
+      onClick={() => galleryInputRef.current?.click()}
+      role="button"
+      tabIndex={0}
       data-testid="image-uploader"
-      className={`relative flex flex-col items-center justify-center gap-4 overflow-hidden rounded-3xl border-2 border-dashed p-10 text-center transition-all ${
+      className={`relative flex cursor-pointer flex-col items-center justify-center gap-4 overflow-hidden rounded-3xl border-2 border-dashed p-10 text-center transition-all ${
         dragging
           ? "border-brand bg-brand/5 shadow-tactile shadow-brand-shadow"
-          : "border-black/15 bg-white"
+          : "border-black/15 bg-white hover:border-brand/50 hover:bg-brand/[0.02]"
       }`}
     >
       {/* Separate inputs: `capture` forces straight into the camera on
           mobile, while its absence is needed for the gallery/files picker.
-          Mobile browsers won't reliably offer both from a single input, so
-          two explicit buttons guarantee both choices everywhere. */}
+          Mobile browsers won't reliably offer both from a single input. On
+          desktop there's no camera to capture from, so the whole card just
+          opens the gallery/file input like before. */}
       <input
         ref={cameraInputRef}
         type="file"
@@ -68,10 +72,15 @@ export function ImageUploader({ onSelect }: { onSelect: (file: File) => void }) 
         </p>
       </div>
 
-      <div className="flex flex-wrap items-center justify-center gap-2">
+      {/* Mobile: explicit camera vs gallery buttons, since a single tap
+          target can't reliably offer both there. */}
+      <div className="flex flex-wrap items-center justify-center gap-2 md:hidden">
         <button
           type="button"
-          onClick={() => cameraInputRef.current?.click()}
+          onClick={(e) => {
+            e.stopPropagation();
+            cameraInputRef.current?.click();
+          }}
           data-testid="image-uploader-camera-btn"
           className="btn-tactile !py-2 bg-brand shadow-tactile shadow-brand-shadow"
         >
@@ -81,7 +90,10 @@ export function ImageUploader({ onSelect }: { onSelect: (file: File) => void }) 
 
         <button
           type="button"
-          onClick={() => galleryInputRef.current?.click()}
+          onClick={(e) => {
+            e.stopPropagation();
+            galleryInputRef.current?.click();
+          }}
           data-testid="image-uploader-gallery-btn"
           className="btn-tactile !bg-white !py-2 !text-ink border-2 border-black/10 shadow-tactile shadow-black/10"
         >
@@ -90,7 +102,10 @@ export function ImageUploader({ onSelect }: { onSelect: (file: File) => void }) 
         </button>
       </div>
 
-      <span className="text-xs text-ink-faint">or drop an image here</span>
+      {/* Desktop: whole card is already the click target. */}
+      <span className="hidden items-center gap-1.5 rounded-full bg-black/[0.04] px-3 py-1 text-xs font-bold text-ink-soft md:inline-flex">
+        <ImagePlus size={12} /> tap to choose · or drop here
+      </span>
     </div>
   );
 }
