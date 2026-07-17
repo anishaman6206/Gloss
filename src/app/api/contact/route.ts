@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getResendClient } from "@/lib/email/resend";
+import { renderContactNotificationEmail } from "@/lib/email/contactNotification";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -41,6 +43,23 @@ export async function POST(req: Request) {
       message,
     },
   });
+
+  // Best-effort notification — the message is already safely stored above,
+  // so a Resend/config problem here should never fail the user's submission.
+  try {
+    const resend = getResendClient();
+    const from = process.env.EMAIL_FROM ?? "Gloss <reminders@gloss.app>";
+    const to = process.env.SUPPORT_EMAIL ?? "gloss.theta@gmail.com";
+    const { subject: mailSubject, html, text } = renderContactNotificationEmail({
+      name,
+      email,
+      subject,
+      message,
+    });
+    await resend.emails.send({ from, to, replyTo: email, subject: mailSubject, html, text });
+  } catch (err) {
+    console.error("Failed to send contact notification email", err);
+  }
 
   return NextResponse.json({
     ok: true,
