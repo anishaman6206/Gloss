@@ -1,12 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireUser } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import {
-  PLANS,
-  razorpayClient,
-  isRazorpayConfigured,
-  type PlanKey,
-} from "@/lib/razorpay";
+import { isCashfreeConfigured, cashfreeMode, PLANS, type PlanKey } from "@/lib/cashfree/client";
+import { createOrder } from "@/lib/cashfree/orders";
 
 export async function POST(req: Request) {
   let user;
@@ -16,9 +11,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
 
-  if (!isRazorpayConfigured()) {
+  if (!isCashfreeConfigured()) {
     return NextResponse.json(
-      { ok: false, error: "razorpay_not_configured" },
+      { ok: false, error: "cashfree_not_configured" },
       { status: 501 }
     );
   }
@@ -28,32 +23,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "invalid_plan" }, { status: 400 });
   }
 
-  const meta = PLANS[plan];
-  const client = razorpayClient();
-
-  const order = await client.orders.create({
-    amount: meta.amount,
-    currency: "INR",
-    receipt: `gloss_${user.id.slice(0, 8)}_${Date.now()}`,
-    notes: {
-      userId: user.id,
-      email: user.email,
-      plan,
-      durationDays: String(meta.durationDays),
-    },
-  });
-
-  await prisma.user.update({
-    where: { id: user.id },
-    data: { planId: plan },
-  });
+  const { orderId, paymentSessionId } = await createOrder(user, plan);
 
   return NextResponse.json({
     ok: true,
-    orderId: order.id,
-    amount: order.amount,
-    currency: order.currency,
-    keyId: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+    orderId,
+    paymentSessionId,
     plan,
+    mode: cashfreeMode(),
   });
 }

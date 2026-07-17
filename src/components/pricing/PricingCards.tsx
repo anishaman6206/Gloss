@@ -159,7 +159,7 @@ export function PricingCards({
       </div>
 
       <p className="text-center text-xs text-ink-faint">
-        Secure checkout by Razorpay · GST included where applicable · Cancel
+        Secure checkout by Cashfree · GST included where applicable · Cancel
         anytime from your profile.
       </p>
     </div>

@@ -9,18 +9,26 @@ datasource db {
 }
 
 model User {
-  id            String   @id @default(cuid())
-  email         String   @unique
-  name          String
-  picture       String?
-  createdAt     DateTime @default(now())
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  picture   String?
+  createdAt DateTime @default(now())
 
   // Subscription tracking
-  subscriptionStatus String   @default("trialing") // trialing | active | past_due | cancelled | expired
+  subscriptionStatus String    @default("trialing") // trialing | active | past_due | cancelled | expired
   trialEndsAt        DateTime? // set at signup: now + 7 days
-  planId             String?   // razorpay plan id
-  razorpaySubId      String?   // razorpay subscription id
+  planId             String? // "monthly" | "yearly" plan key
   currentPeriodEnd   DateTime?
+  subscriptionStart  DateTime? // when the current paid period first began
+  cancelAtPeriodEnd  Boolean   @default(false) // user cancelled future renewals; access continues until currentPeriodEnd
+  cancelledAt        DateTime?
+
+  // Cashfree payment tracking
+  cashfreeOrderId   String?
+  cashfreePaymentId String?
+  paymentStatus     String? // PAID | FAILED | REFUNDED
+  paymentMethod     String? // upi | card | netbanking | wallet, from Cashfree's response
 
   sessions Session[]
   words    Word[]

@@ -4,13 +4,14 @@ import {
   Crown,
   Calendar,
   Mail,
-  ArrowRight,
   BookOpen,
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser, subscriptionStatus } from "@/lib/auth";
 import { AuthGate } from "@/components/auth/AuthGate";
 import { LogoutButton } from "@/components/auth/LogoutButton";
+import { SubscriptionCard } from "@/components/profile/SubscriptionCard";
+import { PLANS, type PlanKey } from "@/lib/cashfree/client";
 
 export const dynamic = "force-dynamic";
 
@@ -39,17 +40,31 @@ export default async function ProfilePage() {
     },
   });
 
-  const statusLabel = sub.isPaid
-    ? "Pro subscriber"
-    : sub.isTrialing
-    ? `Trial · ${sub.daysLeft} day${sub.daysLeft === 1 ? "" : "s"} left`
-    : "Free · trial ended";
+  const statusLabel =
+    sub.displayStatus === "active"
+      ? "Pro subscriber"
+      : sub.displayStatus === "cancelling"
+      ? "Pro · cancelling"
+      : sub.displayStatus === "expired"
+      ? "Free · subscription expired"
+      : sub.displayStatus === "trialing"
+      ? `Trial · ${sub.daysLeft} day${sub.daysLeft === 1 ? "" : "s"} left`
+      : "Free · trial ended";
 
-  const statusStyle = sub.isPaid
-    ? "bg-leaf/15 text-leaf-shadow"
-    : sub.isTrialing
-    ? "bg-mango/15 text-mango-shadow"
-    : "bg-cherry/10 text-cherry";
+  const statusStyle =
+    sub.displayStatus === "active"
+      ? "bg-leaf/15 text-leaf-shadow"
+      : sub.displayStatus === "cancelling"
+      ? "bg-mango/15 text-mango-shadow"
+      : sub.displayStatus === "trialing"
+      ? "bg-mango/15 text-mango-shadow"
+      : "bg-cherry/10 text-cherry";
+
+  const planKey = (user.planId as PlanKey | null) ?? null;
+  const planMeta = planKey && planKey in PLANS ? PLANS[planKey] : null;
+  const planPrice = planMeta
+    ? `${planMeta.price}/${planKey === "yearly" ? "year" : "month"}`
+    : null;
 
   return (
     <div className="space-y-6" data-testid="profile-page">
@@ -122,76 +137,20 @@ export default async function ProfilePage() {
       </div>
 
       {/* Subscription details */}
-      <div className="rounded-3xl border-2 border-black/5 bg-white p-6 shadow-tactile shadow-black/5">
-        <p className="text-xs font-bold uppercase tracking-wider text-ink-faint">
-          Subscription
-        </p>
-
-        <div className="mt-3 space-y-2 text-sm">
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-ink-soft">Status</span>
-            <span className="font-bold">{statusLabel}</span>
-          </div>
-
-          {sub.isTrialing && user.trialEndsAt && (
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-ink-soft">Trial ends</span>
-
-              <span className="font-bold">
-                {new Date(user.trialEndsAt).toLocaleDateString("en-IN", {
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric",
-                })}
-              </span>
-            </div>
-          )}
-
-          {sub.isPaid && user.currentPeriodEnd && (
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-ink-soft">Renews on</span>
-
-              <span className="font-bold">
-                {new Date(user.currentPeriodEnd).toLocaleDateString("en-IN", {
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric",
-                })}
-              </span>
-            </div>
-          )}
-        </div>
-
-        {!sub.isPaid && (
-          <Link
-            href="/pricing"
-            data-testid="profile-upgrade"
-            className="btn-tactile mt-5 bg-brand shadow-tactile shadow-brand-shadow"
-          >
-            <Crown size={16} />
-            {sub.isTrialing
-              ? "Choose a plan"
-              : "Reactivate subscription"}
-            <ArrowRight size={16} />
-          </Link>
-        )}
-
-        {sub.isPaid && (
-          <div className="mt-5 space-y-2 text-sm text-ink-soft">
-            <p>
-              To cancel your subscription or update your payment method,
-              please write to{" "}
-              <a
-                href="mailto:gloss.ai@gmail.com"
-                className="font-bold text-brand"
-              >
-                gloss.ai@gmail.com
-              </a>
-              . We&apos;ll process it within a day.
-            </p>
-          </div>
-        )}
-      </div>
+      <SubscriptionCard
+        displayStatus={sub.displayStatus}
+        planLabel={planMeta?.label ?? null}
+        planPrice={planPrice}
+        trialEndsAt={user.trialEndsAt ? user.trialEndsAt.toISOString() : null}
+        daysLeft={sub.daysLeft}
+        subscriptionStart={
+          user.subscriptionStart ? user.subscriptionStart.toISOString() : null
+        }
+        currentPeriodEnd={
+          user.currentPeriodEnd ? user.currentPeriodEnd.toISOString() : null
+        }
+        paymentStatus={user.paymentStatus}
+      />
 
       {/* Quick links */}
       <div className="rounded-3xl border-2 border-black/5 bg-white p-6 shadow-tactile shadow-black/5">

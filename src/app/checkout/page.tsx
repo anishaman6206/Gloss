@@ -39,8 +39,6 @@ export default async function CheckoutPage({
       plan={plan}
       isTrialing={sub.isTrialing}
       daysLeft={sub.daysLeft}
-      userEmail={user.email}
-      userName={user.name}
     />
   );
 }

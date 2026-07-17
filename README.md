@@ -12,7 +12,7 @@ them forever with spaced repetition.
 - **Daily review** — SM-2 spaced repetition with three mixed modes (recall-flip, fill-in-the-blank, produce-the-word), progress bar, and confetti celebrations.
 - **Stats & streaks** — 14-day chart, streak counter, milestone badges.
 - **Emergent Google Auth** — one-tap sign-in.
-- **Subscriptions** — 7-day free trial, then ₹79/mo or ₹599/yr via Razorpay.
+- **Subscriptions** — 7-day free trial, then ₹79/mo or ₹599/yr via Cashfree.
 
 ## Stack
 
@@ -21,13 +21,13 @@ them forever with spaced repetition.
 - Tesseract.js (client-side OCR)
 - Groq chat completions (server-side only)
 - Framer Motion, Lucide icons, canvas-confetti
-- Emergent-managed Google Auth, Razorpay subscriptions
+- Emergent-managed Google Auth, Cashfree subscriptions
 
 ## Local development
 
 ```bash
 npm install
-cp .env.example .env.local  # then fill in GROQ_API_KEY and Razorpay keys
+cp .env.example .env.local  # then fill in GROQ_API_KEY and Cashfree keys
 npx prisma migrate dev
 npm run dev
 ```
@@ -41,10 +41,9 @@ Open <http://localhost:3000>.
 | `DATABASE_URL` | Prisma database URL. Locally: `file:./prisma/dev.db`. Production: Postgres connection string. |
 | `GROQ_API_KEY` | Server-only. From https://console.groq.com/keys. |
 | `GROQ_MODEL` | Optional. Defaults to `llama-3.3-70b-versatile`. |
-| `RAZORPAY_KEY_ID` | Razorpay dashboard → Account & Settings → API Keys. |
-| `RAZORPAY_KEY_SECRET` | Razorpay dashboard → API Keys (secret is shown once). |
-| `RAZORPAY_WEBHOOK_SECRET` | Razorpay dashboard → Webhooks. Any strong string, set the same one on the webhook. |
-| `NEXT_PUBLIC_RAZORPAY_KEY_ID` | Same as `RAZORPAY_KEY_ID`, exposed to the client for Razorpay Checkout. |
+| `CASHFREE_APP_ID` | Cashfree dashboard → Developers → API Keys. |
+| `CASHFREE_SECRET_KEY` | Cashfree dashboard → Developers → API Keys (secret is shown once). |
+| `CASHFREE_ENV` | `SANDBOX` or `PRODUCTION` — switches the API/webhook-signature environment automatically. |
 | `APP_URL` | Public base URL (e.g., https://gloss.vercel.app). |
 
 ## Deploying to Vercel
@@ -85,18 +84,17 @@ git add prisma && git commit -m "postgres migration"
 - Add all env variables from the table above.
 - Build command is already in `vercel.json` (`prisma migrate deploy && next build`).
 
-### 4. Configure Razorpay
+### 4. Configure Cashfree
 
-1. Log in to https://dashboard.razorpay.com.
-2. Copy your **Key Id** + **Key Secret** into env variables `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, and `NEXT_PUBLIC_RAZORPAY_KEY_ID`.
-3. **Webhooks** → **Add New**:
-   - URL: `https://<your-vercel-domain>/api/razorpay/webhook`
-   - Active Events: `payment.captured`
-   - Secret: set any strong string, copy the same value into `RAZORPAY_WEBHOOK_SECRET`.
+1. Log in to https://merchant.cashfree.com (use the Sandbox toggle while testing).
+2. Copy your **App ID** + **Secret Key** into env variables `CASHFREE_APP_ID`, `CASHFREE_SECRET_KEY`, and set `CASHFREE_ENV` to `SANDBOX` or `PRODUCTION`.
+3. **Developers → Webhooks** → add an endpoint:
+   - URL: `https://<your-vercel-domain>/api/cashfree/webhook`
+   - Events: `PAYMENT_SUCCESS_WEBHOOK`, `PAYMENT_FAILED_WEBHOOK`, `REFUND_STATUS_WEBHOOK`
+   - Cashfree signs webhooks with your **Secret Key** automatically — no separate webhook secret to configure.
+4. No dashboard-side return URL config is needed — it's set per-order by the app (`/api/subscribe/return`).
 
-> The app uses **one-time Razorpay Orders** for ₹79 (30 days) and ₹599 (365 days) instead of the Subscriptions API. Reason: many new Razorpay accounts don't get the Subscriptions API until KYC completes. Orders API works out-of-the-box, and the server tracks `currentPeriodEnd` per user in Prisma so the UX is identical.
->
-> If/when you want true auto-renewing subscriptions, swap `/api/subscribe` to `client.subscriptions.create({ plan_id, total_count, ... })` and update the webhook to handle `subscription.charged`. All the plumbing is in place.
+> The app uses **one-time Cashfree Orders** for ₹79 (30 days) and ₹599 (365 days), mirroring the prior Razorpay Orders design rather than a recurring-billing product — the server tracks `currentPeriodEnd` per user in Prisma so the UX is identical, and "cancel" simply stops nudging renewal rather than calling a Cashfree cancel-subscription API.
 
 ### 5. Redeploy
 
@@ -109,7 +107,7 @@ Vercel will auto-deploy on push. Every push runs `prisma migrate deploy` so sche
 - `/library` — every saved word, searchable, with audio.
 - `/review` — today's due words in mixed modes with SM-2 scheduling.
 - `/stats` — streak, review chart, milestone badges.
-- `/subscribe` — pricing + Razorpay checkout.
+- `/subscribe` — pricing + Cashfree checkout.
 
 ## Notes
 

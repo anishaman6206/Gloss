@@ -75,10 +75,9 @@ git push
 | `DIRECT_URL` | Neon **direct** URL (no pooler) |
 | `GROQ_API_KEY` | Your key from https://console.groq.com/keys — also in your local `.env.local` |
 | `GROQ_MODEL` | `llama-3.3-70b-versatile` |
-| `RAZORPAY_KEY_ID` | Razorpay dashboard → Account & Settings → API Keys |
-| `RAZORPAY_KEY_SECRET` | Razorpay dashboard → API Keys (shown once at creation) |
-| `NEXT_PUBLIC_RAZORPAY_KEY_ID` | Same value as `RAZORPAY_KEY_ID` |
-| `RAZORPAY_WEBHOOK_SECRET` | *Pick any strong random string, e.g.* `whsec_gloss_yourname_2026_random` |
+| `CASHFREE_APP_ID` | Cashfree dashboard → Developers → API Keys |
+| `CASHFREE_SECRET_KEY` | Cashfree dashboard → API Keys (shown once at creation) — also used to verify webhook signatures, no separate webhook secret needed |
+| `CASHFREE_ENV` | `SANDBOX` while testing, `PRODUCTION` when live — switches API/webhook environment automatically |
 | `APP_URL` | Leave empty on first deploy; set to your Vercel URL after |
 
 > **Tip**: Run `cat .env.local` locally to grab the values you already have. Never paste real secrets into any file that will be committed.
@@ -89,14 +88,16 @@ When the build succeeds, Vercel gives you a `https://gloss-<hash>.vercel.app` UR
 
 ---
 
-## 4. Point Razorpay webhook at your Vercel URL
+## 4. Point Cashfree at your Vercel URL
+
+The app builds Cashfree's `return_url` and `notify_url` from `NEXTAUTH_URL`, so make sure that env var matches your deployed origin exactly before testing checkout.
 
 1. Copy your Vercel URL (e.g., `https://gloss-anish.vercel.app`).
-2. In Vercel → Project → **Settings → Environment Variables**, update `APP_URL` = your Vercel URL. Redeploy.
-3. Go to <https://dashboard.razorpay.com> → **Settings → Webhooks → Add New**.
-   - **URL**: `https://<your-vercel-url>/api/razorpay/webhook`
-   - **Active events**: check `payment.captured` only.
-   - **Secret**: paste the same value you put in `RAZORPAY_WEBHOOK_SECRET` (`whsec_gloss_2026_secure_x9k2m` in the example above).
+2. In Vercel → Project → **Settings → Environment Variables**, update `APP_URL` and `NEXTAUTH_URL` = your Vercel URL. Redeploy.
+3. Go to <https://merchant.cashfree.com> → **Developers → Webhooks → Add Endpoint**.
+   - **URL**: `https://<your-vercel-url>/api/cashfree/webhook`
+   - **Events**: `PAYMENT_SUCCESS_WEBHOOK`, `PAYMENT_FAILED_WEBHOOK`, `REFUND_STATUS_WEBHOOK`.
+   - No separate secret field — Cashfree signs with `CASHFREE_SECRET_KEY`, which the webhook route already verifies against.
 4. Save.
 
 ---
@@ -108,7 +109,7 @@ Open your Vercel URL and:
 1. Scan a page (or upload any book photo) → tap a word → confirm the definition arrives.
 2. Click **Sign in · save words** → sign in with Google → you should return to the app with the trial badge showing "**Trial · 7d left**".
 3. Click **Save to my library** → confirm the word appears in **Library**.
-4. Go to **Subscribe** → click a plan → the Razorpay Test-mode checkout should open. Use test card `4111 1111 1111 1111`, any future date, any CVV. On success, you'll be redirected back and the top-right badge changes to **Pro**.
+4. Go to **Subscribe** → click a plan → Cashfree's Sandbox Hosted Checkout should open. Use the test card/UPI credentials listed in your Cashfree Sandbox dashboard. On success, you'll be redirected back and the top-right badge changes to **Pro**.
 
 Done. Ship it.
 
@@ -117,7 +118,7 @@ Done. Ship it.
 ## Custom domain (optional)
 
 - Vercel → Project → **Settings → Domains → Add** — point your DNS `CNAME` at the provided target. Vercel handles HTTPS automatically.
-- Update `APP_URL` env var and the Razorpay webhook URL to the custom domain.
+- Update `APP_URL`, `NEXTAUTH_URL`, and the Cashfree webhook URL to the custom domain.
 
 ---
 

@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Script from "next/script";
 import { useRouter } from "next/navigation";
+import { load as loadCashfree } from "@cashfreepayments/cashfree-js";
 import {
   ArrowLeft,
   ShieldCheck,
@@ -38,28 +38,14 @@ const META: Record<
   },
 };
 
-declare global {
-  interface Window {
-    Razorpay?: new (
-      opts: Record<string, unknown>
-    ) => {
-      open: () => void;
-    };
-  }
-}
-
 export function CheckoutClient({
   plan,
   isTrialing,
   daysLeft,
-  userEmail,
-  userName,
 }: {
   plan: Plan;
   isTrialing: boolean;
   daysLeft: number;
-  userEmail: string;
-  userName: string;
 }) {
   const router = useRouter();
 
@@ -85,7 +71,7 @@ export function CheckoutClient({
       const data = await res.json();
 
       if (!res.ok || !data.ok) {
-        if (data.error === "razorpay_not_configured") {
+        if (data.error === "cashfree_not_configured") {
           setError("Payments are being set up. Please try again shortly.");
         } else {
           setError("Couldn't start checkout. Please try again.");
@@ -93,64 +79,25 @@ export function CheckoutClient({
         return;
       }
 
-      if (typeof window === "undefined" || !window.Razorpay) {
+      const cashfree = await loadCashfree({ mode: data.mode });
+      if (!cashfree) {
         setError("Payment widget failed to load. Please refresh and try again.");
         return;
       }
 
-      const rzp = new window.Razorpay({
-        key: data.keyId,
-        order_id: data.orderId,
-        amount: data.amount,
-        currency: data.currency,
-        name: "Gloss",
-        description: `${meta.label} · ${meta.price}`,
-        prefill: {
-          email: userEmail,
-          name: userName,
-        },
-        theme: {
-          color: "#1CB0F6",
-        },
-        modal: {
-          ondismiss: () => router.push("/payment/cancelled"),
-        },
-        handler: async (response: {
-          razorpay_order_id: string;
-          razorpay_payment_id: string;
-          razorpay_signature: string;
-        }) => {
-          try {
-            const verifyRes = await fetch("/api/subscribe/verify", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              credentials: "include",
-              body: JSON.stringify({
-                orderId: response.razorpay_order_id,
-                paymentId: response.razorpay_payment_id,
-                signature: response.razorpay_signature,
-                plan,
-              }),
-            });
-
-            const verifyData = await verifyRes.json();
-
-            if (verifyData.ok) {
-              router.push(
-                `/payment/success?plan=${plan}&payment_id=${response.razorpay_payment_id}`
-              );
-            } else {
-              router.push("/payment/failed?reason=verification");
-            }
-          } catch {
-            router.push("/payment/failed?reason=verification");
-          }
-        },
+      // redirectTarget "_self" is a full-page navigation rather than a
+      // popup/iframe, which is what keeps this working inside the Median
+      // Android WebView. Cashfree redirects back to order_meta.return_url
+      // (set server-side at order creation), which is where the payment is
+      // actually verified and the subscription activated.
+      const result = await cashfree.checkout({
+        paymentSessionId: data.paymentSessionId,
+        redirectTarget: "_self",
       });
 
-      rzp.open();
+      if (result?.error) {
+        setError("Something went wrong. Try again in a moment.");
+      }
     } catch {
       setError("Something went wrong. Try again in a moment.");
     } finally {
@@ -160,11 +107,6 @@ export function CheckoutClient({
 
   return (
     <>
-      <Script
-        src="https://checkout.razorpay.com/v1/checkout.js"
-        strategy="afterInteractive"
-      />
-
       <div className="space-y-6" data-testid="checkout-page">
         <button
           onClick={() => router.back()}
@@ -253,7 +195,7 @@ export function CheckoutClient({
 
           <p className="mt-4 flex items-center justify-center gap-1.5 text-xs text-ink-faint">
             <ShieldCheck size={12} />
-            Secured by Razorpay · UPI / Cards / Netbanking / Wallets
+            Secured by Cashfree · UPI / Cards / Netbanking / Wallets
           </p>
         </div>
       </div>

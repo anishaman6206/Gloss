@@ -80,18 +80,23 @@ export async function requireUser() {
   return user;
 }
 
+export type DisplayStatus = "free" | "trialing" | "active" | "cancelling" | "expired";
+
 export type SubStatus = {
   isActive: boolean;         // trial active OR paid active
   isTrialing: boolean;
   isPaid: boolean;
+  isCancelling: boolean;     // paid, still active, but won't renew
   daysLeft: number;
   status: string;
+  displayStatus: DisplayStatus;
 };
 
 export function subscriptionStatus(user: {
   subscriptionStatus: string;
   trialEndsAt: Date | null;
   currentPeriodEnd: Date | null;
+  cancelAtPeriodEnd?: boolean;
 }): SubStatus {
   const now = new Date();
   const trialEnd = user.trialEndsAt;
@@ -101,6 +106,7 @@ export function subscriptionStatus(user: {
     user.subscriptionStatus === "trialing" && !!trialEnd && trialEnd > now;
   const isPaid =
     user.subscriptionStatus === "active" && !!periodEnd && periodEnd > now;
+  const isCancelling = isPaid && !!user.cancelAtPeriodEnd;
 
   const activeEnd = isPaid ? periodEnd! : trialEnd ?? now;
   const daysLeft = Math.max(
@@ -108,11 +114,26 @@ export function subscriptionStatus(user: {
     Math.ceil((activeEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
   );
 
+  // isPaid already goes false once currentPeriodEnd passes, regardless of
+  // cancelAtPeriodEnd — expiry naturally downgrades without extra code.
+  const wasEverPaid = user.subscriptionStatus === "active";
+  const displayStatus: DisplayStatus = isCancelling
+    ? "cancelling"
+    : isPaid
+    ? "active"
+    : isTrialing
+    ? "trialing"
+    : wasEverPaid
+    ? "expired"
+    : "free";
+
   return {
     isActive: isTrialing || isPaid,
     isTrialing,
     isPaid,
+    isCancelling,
     daysLeft,
     status: user.subscriptionStatus,
+    displayStatus,
   };
 }
