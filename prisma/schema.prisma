@@ -30,9 +30,18 @@ model User {
   paymentStatus     String? // PAID | FAILED | REFUNDED
   paymentMethod     String? // upi | card | netbanking | wallet, from Cashfree's response
 
+  // Due-review reminder emails
+  reminderEmailsEnabled Boolean   @default(true)
+  lastReminderSentAt    DateTime?
+
+  // Pro-only streak-freeze perk: one skip-day forgiveness, refilled weekly
+  streakFreezesAvailable   Int       @default(0)
+  streakFreezesRefreshedAt DateTime?
+
   sessions Session[]
   words    Word[]
   logs     ReviewLog[]
+  freezes  StreakFreeze[]
 }
 
 model Session {
@@ -82,6 +91,17 @@ model ReviewLog {
   quality    Int
   reviewedAt DateTime @default(now())
 
+  @@index([userId])
+}
+
+model StreakFreeze {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dateKey   String // YYYY-MM-DD (UTC), the day retroactively marked active
+  createdAt DateTime @default(now())
+
+  @@unique([userId, dateKey])
   @@index([userId])
 }
 

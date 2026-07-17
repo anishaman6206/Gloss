@@ -11,6 +11,7 @@ import { getCurrentUser, subscriptionStatus } from "@/lib/auth";
 import { AuthGate } from "@/components/auth/AuthGate";
 import { LogoutButton } from "@/components/auth/LogoutButton";
 import { SubscriptionCard } from "@/components/profile/SubscriptionCard";
+import { ReminderToggle } from "@/components/profile/ReminderToggle";
 import { PLANS, type PlanKey } from "@/lib/cashfree/client";
 
 export const dynamic = "force-dynamic";
@@ -151,6 +152,8 @@ export default async function ProfilePage() {
         }
         paymentStatus={user.paymentStatus}
       />
+
+      <ReminderToggle initialEnabled={user.reminderEmailsEnabled} />
 
       {/* Quick links */}
       <div className="rounded-3xl border-2 border-black/5 bg-white p-6 shadow-tactile shadow-black/5">

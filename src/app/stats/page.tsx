@@ -1,8 +1,9 @@
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
-import { computeStreak, dateKey } from "@/lib/stats";
+import { getCurrentUser, subscriptionStatus } from "@/lib/auth";
+import { computeStreak, dateKey, getReviewCounts } from "@/lib/stats";
+import { autoApplyFreezeIfNeeded } from "@/lib/streakFreeze";
 import { AuthGate } from "@/components/auth/AuthGate";
-import { Flame, BarChart3, Trophy, Zap } from "lucide-react";
+import { Flame, BarChart3, Trophy, Zap, Snowflake } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -23,16 +24,22 @@ export default async function StatsPage() {
   since.setDate(since.getDate() - (DAYS - 1));
   since.setHours(0, 0, 0, 0);
 
-  const logs = await prisma.reviewLog.findMany({
-    where: { userId: user.id, reviewedAt: { gte: since } },
-    select: { reviewedAt: true },
-  });
+  const sub = subscriptionStatus(user);
 
-  const counts = new Map<string, number>();
-  for (const log of logs) {
-    const key = dateKey(log.reviewedAt);
-    counts.set(key, (counts.get(key) ?? 0) + 1);
+  let counts = await getReviewCounts(user.id, DAYS);
+  let freezesAvailable = user.streakFreezesAvailable;
+  if (sub.isPaid) {
+    const { user: updated, appliedDateKey } = await autoApplyFreezeIfNeeded(user.id, counts);
+    freezesAvailable = updated.streakFreezesAvailable;
+    if (appliedDateKey) {
+      counts = new Map(counts);
+      counts.set(appliedDateKey, (counts.get(appliedDateKey) ?? 0) + 1);
+    }
   }
+
+  const totalReviews = await prisma.reviewLog.count({
+    where: { userId: user.id, reviewedAt: { gte: since } },
+  });
 
   const days = Array.from({ length: DAYS }, (_, i) => {
     const d = new Date();
@@ -46,7 +53,6 @@ export default async function StatsPage() {
   });
 
   const streak = computeStreak(counts);
-  const totalReviews = logs.length;
   const totalWords = await prisma.word.count({ where: { userId: user.id } });
   const maxCount = Math.max(1, ...days.map((d) => d.count));
 
@@ -75,6 +81,15 @@ export default async function StatsPage() {
           <p className="mt-1 text-sm text-ink-soft">
             day{streak === 1 ? "" : "s"} in a row
           </p>
+          {sub.isPaid && (
+            <p
+              className="relative mt-3 flex items-center gap-1.5 text-xs font-bold text-brand-shadow"
+              data-testid="streak-freezes"
+            >
+              <Snowflake size={13} />
+              {freezesAvailable} freeze{freezesAvailable === 1 ? "" : "s"} available
+            </p>
+          )}
         </div>
         <div className="rounded-3xl border-2 border-black/5 bg-white p-6 shadow-tactile shadow-black/5">
           <div className="text-sm font-bold uppercase tracking-wider text-brand-shadow">

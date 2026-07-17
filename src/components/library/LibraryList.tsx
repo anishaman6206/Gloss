@@ -16,6 +16,8 @@ export type LibraryWord = {
   synonyms: string[];
   examples: string[];
   status: WordStatus;
+  isLeech: boolean;
+  isCommon: boolean;
 };
 
 const UNDO_WINDOW_MS = 5000;
@@ -24,9 +26,12 @@ export function LibraryList({ initialWords }: { initialWords: LibraryWord[] }) {
   const [words, setWords] = useState(initialWords);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [undoWord, setUndoWord] = useState<{ word: LibraryWord; index: number } | null>(null);
+  const [strugglingOnly, setStrugglingOnly] = useState(false);
   const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const wordToDelete = words.find((w) => w.id === pendingDeleteId) ?? null;
+  const strugglingCount = words.filter((w) => w.isLeech).length;
+  const visibleWords = strugglingOnly ? words.filter((w) => w.isLeech) : words;
 
   function confirmDelete() {
     if (!wordToDelete) return;
@@ -57,9 +62,24 @@ export function LibraryList({ initialWords }: { initialWords: LibraryWord[] }) {
 
   return (
     <>
+      {strugglingCount > 0 && (
+        <button
+          type="button"
+          onClick={() => setStrugglingOnly((v) => !v)}
+          data-testid="struggling-filter-chip"
+          className={`mb-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-wider transition-colors ${
+            strugglingOnly
+              ? "bg-cherry text-white"
+              : "bg-cherry/15 text-cherry-shadow hover:bg-cherry/25"
+          }`}
+        >
+          Struggling ({strugglingCount})
+        </button>
+      )}
+
       <div className="space-y-3">
         <AnimatePresence initial={false}>
-          {words.map((word) => (
+          {visibleWords.map((word) => (
             <motion.div
               key={word.id}
               layout
@@ -76,6 +96,8 @@ export function LibraryList({ initialWords }: { initialWords: LibraryWord[] }) {
                 synonyms={word.synonyms}
                 examples={word.examples}
                 status={word.status}
+                isLeech={word.isLeech}
+                isCommon={word.isCommon}
                 onDelete={() => setPendingDeleteId(word.id)}
               />
             </motion.div>

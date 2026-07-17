@@ -50,3 +50,9 @@ export function wordStatus(review: { repetitions: number; intervalDays: number }
   if (review.intervalDays >= LEARNED_INTERVAL_DAYS) return "learned";
   return "learning";
 }
+
+const LEECH_THRESHOLD = 4;
+
+export function isLeech(review: { lapses: number } | null): boolean {
+  return !!review && review.lapses >= LEECH_THRESHOLD;
+}

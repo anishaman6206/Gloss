@@ -1,10 +1,11 @@
 import { prisma } from "@/lib/prisma";
-import { wordStatus } from "@/lib/sm2";
-import { getCurrentUser } from "@/lib/auth";
+import { wordStatus, isLeech } from "@/lib/sm2";
+import { isCommonWord } from "@/lib/wordFrequency";
+import { getCurrentUser, subscriptionStatus } from "@/lib/auth";
 import { SearchBar } from "@/components/library/SearchBar";
 import { LibraryList } from "@/components/library/LibraryList";
 import { AuthGate } from "@/components/auth/AuthGate";
-import { BookOpen, Sparkles } from "lucide-react";
+import { BookOpen, Sparkles, Download } from "lucide-react";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -53,13 +54,25 @@ export default async function LibraryPage({
         <h1 className="mt-3 font-display text-3xl font-bold tracking-tight md:text-4xl">
           Your word bank
         </h1>
-        <div className="mt-3 flex items-center gap-4 text-sm text-ink-soft">
-          <span>
-            <b className="text-ink">{total}</b> saved
-          </span>
-          <span>
-            <b className="text-leaf-shadow">{learned}</b> learned
-          </span>
+        <div className="mt-3 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4 text-sm text-ink-soft">
+            <span>
+              <b className="text-ink">{total}</b> saved
+            </span>
+            <span>
+              <b className="text-leaf-shadow">{learned}</b> learned
+            </span>
+          </div>
+          {subscriptionStatus(user).isActive && total > 0 && (
+            <a
+              href="/api/export/anki"
+              download
+              data-testid="export-anki-link"
+              className="flex items-center gap-1.5 text-xs font-bold text-brand-shadow hover:underline"
+            >
+              <Download size={13} /> Export to Anki
+            </a>
+          )}
         </div>
       </header>
 
@@ -100,6 +113,8 @@ export default async function LibraryPage({
             synonyms: JSON.parse(word.synonyms),
             examples: JSON.parse(word.examples),
             status: wordStatus(word.review),
+            isLeech: isLeech(word.review),
+            isCommon: isCommonWord(word.phrase),
           }))}
         />
       )}

@@ -2,5 +2,11 @@
   "framework": "nextjs",
   "installCommand": "npm install",
   "buildCommand": "prisma generate && prisma migrate deploy && next build",
-  "regions": ["bom1"]
+  "regions": ["bom1"],
+  "crons": [
+    {
+      "path": "/api/cron/due-reminders",
+      "schedule": "0 3 * * *"
+    }
+  ]
 }

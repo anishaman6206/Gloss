@@ -25,6 +25,8 @@ export function WordCard({
   synonyms,
   examples,
   status,
+  isLeech,
+  isCommon,
   onDelete,
 }: {
   phrase: string;
@@ -34,6 +36,8 @@ export function WordCard({
   synonyms: string[];
   examples: string[];
   status: WordStatus;
+  isLeech?: boolean;
+  isCommon?: boolean;
   onDelete?: () => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -69,10 +73,28 @@ export function WordCard({
             <p className="truncate text-sm text-ink-soft">{definition}</p>
           )}
         </div>
-        <span
-          className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wider ${STATUS_STYLE[status]}`}
-        >
-          {STATUS_LABEL[status]}
+        <span className="flex shrink-0 items-center gap-1.5">
+          {isCommon && (
+            <span
+              className="rounded-full bg-black/[0.05] px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-ink-faint"
+              data-testid={`common-badge-${phrase}`}
+            >
+              Everyday
+            </span>
+          )}
+          {isLeech && (
+            <span
+              className="rounded-full bg-cherry/15 px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-cherry-shadow"
+              data-testid={`leech-badge-${phrase}`}
+            >
+              Struggling
+            </span>
+          )}
+          <span
+            className={`rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wider ${STATUS_STYLE[status]}`}
+          >
+            {STATUS_LABEL[status]}
+          </span>
         </span>
         <ChevronDown
           size={16}
