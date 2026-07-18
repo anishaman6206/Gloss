@@ -3,6 +3,7 @@ import { getCurrentUser, subscriptionStatus } from "@/lib/auth";
 import { isAdmin } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
 import { AdminUserTable, type AdminUserRow } from "@/components/admin/AdminUserTable";
+import { AnnouncementForm } from "@/components/admin/AnnouncementForm";
 
 export const dynamic = "force-dynamic";
 
@@ -110,6 +111,8 @@ export default async function AdminPage() {
         <SummaryCard label="Words saved" value={summary.totalWords} />
         <SummaryCard label="Reviews done" value={summary.totalReviews} />
       </div>
+
+      <AnnouncementForm />
 
       <AdminUserTable users={rows} />
     </div>
