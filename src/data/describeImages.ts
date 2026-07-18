@@ -1,16 +1,15 @@
 import type { DescribeImage } from "@/lib/types";
 
 // Curated set of picture-description exercises, bundled with the app.
-// Images are stable Lorem Picsum ids (sourced from Unsplash photographers,
-// free to use under the Unsplash License). Sentences and vocab are
+// Images are self-hosted under public/describe/. Sentences and vocab are
 // hand-written to match each photo, so "Listen & Learn" needs no LLM call
 // and "Practice" has a reliable reference description to grade against.
 export const describeImages: DescribeImage[] = [
   {
     id: "freelance-desk",
     title: "Working Outdoors",
-    imageUrl: "https://picsum.photos/id/1/900/600",
-    credit: "Photo via Unsplash / Lorem Picsum",
+    imageUrl: "/describe/freelance-desk.jpg",
+    credit: "AI-generated image",
     sentences: [
       "A young man sits at a rustic wooden picnic table, typing on his laptop.",
       "He is completely absorbed in his work, barely glancing away from the screen.",
@@ -68,8 +67,8 @@ export const describeImages: DescribeImage[] = [
   {
     id: "cafe-corner",
     title: "A Quiet Café Corner",
-    imageUrl: "https://picsum.photos/id/76/900/600",
-    credit: "Photo via Unsplash / Lorem Picsum",
+    imageUrl: "/describe/cafe-corner.jpg",
+    credit: "AI-generated image",
     sentences: [
       "Two small espresso cups rest on the polished wooden table of a cozy café.",
       "Sunlight streams in through the large glass windows at the front of the shop.",
@@ -127,8 +126,8 @@ export const describeImages: DescribeImage[] = [
   {
     id: "santorini-village",
     title: "A Cliffside Village",
-    imageUrl: "https://picsum.photos/id/100/900/600",
-    credit: "Photo via Unsplash / Lorem Picsum",
+    imageUrl: "/describe/santorini-village.jpg",
+    credit: "AI-generated image",
     sentences: [
       "A cluster of whitewashed houses tumbles down the side of a steep cliff.",
       "A traditional windmill stands out among the rooftops, its blades now still.",
@@ -186,8 +185,8 @@ export const describeImages: DescribeImage[] = [
   {
     id: "harbor-bird",
     title: "A Bird on the Dock",
-    imageUrl: "https://picsum.photos/id/110/900/600",
-    credit: "Photo via Unsplash / Lorem Picsum",
+    imageUrl: "/describe/harbor-bird.jpg",
+    credit: "AI-generated image",
     sentences: [
       "A dark seabird perches on a thick rope stretched between the harbor and a moored boat.",
       "It has spread its wings wide, perhaps to dry them in the morning sun.",
@@ -245,8 +244,8 @@ export const describeImages: DescribeImage[] = [
   {
     id: "field-of-daisies",
     title: "A Girl in the Field",
-    imageUrl: "https://picsum.photos/id/130/900/600",
-    credit: "Photo via Unsplash / Lorem Picsum",
+    imageUrl: "/describe/field-of-daisies.jpg",
+    credit: "AI-generated image",
     sentences: [
       "A young woman stands in a wide, open field, holding a bunch of wild daisies close to her face.",
       "She wears a pair of dark sunglasses that hide most of her expression.",
@@ -304,8 +303,8 @@ export const describeImages: DescribeImage[] = [
   {
     id: "old-barn-bicycle",
     title: "A Bicycle by the Barn",
-    imageUrl: "https://picsum.photos/id/168/900/600",
-    credit: "Photo via Unsplash / Lorem Picsum",
+    imageUrl: "/describe/old-barn-bicycle.jpg",
+    credit: "AI-generated image",
     sentences: [
       "A rusty green bicycle leans against the weathered wooden wall of an old barn.",
       "The barn's paint is peeling badly, revealing bare, sun-bleached wood underneath.",
@@ -363,8 +362,8 @@ export const describeImages: DescribeImage[] = [
   {
     id: "busy-beach",
     title: "A Crowded Beach",
-    imageUrl: "https://picsum.photos/id/180/900/600",
-    credit: "Photo via Unsplash / Lorem Picsum",
+    imageUrl: "/describe/busy-beach.jpg",
+    credit: "AI-generated image",
     sentences: [
       "Dozens of people gather along a wide, sandy beach beneath a hazy sky.",
       "Waves roll steadily onto the shore, drawing swimmers further into the water.",
@@ -422,8 +421,8 @@ export const describeImages: DescribeImage[] = [
   {
     id: "milky-way-fence",
     title: "Stars Over a Fence",
-    imageUrl: "https://picsum.photos/id/149/900/600",
-    credit: "Photo via Unsplash / Lorem Picsum",
+    imageUrl: "/describe/milky-way-fence.jpg",
+    credit: "AI-generated image",
     sentences: [
       "A wooden fence stretches into the darkness beneath a sky thick with stars.",
       "A faint band of light, the Milky Way, glows softly across the horizon.",

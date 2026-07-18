@@ -19,6 +19,9 @@
 .DS_Store
 *.pem
 
+# raw source images for /describe (large originals; optimized copies live in public/describe)
+/pictures
+
 # debug
 npm-debug.log*
 yarn-debug.log*
