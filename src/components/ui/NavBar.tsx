@@ -16,6 +16,7 @@ import {
   Menu,
   X,
   ChevronDown,
+  Flame,
 } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
 
@@ -38,7 +39,7 @@ const PUBLIC_LINKS = [
 
 export function NavBar() {
   const pathname = usePathname();
-  const { user, sub, login, logout, loading } = useAuth();
+  const { user, sub, streak, login, logout, loading } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
@@ -109,6 +110,18 @@ export function NavBar() {
           </div>
 
           <div className="flex items-center gap-2">
+            {user && (
+              <span
+                className={`hidden items-center gap-1 rounded-full px-3 py-1 text-xs font-bold sm:inline-flex ${
+                  streak > 0 ? "bg-mango/15 text-mango-shadow" : "bg-black/[0.04] text-ink-faint"
+                }`}
+                data-testid="streak-badge"
+              >
+                <Flame size={12} className={streak > 0 ? "animate-wiggle" : ""} />
+                {streak}
+              </span>
+            )}
+
             {sub?.isTrialing && (
               <span
                 className="hidden items-center gap-1 rounded-full bg-mango/15 px-3 py-1 text-xs font-bold text-mango-shadow sm:inline-flex"

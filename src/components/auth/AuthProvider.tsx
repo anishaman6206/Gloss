@@ -27,6 +27,7 @@ export type SubStatus = {
 type Ctx = {
   user: AuthUser | null;
   sub: SubStatus | null;
+  streak: number;
   loading: boolean;
   refresh: () => Promise<void>;
   logout: () => Promise<void>;
@@ -36,6 +37,7 @@ type Ctx = {
 const AuthCtx = createContext<Ctx>({
   user: null,
   sub: null,
+  streak: 0,
   loading: true,
   refresh: async () => {},
   logout: async () => {},
@@ -45,6 +47,7 @@ const AuthCtx = createContext<Ctx>({
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [sub, setSub] = useState<SubStatus | null>(null);
+  const [streak, setStreak] = useState(0);
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
@@ -54,9 +57,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const data = await res.json();
         setUser(data.user);
         setSub(data.subscription);
+        setStreak(data.streak ?? 0);
       } else {
         setUser(null);
         setSub(null);
+        setStreak(0);
       }
     } finally {
       setLoading(false);
@@ -71,6 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
     setUser(null);
     setSub(null);
+    setStreak(0);
   }, []);
 
   // Native Google sign-in via the Median JS Bridge. Uses redirectUri mode
@@ -95,7 +101,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [loginNative]);
 
   return (
-    <AuthCtx.Provider value={{ user, sub, loading, refresh, logout, login }}>
+    <AuthCtx.Provider value={{ user, sub, streak, loading, refresh, logout, login }}>
       {children}
     </AuthCtx.Provider>
   );
