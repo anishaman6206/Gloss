@@ -12,6 +12,7 @@ const SECTIONS: {
     title: "Product",
     links: [
       { label: "Home", href: "/", testId: "footer-home" },
+      { label: "Describe", href: "/describe", testId: "footer-describe" },
       { label: "Pricing", href: "/pricing", testId: "footer-pricing" },
       { label: "About", href: "/about", testId: "footer-about" },
       { label: "FAQ", href: "/faq", testId: "footer-faq" },
