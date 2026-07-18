@@ -6,7 +6,9 @@ import { applySm2 } from "./sm2";
 import { getCurrentUser, requireUser, subscriptionStatus } from "./auth";
 import type { Definition, ReviewQuality } from "./types";
 
-export async function saveWord(input: { phrase: string; sentence: string } & Definition) {
+export async function saveWord(
+  input: { phrase: string; sentence: string; source?: string } & Definition
+) {
   const user = await getCurrentUser();
   if (!user) {
     return { ok: false as const, error: "unauthorized" };
@@ -33,6 +35,7 @@ export async function saveWord(input: { phrase: string; sentence: string } & Def
       partOfSpeech: input.partOfSpeech,
       synonyms: JSON.stringify(input.synonyms),
       examples: JSON.stringify(input.examples),
+      source: input.source ?? "scan",
       review: { create: {} },
     },
     select: { id: true },

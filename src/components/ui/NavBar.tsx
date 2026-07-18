@@ -8,6 +8,7 @@ import {
   Camera,
   Repeat2,
   Sparkles,
+  Image as ImageIcon,
   LogIn,
   LogOut,
   Crown,
@@ -22,6 +23,7 @@ const APP_LINKS = [
   { href: "/scan", label: "Scan", icon: Camera, testId: "nav-scan" },
   { href: "/library", label: "Library", icon: BookOpen, testId: "nav-library" },
   { href: "/review", label: "Review", icon: Repeat2, testId: "nav-review" },
+  { href: "/describe", label: "Describe", icon: ImageIcon, testId: "nav-describe" },
   { href: "/stats", label: "Stats", icon: Sparkles, testId: "nav-stats" },
 ];
 

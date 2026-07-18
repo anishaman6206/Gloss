@@ -60,3 +60,38 @@ export type WordWithReview = {
     lapses: number;
   } | null;
 };
+
+// A vocab word surfaced during a picture description, tied to the sentence
+// that introduces it so "Listen & Learn" can highlight it in context.
+export type DescribeVocabItem = Definition & {
+  phrase: string;
+  sentenceIndex: number;
+};
+
+// One curated picture-description entry — bundled with the app, not stored
+// in the DB, so "Listen & Learn" needs zero LLM calls.
+export type DescribeImage = {
+  id: string;
+  title: string;
+  imageUrl: string;
+  credit: string;
+  sentences: string[];
+  vocab: DescribeVocabItem[];
+};
+
+export type DescribeFeedback = {
+  overall: string;
+  strengths: string[];
+  improvements: { original: string; suggestion: string; note: string }[];
+  missedDetails: string[];
+  vocabUsed: string[];
+};
+
+export type DescribeFeedbackRequest = {
+  imageId: string;
+  description: string;
+};
+
+export type DescribeFeedbackResult =
+  | { ok: true; data: DescribeFeedback }
+  | { ok: false; error: string; code?: string };

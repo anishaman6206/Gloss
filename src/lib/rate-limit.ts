@@ -58,3 +58,40 @@ export async function consumeAnonDefine(ip: string): Promise<RateLimitResult> {
     used: updated.count,
   };
 }
+
+export const DESCRIBE_DAILY_LIMIT = 20;
+
+/**
+ * Consume one picture-description feedback request for `userId`. Same
+ * atomic upsert shape as consumeAnonDefine, keyed by user instead of IP
+ * since this feature always requires a signed-in, subscribed user.
+ */
+export async function consumeDescribeFeedback(userId: string): Promise<RateLimitResult> {
+  const date = todayKey();
+
+  const existing = await prisma.describeRateLimit.findUnique({
+    where: { userId_date: { userId, date } },
+  });
+
+  if (existing && existing.count >= DESCRIBE_DAILY_LIMIT) {
+    return {
+      ok: false,
+      remaining: 0,
+      limit: DESCRIBE_DAILY_LIMIT,
+      used: existing.count,
+    };
+  }
+
+  const updated = await prisma.describeRateLimit.upsert({
+    where: { userId_date: { userId, date } },
+    create: { userId, date, count: 1 },
+    update: { count: { increment: 1 } },
+  });
+
+  return {
+    ok: updated.count <= DESCRIBE_DAILY_LIMIT,
+    remaining: Math.max(0, DESCRIBE_DAILY_LIMIT - updated.count),
+    limit: DESCRIBE_DAILY_LIMIT,
+    used: updated.count,
+  };
+}

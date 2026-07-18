@@ -38,10 +38,11 @@ model User {
   streakFreezesAvailable   Int       @default(0)
   streakFreezesRefreshedAt DateTime?
 
-  sessions Session[]
-  words    Word[]
-  logs     ReviewLog[]
-  freezes  StreakFreeze[]
+  sessions         Session[]
+  words            Word[]
+  logs             ReviewLog[]
+  freezes          StreakFreeze[]
+  describeAttempts DescribeAttempt[]
 }
 
 model Session {
@@ -65,6 +66,7 @@ model Word {
   partOfSpeech String
   synonyms     String // JSON-encoded string[]
   examples     String // JSON-encoded string[]
+  source       String   @default("scan") // scan | describe
   createdAt    DateTime @default(now())
   review       Review?
 
@@ -113,6 +115,28 @@ model DefineRateLimit {
 
   @@unique([ip, date])
   @@index([date])
+}
+
+model DescribeRateLimit {
+  id     String @id @default(cuid())
+  userId String
+  date   String // YYYY-MM-DD (UTC)
+  count  Int    @default(0)
+
+  @@unique([userId, date])
+  @@index([date])
+}
+
+model DescribeAttempt {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  imageId     String // key into the curated static image set, not a DB relation
+  description String
+  feedback    String // JSON-encoded DescribeFeedback
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
 }
 
 model ContactMessage {
