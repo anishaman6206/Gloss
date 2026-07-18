@@ -226,6 +226,38 @@ export function NavBar() {
         )}
       </nav>
 
+      {/* Secondary app nav (tablet/desktop) - mirrors the bottom nav's links
+          for screens where the bottom nav is hidden (md:hidden). */}
+      {isAppRoute && (
+        <div
+          className="hidden border-b-2 border-black/5 bg-white/80 backdrop-blur-xl md:block"
+          data-testid="app-navbar"
+        >
+          <div className="mx-auto flex max-w-3xl items-center gap-1 px-4 py-2">
+            {APP_LINKS.map((link) => {
+              const Icon = link.icon;
+              const active = pathname?.startsWith(link.href);
+
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  data-testid={`desktop-${link.testId}`}
+                  className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-bold transition-colors ${
+                    active
+                      ? "bg-brand/10 text-brand-shadow"
+                      : "text-ink-soft hover:bg-black/[0.03] hover:text-ink"
+                  }`}
+                >
+                  <Icon size={15} strokeWidth={2.4} />
+                  {link.label}
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Bottom nav (mobile-first) - only on app routes */}
       {isAppRoute && (
         <div

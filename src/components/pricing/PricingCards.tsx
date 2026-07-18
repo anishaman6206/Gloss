@@ -8,6 +8,7 @@ const FEATURES_MONTHLY = [
   "Unlimited saved words",
   "Unlimited reviews",
   "Contextual word meanings",
+  "Picture-description practice with AI feedback",
   "Vocabulary progress tracking",
 ];
 
