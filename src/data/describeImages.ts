@@ -1,4 +1,35 @@
-import type { DescribeImage } from "@/lib/types";
+import type { DescribeCategory, DescribeImage } from "@/lib/types";
+
+// Category metadata for the gallery filter tabs. Categories with zero
+// images yet still show up (so the roadmap is visible) with a "coming
+// soon" note explaining what's planned for that pack.
+export const DESCRIBE_CATEGORIES: {
+  id: DescribeCategory;
+  label: string;
+  comingSoonNote?: string;
+}[] = [
+  { id: "general", label: "General" },
+  {
+    id: "business",
+    label: "Business",
+    comingSoonNote: "Client calls, negotiations, and everyday workplace scenes.",
+  },
+  {
+    id: "corporate",
+    label: "Corporate",
+    comingSoonNote: "Meetings, presentations, and professional email tone.",
+  },
+  {
+    id: "college",
+    label: "College",
+    comingSoonNote: "Campus life, group projects, and presentations.",
+  },
+  {
+    id: "school",
+    label: "School",
+    comingSoonNote: "Classroom basics and everyday school scenes.",
+  },
+];
 
 // Curated set of picture-description exercises, bundled with the app.
 // Images are self-hosted under public/describe/. Sentences and vocab are
@@ -10,6 +41,7 @@ export const describeImages: DescribeImage[] = [
     title: "Working Outdoors",
     imageUrl: "/describe/freelance-desk.jpg",
     credit: "AI-generated image",
+    category: "general",
     sentences: [
       "A young man sits at a rustic wooden picnic table, typing on his laptop.",
       "He is completely absorbed in his work, barely glancing away from the screen.",
@@ -69,6 +101,7 @@ export const describeImages: DescribeImage[] = [
     title: "A Quiet Café Corner",
     imageUrl: "/describe/cafe-corner.jpg",
     credit: "AI-generated image",
+    category: "general",
     sentences: [
       "Two small espresso cups rest on the polished wooden table of a cozy café.",
       "Sunlight streams in through the large glass windows at the front of the shop.",
@@ -128,6 +161,7 @@ export const describeImages: DescribeImage[] = [
     title: "A Cliffside Village",
     imageUrl: "/describe/santorini-village.jpg",
     credit: "AI-generated image",
+    category: "general",
     sentences: [
       "A cluster of whitewashed houses tumbles down the side of a steep cliff.",
       "A traditional windmill stands out among the rooftops, its blades now still.",
@@ -187,6 +221,7 @@ export const describeImages: DescribeImage[] = [
     title: "A Bird on the Dock",
     imageUrl: "/describe/harbor-bird.jpg",
     credit: "AI-generated image",
+    category: "general",
     sentences: [
       "A dark seabird perches on a thick rope stretched between the harbor and a moored boat.",
       "It has spread its wings wide, perhaps to dry them in the morning sun.",
@@ -246,6 +281,7 @@ export const describeImages: DescribeImage[] = [
     title: "A Girl in the Field",
     imageUrl: "/describe/field-of-daisies.jpg",
     credit: "AI-generated image",
+    category: "general",
     sentences: [
       "A young woman stands in a wide, open field, holding a bunch of wild daisies close to her face.",
       "She wears a pair of dark sunglasses that hide most of her expression.",
@@ -305,6 +341,7 @@ export const describeImages: DescribeImage[] = [
     title: "A Bicycle by the Barn",
     imageUrl: "/describe/old-barn-bicycle.jpg",
     credit: "AI-generated image",
+    category: "general",
     sentences: [
       "A rusty green bicycle leans against the weathered wooden wall of an old barn.",
       "The barn's paint is peeling badly, revealing bare, sun-bleached wood underneath.",
@@ -364,6 +401,7 @@ export const describeImages: DescribeImage[] = [
     title: "A Crowded Beach",
     imageUrl: "/describe/busy-beach.jpg",
     credit: "AI-generated image",
+    category: "general",
     sentences: [
       "Dozens of people gather along a wide, sandy beach beneath a hazy sky.",
       "Waves roll steadily onto the shore, drawing swimmers further into the water.",
@@ -423,6 +461,7 @@ export const describeImages: DescribeImage[] = [
     title: "Stars Over a Fence",
     imageUrl: "/describe/milky-way-fence.jpg",
     credit: "AI-generated image",
+    category: "general",
     sentences: [
       "A wooden fence stretches into the darkness beneath a sky thick with stars.",
       "A faint band of light, the Milky Way, glows softly across the horizon.",

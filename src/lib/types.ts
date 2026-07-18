@@ -68,6 +68,8 @@ export type DescribeVocabItem = Definition & {
   sentenceIndex: number;
 };
 
+export type DescribeCategory = "general" | "business" | "corporate" | "college" | "school";
+
 // One curated picture-description entry — bundled with the app, not stored
 // in the DB, so "Listen & Learn" needs zero LLM calls.
 export type DescribeImage = {
@@ -75,6 +77,7 @@ export type DescribeImage = {
   title: string;
   imageUrl: string;
   credit: string;
+  category: DescribeCategory;
   sentences: string[];
   vocab: DescribeVocabItem[];
 };

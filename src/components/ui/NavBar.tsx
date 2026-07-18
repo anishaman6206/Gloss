@@ -28,14 +28,28 @@ const APP_LINKS = [
   { href: "/stats", label: "Stats", icon: Sparkles, testId: "nav-stats" },
 ];
 
-const PUBLIC_LINKS = [
+const PUBLIC_LINKS: { href: string; label: string; testId: string; soon?: boolean }[] = [
   { href: "/", label: "Home", testId: "nav-home" },
   { href: "/describe", label: "Describe", testId: "nav-describe-public" },
+  { href: "/grammar", label: "Grammar", testId: "nav-grammar", soon: true },
+  { href: "/microlessons", label: "Microlessons", testId: "nav-microlessons", soon: true },
   { href: "/pricing", label: "Pricing", testId: "nav-pricing" },
   { href: "/about", label: "About", testId: "nav-about" },
   { href: "/faq", label: "FAQ", testId: "nav-faq" },
   { href: "/contact", label: "Contact", testId: "nav-contact" },
 ];
+
+function SoonBadge({ inverted }: { inverted?: boolean }) {
+  return (
+    <span
+      className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
+        inverted ? "bg-white/25 text-white" : "bg-black/10 text-ink-faint"
+      }`}
+    >
+      Soon
+    </span>
+  );
+}
 
 export function NavBar() {
   const pathname = usePathname();
@@ -97,13 +111,14 @@ export function NavBar() {
                   key={link.href}
                   href={link.href}
                   data-testid={`desktop-${link.testId}`}
-                  className={`rounded-xl px-3 py-2 text-sm font-bold transition-colors ${
+                  className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-bold transition-colors ${
                     active
                       ? "bg-brand/10 text-brand-shadow"
                       : "text-ink-soft hover:bg-black/[0.03] hover:text-ink"
                   }`}
                 >
                   {link.label}
+                  {link.soon && <SoonBadge />}
                 </Link>
               );
             })}
@@ -225,13 +240,14 @@ export function NavBar() {
                   <Link
                     href={link.href}
                     data-testid={`mobile-${link.testId}`}
-                    className={`block rounded-xl px-3 py-2.5 text-sm font-bold ${
+                    className={`flex items-center gap-1.5 rounded-xl px-3 py-2.5 text-sm font-bold ${
                       pathname === link.href
                         ? "bg-brand/10 text-brand-shadow"
                         : "text-ink hover:bg-black/[0.03]"
                     }`}
                   >
                     {link.label}
+                    {link.soon && <SoonBadge />}
                   </Link>
                 </li>
               ))}

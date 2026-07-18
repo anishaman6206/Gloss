@@ -1,6 +1,5 @@
 import { Image as ImageIcon } from "lucide-react";
 import { DescribeGallery } from "@/components/describe/DescribeGallery";
-import { describeImages } from "@/data/describeImages";
 
 export const dynamic = "force-static";
 
@@ -20,7 +19,7 @@ export default function DescribePage() {
         </p>
       </header>
 
-      <DescribeGallery images={describeImages} />
+      <DescribeGallery />
     </div>
   );
 }

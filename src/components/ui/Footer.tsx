@@ -6,13 +6,20 @@ import { BookOpen, Mail, Sparkles } from "lucide-react";
 
 const SECTIONS: {
   title: string;
-  links: { label: string; href: string; testId: string }[];
+  links: { label: string; href: string; testId: string; soon?: boolean }[];
 }[] = [
   {
     title: "Product",
     links: [
       { label: "Home", href: "/", testId: "footer-home" },
       { label: "Describe", href: "/describe", testId: "footer-describe" },
+      { label: "Grammar", href: "/grammar", testId: "footer-grammar", soon: true },
+      {
+        label: "Microlessons",
+        href: "/microlessons",
+        testId: "footer-microlessons",
+        soon: true,
+      },
       { label: "Pricing", href: "/pricing", testId: "footer-pricing" },
       { label: "About", href: "/about", testId: "footer-about" },
       { label: "FAQ", href: "/faq", testId: "footer-faq" },
@@ -81,9 +88,14 @@ export function Footer() {
                     <Link
                       href={link.href}
                       data-testid={link.testId}
-                      className="text-sm font-medium text-ink hover:text-brand"
+                      className="inline-flex items-center gap-1.5 text-sm font-medium text-ink hover:text-brand"
                     >
                       {link.label}
+                      {link.soon && (
+                        <span className="rounded-full bg-black/[0.06] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-ink-faint">
+                          Soon
+                        </span>
+                      )}
                     </Link>
                   </li>
                 ))}
