@@ -34,7 +34,6 @@ const PUBLIC_LINKS = [
   { href: "/pricing", label: "Pricing", testId: "nav-pricing" },
   { href: "/about", label: "About", testId: "nav-about" },
   { href: "/faq", label: "FAQ", testId: "nav-faq" },
-  { href: "/contact", label: "Contact", testId: "nav-contact" },
 ];
 
 export function NavBar() {
