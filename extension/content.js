@@ -3,7 +3,7 @@
   const SELECTION_DEBOUNCE_MS = 300;
   const GENERIC_LOOKUP_ERROR = "Couldn't get a definition. Try again";
   const GENERIC_SAVE_ERROR = "Couldn't save that. Try again";
-  const LIBRARY_URL = "https://gloss-theta.vercel.app/library";
+  const LIBRARY_URL = "https://usegloss.app/library";
   const EXIT_ANIMATION_MS = 140;
 
   const SPEAKER_ICON = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 9 3 15 8 15 13 20 13 4 8 9 3 9"></polygon><path d="M16 8a5 5 0 0 1 0 8"></path></svg>`;
@@ -185,7 +185,7 @@
         }
         if (res?.status === "auth_required") {
           actionsEl.innerHTML = `
-            <a class="gloss-ext-open-link" href="https://gloss-theta.vercel.app" target="_blank" rel="noopener noreferrer">Sign in to Gloss</a>
+            <a class="gloss-ext-open-link" href="https://usegloss.app" target="_blank" rel="noopener noreferrer">Sign in to Gloss</a>
             <button class="gloss-ext-retry-btn" type="button">Retry</button>
           `;
           statusEl.textContent = "Saving needs a free Gloss account.";
@@ -195,7 +195,7 @@
         }
         if (res?.status === "subscription_required") {
           actionsEl.innerHTML =
-            '<a class="gloss-ext-open-link" href="https://gloss-theta.vercel.app/subscribe" target="_blank" rel="noopener noreferrer">Subscribe to keep saving words</a>';
+            '<a class="gloss-ext-open-link" href="https://usegloss.app/subscribe" target="_blank" rel="noopener noreferrer">Subscribe to keep saving words</a>';
           statusEl.textContent = "Your trial's ended.";
           return;
         }

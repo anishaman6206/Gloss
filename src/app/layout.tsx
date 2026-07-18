@@ -17,7 +17,7 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://gloss.app"),
+  metadataBase: new URL("https://usegloss.app"),
   title: {
     default: "Gloss: Learn every word you read",
     template: "%s · Gloss",

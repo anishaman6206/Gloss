@@ -48,7 +48,7 @@ export async function POST(req: Request) {
   // so a Resend/config problem here should never fail the user's submission.
   try {
     const resend = getResendClient();
-    const from = process.env.EMAIL_FROM ?? "Gloss <reminders@gloss.app>";
+    const from = process.env.EMAIL_FROM ?? "Gloss <reminders@usegloss.app>";
     const to = process.env.SUPPORT_EMAIL ?? "gloss.theta@gmail.com";
     const { subject: mailSubject, html, text } = renderContactNotificationEmail({
       name,

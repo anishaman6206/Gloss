@@ -1,4 +1,4 @@
-const API_BASE = "https://gloss-theta.vercel.app";
+const API_BASE = "https://usegloss.app";
 
 function escapeHtml(str) {
   const div = document.createElement("div");

@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
   }
 
   const resend = getResendClient();
-  const from = process.env.EMAIL_FROM ?? "Gloss <reminders@gloss.app>";
+  const from = process.env.EMAIL_FROM ?? "Gloss <reminders@usegloss.app>";
   let sent = 0;
 
   for (const [userId, dueCount] of dueCountByUser) {

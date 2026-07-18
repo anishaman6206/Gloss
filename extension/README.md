@@ -1,6 +1,6 @@
 # Gloss Chrome extension
 
-Companion to the Gloss web app (`gloss-theta.vercel.app`). Select a word or phrase on any
+Companion to the Gloss web app (`usegloss.app`). Select a word or phrase on any
 regular web page, on a PDF rendered by an in-page viewer like PDF.js (e.g. arXiv's
 "View PDF" reader), or on a directly-opened `.pdf` link (via the bundled Gloss PDF Reader —
 see below), see its meaning in context, save it into the same library used by the web app.
@@ -8,7 +8,7 @@ see below), see its meaning in context, save it into the same library used by th
 ## Load unpacked (dev)
 
 1. `chrome://extensions` → enable Developer mode → "Load unpacked" → select this `extension/` folder.
-2. You must already be signed into `https://gloss-theta.vercel.app` in the same Chrome
+2. You must already be signed into `https://usegloss.app` in the same Chrome
    profile for "Save to Gloss" to work — the extension reuses your existing session cookie,
    it does not have its own login flow.
 
@@ -56,7 +56,7 @@ regardless of what `host_permissions` declares.
 **Tradeoffs worth knowing about:**
 
 - Making the automatic redirect work for PDFs hosted on *any* domain (not just
-  `gloss-theta.vercel.app`) requires `host_permissions` for all `http(s)://` (and now
+  `usegloss.app`) requires `host_permissions` for all `http(s)://` (and now
   `file:///`) URLs, which is a materially broader permission grant than before (Chrome will
   show a "Read and change all your data on all websites" warning on install/update). That's
   the direct cost of the redirect being domain-agnostic rather than an allowlist.

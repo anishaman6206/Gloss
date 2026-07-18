@@ -1,4 +1,4 @@
-const API_BASE = "https://gloss-theta.vercel.app";
+const API_BASE = "https://usegloss.app";
 const MAX_RECENT = 20;
 const DEFINE_CACHE_LIMIT = 50;
 const GENERIC_LOOKUP_ERROR = "Couldn't get a definition. Try again";
