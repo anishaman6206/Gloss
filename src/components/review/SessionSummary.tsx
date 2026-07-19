@@ -3,18 +3,20 @@
 import { useEffect } from "react";
 import confetti from "canvas-confetti";
 import Link from "next/link";
-import { Trophy, ArrowRight } from "lucide-react";
+import { Trophy, Sparkles, ArrowRight } from "lucide-react";
 
 export function SessionSummary({
   reviewed,
   knew,
   hesitated,
   again,
+  hasAnyWords,
 }: {
   reviewed: number;
   knew: number;
   hesitated: number;
   again: number;
+  hasAnyWords: boolean;
 }) {
   useEffect(() => {
     if (reviewed > 0) {
@@ -39,6 +41,30 @@ export function SessionSummary({
       })();
     }
   }, [reviewed]);
+
+  if (reviewed === 0 && !hasAnyWords) {
+    return (
+      <div
+        className="relative overflow-hidden rounded-3xl border-2 border-dashed border-black/10 bg-white p-10 text-center"
+        data-testid="session-empty-new"
+      >
+        <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-brand/10 text-brand animate-floaty">
+          <Sparkles size={22} strokeWidth={2.5} />
+        </span>
+        <p className="mt-4 font-display text-2xl font-bold">No words saved yet.</p>
+        <p className="mt-1 text-ink-soft">
+          Scan a page and tap a few words you don&apos;t know, they&apos;ll show up here for review.
+        </p>
+        <Link
+          href="/scan"
+          data-testid="session-cta-scan"
+          className="btn-tactile mt-6 bg-brand shadow-tactile shadow-brand-shadow"
+        >
+          Scan a page <ArrowRight size={16} />
+        </Link>
+      </div>
+    );
+  }
 
   if (reviewed === 0) {
     return (

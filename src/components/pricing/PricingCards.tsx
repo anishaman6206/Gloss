@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Check, Sparkles, Crown, ArrowRight } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { PLANS } from "@/lib/planPricing";
 
 const FEATURES_MONTHLY = [
   "Unlimited saved words",
@@ -96,9 +97,9 @@ export function PricingCards({
           </p>
 
           <p className="mt-2 font-display text-5xl font-bold leading-none">
-            ₹39
+            {PLANS.monthly.price}
             <span className="ml-1 text-base font-medium text-ink-soft">
-              / month
+              {PLANS.monthly.suffix}
             </span>
           </p>
 
@@ -134,9 +135,9 @@ export function PricingCards({
           </p>
 
           <p className="mt-2 font-display text-5xl font-bold leading-none">
-            ₹399
+            {PLANS.yearly.price}
             <span className="ml-1 text-base font-medium text-ink-soft">
-              / year
+              {PLANS.yearly.suffix}
             </span>
           </p>
 

@@ -13,3 +13,13 @@ export async function setReminderPreference(enabled: boolean) {
   revalidatePath("/profile");
   return { ok: true as const };
 }
+
+export async function setAnnouncementPreference(enabled: boolean) {
+  const user = await requireUser();
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { announcementEmailsEnabled: enabled },
+  });
+  revalidatePath("/profile");
+  return { ok: true as const };
+}

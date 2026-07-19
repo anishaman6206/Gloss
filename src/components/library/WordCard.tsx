@@ -60,6 +60,13 @@ export function WordCard({
                 e.stopPropagation();
                 speak(phrase);
               }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  speak(phrase);
+                }
+              }}
               role="button"
               tabIndex={0}
               aria-label={`Hear ${phrase}`}

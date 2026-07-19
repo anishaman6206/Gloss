@@ -29,8 +29,15 @@ export function ImageUploader({ onSelect }: { onSelect: (file: File) => void }) 
         handleFiles(e.dataTransfer.files);
       }}
       onClick={() => galleryInputRef.current?.click()}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          galleryInputRef.current?.click();
+        }
+      }}
       role="button"
       tabIndex={0}
+      aria-label="Snap or drop a page"
       data-testid="image-uploader"
       className={`relative flex cursor-pointer flex-col items-center justify-center gap-4 overflow-hidden rounded-3xl border-2 border-dashed p-10 text-center transition-all ${
         dragging

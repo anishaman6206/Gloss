@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 export function ConfirmDialog({
@@ -17,6 +18,21 @@ export function ConfirmDialog({
   onConfirm: () => void;
   onCancel: () => void;
 }) {
+  const cancelRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+
+    cancelRef.current?.focus();
+
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") onCancel();
+    }
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
   return (
     <AnimatePresence>
       {open && (
@@ -42,6 +58,7 @@ export function ConfirmDialog({
             <p className="mt-2 text-sm text-ink-soft">{description}</p>
             <div className="mt-5 flex gap-2">
               <button
+                ref={cancelRef}
                 type="button"
                 onClick={onCancel}
                 className="flex-1 rounded-2xl border-2 border-black/10 py-2.5 text-sm font-bold text-ink-soft"

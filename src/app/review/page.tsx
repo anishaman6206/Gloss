@@ -11,10 +11,13 @@ export default async function ReviewPage() {
   const user = await getCurrentUser();
   if (!user) return <AuthGate />;
 
-  const rows = await prisma.word.findMany({
-    where: { userId: user.id, review: { nextReviewAt: { lte: new Date() } } },
-    include: { review: true },
-  });
+  const [rows, totalWords] = await Promise.all([
+    prisma.word.findMany({
+      where: { userId: user.id, review: { nextReviewAt: { lte: new Date() } } },
+      include: { review: true },
+    }),
+    prisma.word.count({ where: { userId: user.id } }),
+  ]);
 
   const words: WordWithReview[] = rows
     .map((word) => ({
@@ -46,7 +49,7 @@ export default async function ReviewPage() {
           Three quick modes: recall, fill‑blank, produce the word. Mixed.
         </p>
       </header>
-      <ReviewSession words={words} />
+      <ReviewSession words={words} hasAnyWords={totalWords > 0} />
     </div>
   );
 }

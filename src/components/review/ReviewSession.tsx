@@ -45,7 +45,13 @@ function buildQueue(words: WordWithReview[]): QueueItem[] {
   });
 }
 
-export function ReviewSession({ words }: { words: WordWithReview[] }) {
+export function ReviewSession({
+  words,
+  hasAnyWords,
+}: {
+  words: WordWithReview[];
+  hasAnyWords: boolean;
+}) {
   const [queue, setQueue] = useState<QueueItem[] | null>(null);
   const [index, setIndex] = useState(0);
   const [stats, setStats] = useState({ reviewed: 0, knew: 0, hesitated: 0, again: 0 });
@@ -85,7 +91,7 @@ export function ReviewSession({ words }: { words: WordWithReview[] }) {
     setIndex((i) => i + 1);
   }
 
-  if (!current) return <SessionSummary {...stats} />;
+  if (!current) return <SessionSummary {...stats} hasAnyWords={hasAnyWords} />;
 
   return (
     <div className="space-y-4" data-testid="review-session">

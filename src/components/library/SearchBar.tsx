@@ -1,23 +1,33 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { Search } from "lucide-react";
+
+const DEBOUNCE_MS = 300;
 
 export function SearchBar({ initialQuery }: { initialQuery: string }) {
   const router = useRouter();
   const pathname = usePathname();
   const [value, setValue] = useState(initialQuery);
   const [, startTransition] = useTransition();
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+
+  useEffect(() => {
+    return () => clearTimeout(debounceRef.current);
+  }, []);
 
   function update(q: string) {
     setValue(q);
-    startTransition(() => {
-      const params = new URLSearchParams();
-      if (q) params.set("q", q);
-      const query = params.toString();
-      router.replace(query ? `${pathname}?${query}` : pathname);
-    });
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      startTransition(() => {
+        const params = new URLSearchParams();
+        if (q) params.set("q", q);
+        const query = params.toString();
+        router.replace(query ? `${pathname}?${query}` : pathname);
+      });
+    }, DEBOUNCE_MS);
   }
 
   return (

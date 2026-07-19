@@ -5,13 +5,17 @@ import {
   Calendar,
   Mail,
   BookOpen,
+  Snowflake,
+  Bell,
+  Megaphone,
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser, subscriptionStatus } from "@/lib/auth";
 import { AuthGate } from "@/components/auth/AuthGate";
 import { LogoutButton } from "@/components/auth/LogoutButton";
 import { SubscriptionCard } from "@/components/profile/SubscriptionCard";
-import { ReminderToggle } from "@/components/profile/ReminderToggle";
+import { EmailPreferenceToggle } from "@/components/profile/EmailPreferenceToggle";
+import { setReminderPreference, setAnnouncementPreference } from "@/lib/notifications";
 import { PLANS, type PlanKey } from "@/lib/cashfree/client";
 
 export const dynamic = "force-dynamic";
@@ -153,7 +157,44 @@ export default async function ProfilePage() {
         paymentStatus={user.paymentStatus}
       />
 
-      <ReminderToggle initialEnabled={user.reminderEmailsEnabled} />
+      {sub.isPaid && (
+        <div
+          className="flex items-center gap-4 rounded-3xl border-2 border-black/5 bg-white p-6 shadow-tactile shadow-black/5"
+          data-testid="profile-streak-freezes"
+        >
+          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-brand/10 text-brand">
+            <Snowflake size={22} strokeWidth={2.5} />
+          </span>
+          <div>
+            <p className="font-display text-lg font-bold">
+              {user.streakFreezesAvailable} streak freeze
+              {user.streakFreezesAvailable === 1 ? "" : "s"} available
+            </p>
+            <p className="text-sm text-ink-soft">
+              A Pro perk that auto-covers one missed day so your streak survives it.
+              Refills weekly.
+            </p>
+          </div>
+        </div>
+      )}
+
+      <EmailPreferenceToggle
+        icon={Bell}
+        title="Due-review emails"
+        description="A daily nudge when words are ready to review."
+        initialEnabled={user.reminderEmailsEnabled}
+        testId="reminder-toggle"
+        onToggle={setReminderPreference}
+      />
+
+      <EmailPreferenceToggle
+        icon={Megaphone}
+        title="Product announcements"
+        description="Occasional emails about new features and updates."
+        initialEnabled={user.announcementEmailsEnabled}
+        testId="announcement-toggle"
+        onToggle={setAnnouncementPreference}
+      />
 
       {/* Quick links */}
       <div className="rounded-3xl border-2 border-black/5 bg-white p-6 shadow-tactile shadow-black/5">

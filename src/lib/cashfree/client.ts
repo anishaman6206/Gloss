@@ -1,5 +1,6 @@
 import "server-only";
 import { Cashfree, CFEnvironment } from "cashfree-pg";
+export { PLANS, type PlanKey } from "@/lib/planPricing";
 
 const APP_ID = process.env.CASHFREE_APP_ID;
 const SECRET_KEY = process.env.CASHFREE_SECRET_KEY;
@@ -22,22 +23,3 @@ export function isCashfreeConfigured() {
   return !!(APP_ID && SECRET_KEY);
 }
 
-// Plan catalog. Amount is in rupees (Cashfree's order_amount, unlike
-// Razorpay, is not in paise). Duration is in calendar months so renewal
-// lands on the same day-of-month (e.g. 17 Jul -> 17 Aug), not a fixed
-// day-count that drifts against month length.
-export const PLANS = {
-  monthly: {
-    label: "Monthly",
-    price: "₹39",
-    amount: 39,
-    durationMonths: 1,
-  },
-  yearly: {
-    label: "Yearly",
-    price: "₹399",
-    amount: 399,
-    durationMonths: 12,
-  },
-} as const;
-export type PlanKey = keyof typeof PLANS;

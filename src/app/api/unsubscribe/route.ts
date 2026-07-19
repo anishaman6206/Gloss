@@ -11,11 +11,11 @@ export async function GET(request: NextRequest) {
 
   await prisma.user.update({
     where: { id: userId },
-    data: { reminderEmailsEnabled: false },
+    data: { reminderEmailsEnabled: false, announcementEmailsEnabled: false },
   });
 
   return new NextResponse(
-    "<!doctype html><html><body style=\"font-family: -apple-system, sans-serif; text-align: center; padding: 60px 20px;\"><p>You won't get any more due-review emails from Gloss.</p></body></html>",
+    "<!doctype html><html><body style=\"font-family: -apple-system, sans-serif; text-align: center; padding: 60px 20px;\"><p>You won't get any more emails from Gloss. You can turn individual ones back on anytime from your profile.</p></body></html>",
     { headers: { "Content-Type": "text/html; charset=utf-8" } }
   );
 }

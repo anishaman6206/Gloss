@@ -11,34 +11,19 @@ import {
   Tag,
 } from "lucide-react";
 import { isValidPromoCode, applyPromoDiscount, TRIAL_PROMO_DISCOUNT_PERCENT } from "@/lib/promoCode";
+import { PLANS } from "@/lib/planPricing";
 
 type Plan = "monthly" | "yearly";
 
-const META: Record<
-  Plan,
-  {
-    label: string;
-    price: string;
-    suffix: string;
-    amount: number;
-    note: string;
-  }
-> = {
-  monthly: {
-    label: "Monthly",
-    price: "₹39",
-    suffix: "/month",
-    amount: 39,
-    note: "Billed monthly. Cancel anytime.",
-  },
-  yearly: {
-    label: "Yearly",
-    price: "₹399",
-    suffix: "/year",
-    amount: 399,
-    note: "Nearly 2 months free. Cancel future renewals anytime.",
-  },
+const NOTES: Record<Plan, string> = {
+  monthly: "Billed monthly. Cancel anytime.",
+  yearly: "Nearly 2 months free. Cancel future renewals anytime.",
 };
+
+const META = {
+  monthly: { ...PLANS.monthly, note: NOTES.monthly },
+  yearly: { ...PLANS.yearly, note: NOTES.yearly },
+} satisfies Record<Plan, { label: string; price: string; suffix: string; amount: number; note: string }>;
 
 export function CheckoutClient({
   plan,

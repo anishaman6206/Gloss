@@ -30,9 +30,13 @@ model User {
   paymentStatus     String? // PAID | FAILED | REFUNDED
   paymentMethod     String? // upi | card | netbanking | wallet, from Cashfree's response
 
-  // Due-review reminder emails
+  // Due-review + trial-lifecycle reminder emails
   reminderEmailsEnabled Boolean   @default(true)
   lastReminderSentAt    DateTime?
+
+  // Admin bulk announcement emails (new features, product news) — separate
+  // from reminders so opting out of one doesn't silently opt out of both.
+  announcementEmailsEnabled Boolean @default(true)
 
   // Trial-conversion nudge emails: 0 = none sent, 1 = "days left" sent,
   // 2 = "ends today" sent. Prevents re-sending the same stage on every cron run.

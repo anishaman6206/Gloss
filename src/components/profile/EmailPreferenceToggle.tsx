@@ -1,10 +1,23 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Bell } from "lucide-react";
-import { setReminderPreference } from "@/lib/notifications";
+import type { LucideIcon } from "lucide-react";
 
-export function ReminderToggle({ initialEnabled }: { initialEnabled: boolean }) {
+export function EmailPreferenceToggle({
+  icon: Icon,
+  title,
+  description,
+  initialEnabled,
+  testId,
+  onToggle,
+}: {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  initialEnabled: boolean;
+  testId: string;
+  onToggle: (enabled: boolean) => Promise<unknown>;
+}) {
   const [enabled, setEnabled] = useState(initialEnabled);
   const [isPending, startTransition] = useTransition();
 
@@ -12,7 +25,7 @@ export function ReminderToggle({ initialEnabled }: { initialEnabled: boolean }) 
     const next = !enabled;
     setEnabled(next);
     startTransition(() => {
-      setReminderPreference(next);
+      onToggle(next);
     });
   }
 
@@ -20,13 +33,11 @@ export function ReminderToggle({ initialEnabled }: { initialEnabled: boolean }) 
     <div className="flex items-center justify-between rounded-3xl border-2 border-black/5 bg-white p-6 shadow-tactile shadow-black/5">
       <div className="flex items-center gap-3">
         <span className="grid h-10 w-10 place-items-center rounded-2xl bg-brand/10 text-brand">
-          <Bell size={18} />
+          <Icon size={18} />
         </span>
         <div>
-          <p className="font-bold">Due-review emails</p>
-          <p className="text-sm text-ink-soft">
-            A daily nudge when words are ready to review.
-          </p>
+          <p className="font-bold">{title}</p>
+          <p className="text-sm text-ink-soft">{description}</p>
         </div>
       </div>
 
@@ -36,7 +47,7 @@ export function ReminderToggle({ initialEnabled }: { initialEnabled: boolean }) 
         aria-checked={enabled}
         disabled={isPending}
         onClick={toggle}
-        data-testid="reminder-toggle"
+        data-testid={testId}
         className={`relative h-7 w-12 shrink-0 rounded-full transition-colors ${
           enabled ? "bg-brand" : "bg-black/10"
         }`}

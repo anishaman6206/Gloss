@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   BookOpen,
   Camera,
@@ -42,11 +43,43 @@ export function NavBar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
+  const menuPanelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMenuOpen(false);
     setProfileOpen(false);
   }, [pathname]);
+
+  // Escape closes the drawer, and Tab is trapped to the panel's own
+  // focusable links while it's open (it's an overlay, not in-flow content).
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    const panel = menuPanelRef.current;
+    const focusable = panel?.querySelectorAll<HTMLElement>("a, button");
+    focusable?.[0]?.focus();
+
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setMenuOpen(false);
+        return;
+      }
+      if (e.key !== "Tab" || !focusable || focusable.length === 0) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [menuOpen]);
 
   useEffect(() => {
     function onClick(e: MouseEvent) {
@@ -68,7 +101,7 @@ export function NavBar() {
     <>
       {/* Top bar */}
       <nav
-        className="sticky top-0 z-40 border-b-2 border-black/5 bg-bg/85 backdrop-blur-xl"
+        className="sticky top-0 z-40 border-b-2 border-black/5 bg-bg/85 backdrop-blur-xl relative"
         data-testid="top-navbar"
       >
         <div className="relative mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-3">
@@ -111,7 +144,7 @@ export function NavBar() {
           <div className="flex items-center gap-2">
             {user && (
               <span
-                className={`hidden items-center gap-1 rounded-full px-3 py-1 text-xs font-bold sm:inline-flex ${
+                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold sm:px-3 ${
                   streak > 0 ? "bg-mango/15 text-mango-shadow" : "bg-black/[0.04] text-ink-faint"
                 }`}
                 data-testid="streak-badge"
@@ -123,16 +156,18 @@ export function NavBar() {
 
             {sub?.isTrialing && (
               <span
-                className="hidden items-center gap-1 rounded-full bg-mango/15 px-3 py-1 text-xs font-bold text-mango-shadow sm:inline-flex"
+                className="inline-flex items-center gap-1 rounded-full bg-mango/15 px-2.5 py-1 text-xs font-bold text-mango-shadow sm:px-3"
                 data-testid="trial-badge"
               >
-                <Crown size={12} /> Trial · {sub.daysLeft}d
+                <Crown size={12} />
+                <span className="sm:hidden">{sub.daysLeft}d</span>
+                <span className="hidden sm:inline">Trial · {sub.daysLeft}d</span>
               </span>
             )}
 
             {sub?.isPaid && (
               <span
-                className="hidden items-center gap-1 rounded-full bg-leaf/15 px-3 py-1 text-xs font-bold text-leaf-shadow sm:inline-flex"
+                className="inline-flex items-center gap-1 rounded-full bg-leaf/15 px-2.5 py-1 text-xs font-bold text-leaf-shadow sm:px-3"
                 data-testid="paid-badge"
               >
                 <Crown size={12} /> Pro
@@ -204,6 +239,8 @@ export function NavBar() {
             <button
               onClick={() => setMenuOpen((o) => !o)}
               aria-label="Toggle menu"
+              aria-expanded={menuOpen}
+              aria-controls="mobile-menu-panel"
               className="grid h-9 w-9 place-items-center rounded-xl border-2 border-black/10 bg-white text-ink lg:hidden"
               data-testid="mobile-menu-toggle"
             >
@@ -212,31 +249,56 @@ export function NavBar() {
           </div>
         </div>
 
-        {/* Mobile menu */}
-        {menuOpen && (
-          <div
-            className="mx-auto max-w-3xl border-t-2 border-black/5 bg-white px-4 py-3 lg:hidden"
-            data-testid="mobile-menu"
-          >
-            <ul className="space-y-1">
-              {PUBLIC_LINKS.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    data-testid={`mobile-${link.testId}`}
-                    className={`block rounded-xl px-3 py-2.5 text-sm font-bold ${
-                      pathname === link.href
-                        ? "bg-brand/10 text-brand-shadow"
-                        : "text-ink hover:bg-black/[0.03]"
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+        {/* Mobile menu: an overlay drawer (backdrop + absolutely-positioned
+            panel) rather than in-flow content, so opening it never pushes
+            the page below down. */}
+        <AnimatePresence>
+          {menuOpen && (
+            <>
+              <motion.div
+                key="mobile-menu-backdrop"
+                className="fixed inset-0 z-30 bg-black/30 lg:hidden"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setMenuOpen(false)}
+                aria-hidden="true"
+              />
+              <motion.div
+                key="mobile-menu-panel"
+                ref={menuPanelRef}
+                id="mobile-menu-panel"
+                role="dialog"
+                aria-modal="true"
+                aria-label="Menu"
+                className="absolute inset-x-0 top-full z-40 border-t-2 border-black/5 bg-white px-4 py-3 shadow-tactile shadow-black/10 lg:hidden"
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.15 }}
+                data-testid="mobile-menu"
+              >
+                <ul className="mx-auto max-w-3xl space-y-1">
+                  {PUBLIC_LINKS.map((link) => (
+                    <li key={link.href}>
+                      <Link
+                        href={link.href}
+                        data-testid={`mobile-${link.testId}`}
+                        className={`block rounded-xl px-3 py-2.5 text-sm font-bold ${
+                          pathname === link.href
+                            ? "bg-brand/10 text-brand-shadow"
+                            : "text-ink hover:bg-black/[0.03]"
+                        }`}
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
       </nav>
 
       {/* Secondary app nav (tablet/desktop) - mirrors the bottom nav's links

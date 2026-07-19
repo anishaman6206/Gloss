@@ -13,9 +13,10 @@ import {
   Image as ImageIcon,
 } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { PLANS } from "@/lib/planPricing";
 
 export default function Landing() {
-  const { user, login } = useAuth();
+  const { user, login, loading } = useAuth();
 
   return (
     <div className="space-y-16" data-testid="landing-page">
@@ -47,7 +48,14 @@ export default function Landing() {
             >
               <Camera size={18} /> Scan a page · free
             </Link>
-            {user ? (
+            {loading ? (
+              <span
+                aria-hidden="true"
+                className="btn-tactile invisible border-2 border-black/10 shadow-tactile shadow-black/10"
+              >
+                <ArrowRight size={18} /> Sign in · save words
+              </span>
+            ) : user ? (
               <Link
                 href="/library"
                 data-testid="cta-open-library"
@@ -187,7 +195,8 @@ export default function Landing() {
           >
             <p className="text-sm font-bold uppercase tracking-wider text-ink-faint">Monthly</p>
             <p className="mt-2 font-display text-5xl font-bold">
-              ₹39 <span className="text-lg font-medium text-ink-soft">/ month</span>
+              {PLANS.monthly.price}{" "}
+              <span className="text-lg font-medium text-ink-soft">{PLANS.monthly.suffix}</span>
             </p>
             <p className="mt-2 text-ink-soft">Save & review unlimited words.</p>
           </div>
@@ -200,7 +209,8 @@ export default function Landing() {
             </span>
             <p className="text-sm font-bold uppercase tracking-wider text-mango-shadow">Yearly</p>
             <p className="mt-2 font-display text-5xl font-bold">
-              ₹399 <span className="text-lg font-medium text-ink-soft">/ year</span>
+              {PLANS.yearly.price}{" "}
+              <span className="text-lg font-medium text-ink-soft">{PLANS.yearly.suffix}</span>
             </p>
             <p className="mt-2 text-ink-soft">
               Nearly 2 months free · works out to <b>₹33.3/mo</b>.
@@ -208,7 +218,11 @@ export default function Landing() {
           </div>
         </div>
         <div className="text-center">
-          {user ? (
+          {loading ? (
+            <span aria-hidden="true" className="btn-tactile invisible text-lg">
+              Sign in · start your free trial <ArrowRight size={18} />
+            </span>
+          ) : user ? (
             <Link
               href="/library"
               className="btn-tactile bg-leaf text-lg shadow-tactile shadow-leaf-shadow"

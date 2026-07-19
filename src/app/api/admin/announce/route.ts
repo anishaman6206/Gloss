@@ -46,7 +46,7 @@ export async function POST(request: Request) {
   }
 
   const recipients = await prisma.user.findMany({
-    where: { reminderEmailsEnabled: true },
+    where: { announcementEmailsEnabled: true },
     select: { id: true, email: true, name: true },
   });
 
