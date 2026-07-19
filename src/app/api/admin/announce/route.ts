@@ -55,7 +55,7 @@ export async function POST(request: Request) {
   }
 
   const resend = getResendClient();
-  const from = process.env.EMAIL_FROM ?? "Gloss <noreply@usegloss.app>";
+  const from = process.env.EMAIL_FROM_ANNOUNCE ?? "Gloss <updates@usegloss.app>";
 
   let sent = 0;
   const failedEmails: string[] = [];
