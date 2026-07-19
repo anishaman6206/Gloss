@@ -42,7 +42,7 @@ export default function Landing() {
         <Band
           bg="white"
           glow
-          className="flex min-h-[75vh] items-center py-6 md:py-8 lg:min-h-[80vh]"
+          className="flex items-center py-6 md:min-h-[75vh] md:py-8 lg:min-h-[80vh]"
         >
           <Hero />
         </Band>

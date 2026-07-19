@@ -1,11 +1,26 @@
 import { Volume2, Sparkles, BookmarkCheck } from "lucide-react";
 
-const EXAMPLES = [
+const DEFAULT_EXAMPLES = [
   "The old river seemed content to meander through the valley, in no hurry to reach the sea.",
   "During the lecture, his thoughts would meander far from the topic at hand.",
 ];
+const DEFAULT_SYNONYMS = ["wander", "drift", "roam"];
 
-export function WordPopupMockup({ className = "" }: { className?: string }) {
+export function WordPopupMockup({
+  className = "",
+  word = "meander",
+  definition = "to follow a winding course, without hurry",
+  partOfSpeech = "verb",
+  synonyms = DEFAULT_SYNONYMS,
+  examples = DEFAULT_EXAMPLES,
+}: {
+  className?: string;
+  word?: string;
+  definition?: string;
+  partOfSpeech?: string;
+  synonyms?: string[];
+  examples?: string[];
+}) {
   return (
     <div
       aria-hidden="true"
@@ -13,7 +28,7 @@ export function WordPopupMockup({ className = "" }: { className?: string }) {
     >
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-1.5">
-          <p className="truncate font-display text-lg font-bold">meander</p>
+          <p className="truncate font-display text-lg font-bold">{word}</p>
           <span className="shrink-0 rounded-full bg-brand/10 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-brand-shadow">
             New
           </span>
@@ -23,30 +38,27 @@ export function WordPopupMockup({ className = "" }: { className?: string }) {
         </span>
       </div>
 
-      <p className="mt-2 text-sm font-medium leading-snug text-ink">
-        to follow a winding course, without hurry
-      </p>
+      <p className="mt-2 text-sm font-medium leading-snug text-ink">{definition}</p>
       <p className="mt-1.5 text-[10px] font-bold uppercase tracking-wider text-ink-faint">
-        verb
+        {partOfSpeech}
       </p>
 
       <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
         <span className="text-[10px] font-bold uppercase tracking-wider text-ink-faint">
           Similar
         </span>
-        <span className="rounded-full bg-brand/10 px-2 py-0.5 text-[10px] font-bold text-brand-shadow">
-          wander
-        </span>
-        <span className="rounded-full bg-brand/10 px-2 py-0.5 text-[10px] font-bold text-brand-shadow">
-          drift
-        </span>
-        <span className="rounded-full bg-brand/10 px-2 py-0.5 text-[10px] font-bold text-brand-shadow">
-          roam
-        </span>
+        {synonyms.map((s) => (
+          <span
+            key={s}
+            className="rounded-full bg-brand/10 px-2 py-0.5 text-[10px] font-bold text-brand-shadow"
+          >
+            {s}
+          </span>
+        ))}
       </div>
 
       <div className="mt-2.5 space-y-1.5 rounded-xl bg-mango/[0.08] p-2">
-        {EXAMPLES.map((example) => (
+        {examples.map((example) => (
           <div key={example} className="flex items-start gap-1.5 text-[11px] text-ink-soft">
             <Sparkles size={11} className="mt-0.5 shrink-0 text-mango" />
             <span>&ldquo;{example}&rdquo;</span>

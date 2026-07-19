@@ -98,9 +98,9 @@ export function Hero() {
         </ul>
       </div>
 
-      {/* Right: layered product story - reading page -> definition -> saved */}
+      {/* Right: layered product story (desktop only - unchanged) */}
       <div
-        className="relative mx-auto w-full max-w-sm pb-6 pt-4 sm:max-w-md lg:max-w-lg lg:py-6"
+        className="relative mx-auto hidden w-full max-w-lg py-6 lg:block"
         aria-hidden="true"
       >
         <motion.div className="relative z-10" style={{ y: parallaxY }}>
@@ -155,6 +155,40 @@ export function Hero() {
               <SavedConfirmationMockup />
             </motion.div>
           )}
+        </motion.div>
+      </div>
+
+      {/* Right, mobile/tablet: a plain vertical story, no overlap, no absolute
+          positioning - a purpose-built layout, not a shrunk desktop one. */}
+      <div
+        className="mx-auto flex w-full max-w-xs flex-col items-center gap-4 lg:hidden"
+        aria-hidden="true"
+      >
+        <motion.div
+          className="w-[82%]"
+          initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <BrowserMockup />
+        </motion.div>
+
+        <motion.div
+          className="w-[90%]"
+          initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.25 }}
+        >
+          <WordPopupMockup />
+        </motion.div>
+
+        <motion.div
+          className="w-[62%]"
+          initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+        >
+          <SavedConfirmationMockup />
         </motion.div>
       </div>
     </section>

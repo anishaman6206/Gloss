@@ -11,7 +11,19 @@ const ROWS = [
     eyebrow: "Word lookup",
     title: "Never interrupt your reading just to open a dictionary.",
     body: "Tap a word without leaving the page. The definition comes from the exact sentence you tapped, with synonyms and an example one glance away.",
-    mockup: <WordPopupMockup className="mx-auto max-w-sm" />,
+    mockup: (
+      <WordPopupMockup
+        className="mx-auto max-w-sm"
+        word="ephemeral"
+        definition="lasting for a very short time"
+        partOfSpeech="adjective"
+        synonyms={["fleeting", "transient", "momentary"]}
+        examples={[
+          "The morning mist was ephemeral, vanishing the moment sunlight touched the hills.",
+          "Fame in the digital age can feel ephemeral, here one day and forgotten the next.",
+        ]}
+      />
+    ),
     tint: "bg-brand/15 text-brand-shadow",
   },
   {
