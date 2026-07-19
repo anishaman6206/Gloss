@@ -179,7 +179,7 @@ export default async function ProfilePage() {
       )}
 
       <EmailPreferenceToggle
-        icon={Bell}
+        icon={<Bell size={18} />}
         title="Due-review emails"
         description="A daily nudge when words are ready to review."
         initialEnabled={user.reminderEmailsEnabled}
@@ -188,7 +188,7 @@ export default async function ProfilePage() {
       />
 
       <EmailPreferenceToggle
-        icon={Megaphone}
+        icon={<Megaphone size={18} />}
         title="Product announcements"
         description="Occasional emails about new features and updates."
         initialEnabled={user.announcementEmailsEnabled}

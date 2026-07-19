@@ -1,17 +1,16 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import type { LucideIcon } from "lucide-react";
+import { useState, useTransition, type ReactNode } from "react";
 
 export function EmailPreferenceToggle({
-  icon: Icon,
+  icon,
   title,
   description,
   initialEnabled,
   testId,
   onToggle,
 }: {
-  icon: LucideIcon;
+  icon: ReactNode;
   title: string;
   description: string;
   initialEnabled: boolean;
@@ -33,7 +32,7 @@ export function EmailPreferenceToggle({
     <div className="flex items-center justify-between rounded-3xl border-2 border-black/5 bg-white p-6 shadow-tactile shadow-black/5">
       <div className="flex items-center gap-3">
         <span className="grid h-10 w-10 place-items-center rounded-2xl bg-brand/10 text-brand">
-          <Icon size={18} />
+          {icon}
         </span>
         <div>
           <p className="font-bold">{title}</p>
