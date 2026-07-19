@@ -4,31 +4,56 @@ import type { Definition, DescribeFeedback } from "./types";
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 const DEFAULT_MODEL = "llama-3.3-70b-versatile";
 
-const SYSTEM_PROMPT = `You are a precise contextual dictionary. Given a word or short
-phrase and the exact sentence it appears in, respond with ONLY a single
-valid JSON object — no markdown, no code fences, no commentary before or
-after. If any string value needs a quotation mark inside it, escape it
-properly as \\" so the JSON stays valid. Schema: {"definition": string
-(one clear sentence explaining the meaning AS USED in this sentence, not
-a generic dictionary entry), "part_of_speech": string, "synonyms": array
-of 1-3 strings, "examples": array of exactly 2 new example sentences
-using the word/phrase in a similar sense, different from the source
-sentence}.`;
+// A key that just got rate-limited sits out for a bit rather than being
+// retried on the very next request that rotates back around to it.
+const KEY_COOLDOWN_MS = 60_000;
+const keyCooldownUntil = new Map<string, number>();
+let rrIndex = 0;
 
-function buildUserPrompt(phrase: string, sentence: string): string {
-  return `Word or phrase: "${phrase}"\nSentence: "${sentence}"`;
+// Picks up GROQ_API_KEY, GROQ_API_KEY_2, GROQ_API_KEY_3, ... — as many as
+// are set, no fixed cap. Each is expected to be on a separate Groq account,
+// so rotating across them multiplies the effective rate limit rather than
+// sharing one account-wide quota.
+function getApiKeys(): string[] {
+  return Object.keys(process.env)
+    .filter((k) => /^GROQ_API_KEY(_\d+)?$/.test(k))
+    .map((k) => process.env[k])
+    .filter((v): v is string => !!v && v.trim() !== "");
+}
+
+// Round-robins the starting point across requests, and within a single
+// request tries keys not currently cooling down before ones that are.
+function pickOrderedKeys(): string[] {
+  const keys = getApiKeys();
+  if (keys.length === 0) return [];
+
+  const start = rrIndex % keys.length;
+  rrIndex++;
+  const ordered = [...keys.slice(start), ...keys.slice(0, start)];
+
+  const now = Date.now();
+  const fresh = ordered.filter((k) => (keyCooldownUntil.get(k) ?? 0) <= now);
+  const resting = ordered.filter((k) => (keyCooldownUntil.get(k) ?? 0) > now);
+  return [...fresh, ...resting];
+}
+
+class GroqRequestError extends Error {
+  retryable: boolean;
+  constructor(message: string, retryable: boolean) {
+    super(message);
+    this.retryable = retryable;
+  }
 }
 
 type GroqChatResponse = {
   choices?: { message?: { content?: string } }[];
 };
 
-async function callGroq(phrase: string, sentence: string): Promise<string> {
-  const apiKey = process.env.GROQ_API_KEY;
-  if (!apiKey) {
-    throw new Error("request_failed");
-  }
-
+async function requestGroq(
+  apiKey: string,
+  systemPrompt: string,
+  userPrompt: string
+): Promise<string> {
   const model = process.env.GROQ_MODEL || DEFAULT_MODEL;
 
   let res: Response;
@@ -43,28 +68,67 @@ async function callGroq(phrase: string, sentence: string): Promise<string> {
         model,
         response_format: { type: "json_object" },
         messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: buildUserPrompt(phrase, sentence) },
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
         ],
       }),
     });
   } catch {
-    throw new Error("request_failed");
+    // Network-level failure — worth trying another key.
+    throw new GroqRequestError("request_failed", true);
   }
 
   if (res.status === 429) {
-    throw new Error("rate_limited");
+    keyCooldownUntil.set(apiKey, Date.now() + KEY_COOLDOWN_MS);
+    throw new GroqRequestError("rate_limited", true);
   }
   if (!res.ok) {
-    throw new Error("request_failed");
+    // A bad request/response fails identically on every key, so this one
+    // isn't worth burning other keys' quota retrying.
+    throw new GroqRequestError("request_failed", false);
   }
 
   const data = (await res.json()) as GroqChatResponse;
   const content = data.choices?.[0]?.message?.content;
   if (!content) {
-    throw new Error("malformed_response");
+    throw new GroqRequestError("malformed_response", false);
   }
   return content;
+}
+
+async function callGroqChat(systemPrompt: string, userPrompt: string): Promise<string> {
+  const keys = pickOrderedKeys();
+  if (keys.length === 0) {
+    throw new Error("request_failed");
+  }
+
+  let lastError = new Error("request_failed");
+  for (const apiKey of keys) {
+    try {
+      return await requestGroq(apiKey, systemPrompt, userPrompt);
+    } catch (err) {
+      if (!(err instanceof GroqRequestError)) throw err;
+      lastError = new Error(err.message);
+      if (!err.retryable) throw lastError;
+      // else: try the next key
+    }
+  }
+  throw lastError;
+}
+
+const SYSTEM_PROMPT = `You are a precise contextual dictionary. Given a word or short
+phrase and the exact sentence it appears in, respond with ONLY a single
+valid JSON object — no markdown, no code fences, no commentary before or
+after. If any string value needs a quotation mark inside it, escape it
+properly as \\" so the JSON stays valid. Schema: {"definition": string
+(one clear sentence explaining the meaning AS USED in this sentence, not
+a generic dictionary entry), "part_of_speech": string, "synonyms": array
+of 1-3 strings, "examples": array of exactly 2 new example sentences
+using the word/phrase in a similar sense, different from the source
+sentence}.`;
+
+function buildUserPrompt(phrase: string, sentence: string): string {
+  return `Word or phrase: "${phrase}"\nSentence: "${sentence}"`;
 }
 
 function normalizeDefinition(parsed: Record<string, unknown>): Definition {
@@ -92,7 +156,7 @@ function trimToLastBrace(raw: string): string {
 }
 
 export async function generateDefinition(phrase: string, sentence: string): Promise<Definition> {
-  const raw = await callGroq(phrase, sentence);
+  const raw = await callGroqChat(SYSTEM_PROMPT, buildUserPrompt(phrase, sentence));
 
   try {
     return parseDefinition(raw);
@@ -140,57 +204,6 @@ function buildDescribeUserPrompt(
   ].join("\n");
 }
 
-async function callGroqDescribe(
-  referenceSentences: string[],
-  vocabWords: string[],
-  userDescription: string
-): Promise<string> {
-  const apiKey = process.env.GROQ_API_KEY;
-  if (!apiKey) {
-    throw new Error("request_failed");
-  }
-
-  const model = process.env.GROQ_MODEL || DEFAULT_MODEL;
-
-  let res: Response;
-  try {
-    res = await fetch(GROQ_API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model,
-        response_format: { type: "json_object" },
-        messages: [
-          { role: "system", content: DESCRIBE_SYSTEM_PROMPT },
-          {
-            role: "user",
-            content: buildDescribeUserPrompt(referenceSentences, vocabWords, userDescription),
-          },
-        ],
-      }),
-    });
-  } catch {
-    throw new Error("request_failed");
-  }
-
-  if (res.status === 429) {
-    throw new Error("rate_limited");
-  }
-  if (!res.ok) {
-    throw new Error("request_failed");
-  }
-
-  const data = (await res.json()) as GroqChatResponse;
-  const content = data.choices?.[0]?.message?.content;
-  if (!content) {
-    throw new Error("malformed_response");
-  }
-  return content;
-}
-
 function normalizeDescribeFeedback(parsed: Record<string, unknown>): DescribeFeedback {
   const overall = String(parsed.overall ?? "").trim();
   const strengths = Array.isArray(parsed.strengths) ? parsed.strengths.map(String) : [];
@@ -225,7 +238,10 @@ export async function generateDescribeFeedback(
   vocabWords: string[],
   userDescription: string
 ): Promise<DescribeFeedback> {
-  const raw = await callGroqDescribe(referenceSentences, vocabWords, userDescription);
+  const raw = await callGroqChat(
+    DESCRIBE_SYSTEM_PROMPT,
+    buildDescribeUserPrompt(referenceSentences, vocabWords, userDescription)
+  );
 
   try {
     return parseDescribeFeedback(raw);
