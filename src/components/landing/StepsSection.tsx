@@ -17,8 +17,8 @@ const STEPS = [
   {
     icon: BookOpen,
     tint: "bg-mango/15 text-mango-shadow",
-    title: "Tap the word",
-    body: "Tap any word (or phrase) on the image. Get a definition based on the exact sentence, not a random one.",
+    title: "Tap words",
+    body: "Tap any word, or several at once, right on the image. Each gets its own definition based on the exact sentence it's in, not a random dictionary entry.",
     preview: <WordPopupMockup />,
   },
   {

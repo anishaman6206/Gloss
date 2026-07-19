@@ -17,7 +17,7 @@ export default function ContactPage() {
         accent="mango"
       />
 
-      <div className="grid gap-6 md:grid-cols-[1fr_1.2fr]">
+      <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-[1fr_1.2fr]">
         {/* Contact card */}
         <div className="space-y-4">
           <div className="rounded-3xl border-2 border-black/5 bg-white p-6 shadow-tactile shadow-black/5">

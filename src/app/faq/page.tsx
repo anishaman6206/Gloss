@@ -56,7 +56,9 @@ export default function FaqPage() {
         accent="mango"
       />
 
-      <FaqList items={FAQS} />
+      <div className="mx-auto max-w-3xl">
+        <FaqList items={FAQS} />
+      </div>
     </div>
   );
 }

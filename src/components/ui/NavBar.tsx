@@ -20,6 +20,7 @@ import {
   Flame,
 } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { isWideRoute } from "@/lib/marketingRoutes";
 
 const APP_LINKS = [
   { href: "/scan", label: "Scan", icon: Camera, testId: "nav-scan" },
@@ -35,8 +36,9 @@ const PUBLIC_LINKS = [
   { href: "/pricing", label: "Pricing", testId: "nav-pricing" },
   { href: "/about", label: "About", testId: "nav-about" },
   { href: "/faq", label: "FAQ", testId: "nav-faq" },
-  { href: "/contact", label: "Contact", testId: "nav-contact" },
 ];
+
+const CONTACT_LINK = { href: "/contact", label: "Contact", testId: "nav-contact" };
 
 export function NavBar() {
   const pathname = usePathname();
@@ -97,7 +99,111 @@ export function NavBar() {
   }, [profileOpen]);
 
   const isAppRoute = APP_LINKS.some((l) => pathname?.startsWith(l.href));
-  const isLanding = pathname === "/";
+  const isWide = isWideRoute(pathname);
+  const links = isWide ? [...PUBLIC_LINKS, CONTACT_LINK] : PUBLIC_LINKS;
+
+  const rightCluster = (
+    <div className="flex items-center gap-2">
+      {user && (
+        <span
+          className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold sm:px-3 ${
+            streak > 0 ? "bg-mango/15 text-mango-shadow" : "bg-black/[0.04] text-ink-faint"
+          }`}
+          data-testid="streak-badge"
+        >
+          <Flame size={12} className={streak > 0 ? "animate-wiggle" : ""} />
+          {streak}
+        </span>
+      )}
+
+      {sub?.isTrialing && (
+        <span
+          className="inline-flex items-center gap-1 rounded-full bg-mango/15 px-2.5 py-1 text-xs font-bold text-mango-shadow sm:px-3"
+          data-testid="trial-badge"
+        >
+          <Crown size={12} />
+          <span className="sm:hidden">{sub.daysLeft}d</span>
+          <span className="hidden sm:inline">Trial · {sub.daysLeft}d</span>
+        </span>
+      )}
+
+      {sub?.isPaid && (
+        <span
+          className="inline-flex items-center gap-1 rounded-full bg-leaf/15 px-2.5 py-1 text-xs font-bold text-leaf-shadow sm:px-3"
+          data-testid="paid-badge"
+        >
+          <Crown size={12} /> Pro
+        </span>
+      )}
+
+      {loading ? null : user ? (
+        <div ref={profileRef} className="relative">
+          <button
+            onClick={() => setProfileOpen((o) => !o)}
+            className="inline-flex items-center gap-1.5 rounded-full border-2 border-black/10 bg-white px-2.5 py-1.5 text-sm font-bold text-ink hover:bg-black/[0.03]"
+            data-testid="profile-menu-button"
+            aria-label="Open profile menu"
+          >
+            {user.picture ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={user.picture} alt="" className="h-5 w-5 rounded-full" />
+            ) : (
+              <User size={14} />
+            )}
+
+            <ChevronDown size={12} />
+          </button>
+
+          {profileOpen && (
+            <div
+              className="absolute right-0 top-full mt-2 w-48 overflow-hidden rounded-2xl border-2 border-black/5 bg-white shadow-tactile shadow-black/10"
+              data-testid="profile-menu"
+            >
+              <div className="border-b-2 border-black/5 px-3 py-2.5">
+                <p className="truncate text-sm font-bold">{user.name}</p>
+                <p className="truncate text-xs text-ink-faint">{user.email}</p>
+              </div>
+
+              <Link
+                href="/profile"
+                data-testid="menu-profile"
+                className="block px-3 py-2.5 text-sm font-bold text-ink hover:bg-black/[0.03]"
+              >
+                Profile
+              </Link>
+
+              <button
+                onClick={logout}
+                data-testid="logout-button"
+                className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-bold text-cherry hover:bg-cherry/[0.08]"
+              >
+                <LogOut size={14} /> Logout
+              </button>
+            </div>
+          )}
+        </div>
+      ) : (
+        <button
+          onClick={login}
+          className="btn-tactile bg-brand !px-4 !py-2 text-sm shadow-tactile shadow-brand-shadow"
+          data-testid="login-button"
+        >
+          <LogIn size={14} /> Sign in
+        </button>
+      )}
+
+      <button
+        onClick={() => setMenuOpen((o) => !o)}
+        aria-label="Toggle menu"
+        aria-expanded={menuOpen}
+        aria-controls="mobile-menu-panel"
+        className="grid h-9 w-9 place-items-center rounded-xl border-2 border-black/10 bg-white text-ink lg:hidden"
+        data-testid="mobile-menu-toggle"
+      >
+        {menuOpen ? <X size={16} /> : <Menu size={16} />}
+      </button>
+    </div>
+  );
 
   return (
     <>
@@ -107,160 +213,77 @@ export function NavBar() {
         data-testid="top-navbar"
       >
         <div
-          className={`relative mx-auto flex items-center justify-between gap-3 px-4 py-2.5 ${
-            isLanding ? "max-w-7xl" : "max-w-3xl"
+          className={`relative mx-auto flex items-center justify-between gap-3 px-4 ${
+            isWide ? "max-w-7xl py-2.5" : "max-w-3xl py-3"
           }`}
         >
-          <Link
-            href="/"
-            className="flex items-center gap-2"
-            data-testid="brand-link"
-          >
+          <Link href="/" className="flex items-center gap-2" data-testid="brand-link">
             <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand text-white shadow-tactile shadow-brand-shadow">
               <BookOpen size={18} strokeWidth={2.5} />
             </span>
 
-            <span className="font-display text-2xl font-bold tracking-tight">
-              Gloss
-            </span>
+            <span className="font-display text-2xl font-bold tracking-tight">Gloss</span>
           </Link>
 
-          <div className="flex items-center gap-3 lg:gap-6">
-            {/* Desktop links, on the right side next to the profile/CTA cluster */}
-            <div className="hidden items-center gap-1 lg:flex">
-              {PUBLIC_LINKS.map((link) => {
-                const active = pathname === link.href;
-                const isPricing = link.href === "/pricing";
+          {isWide ? (
+            <div className="flex items-center gap-3 lg:gap-6">
+              {/* Desktop links, on the right side next to the profile/CTA cluster */}
+              <div className="hidden items-center gap-1 lg:flex">
+                {links.map((link) => {
+                  const active = pathname === link.href;
+                  const isPricing = link.href === "/pricing";
 
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    data-testid={`desktop-${link.testId}`}
-                    className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-bold transition-colors duration-150 ${
-                      active
-                        ? "bg-brand/10 text-brand-shadow"
-                        : isPricing
-                          ? "text-mango-shadow hover:bg-mango/10"
-                          : "text-ink-soft hover:bg-black/[0.03] hover:text-ink"
-                    }`}
-                  >
-                    {link.label}
-                    {isPricing && !active && (
-                      <span className="h-1.5 w-1.5 rounded-full bg-mango" aria-hidden="true" />
-                    )}
-                  </Link>
-                );
-              })}
-            </div>
-
-            <div className="flex items-center gap-2">
-              {user && (
-                <span
-                  className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold sm:px-3 ${
-                    streak > 0 ? "bg-mango/15 text-mango-shadow" : "bg-black/[0.04] text-ink-faint"
-                  }`}
-                  data-testid="streak-badge"
-                >
-                  <Flame size={12} className={streak > 0 ? "animate-wiggle" : ""} />
-                  {streak}
-                </span>
-              )}
-
-              {sub?.isTrialing && (
-                <span
-                  className="inline-flex items-center gap-1 rounded-full bg-mango/15 px-2.5 py-1 text-xs font-bold text-mango-shadow sm:px-3"
-                  data-testid="trial-badge"
-                >
-                  <Crown size={12} />
-                  <span className="sm:hidden">{sub.daysLeft}d</span>
-                  <span className="hidden sm:inline">Trial · {sub.daysLeft}d</span>
-                </span>
-              )}
-
-              {sub?.isPaid && (
-                <span
-                  className="inline-flex items-center gap-1 rounded-full bg-leaf/15 px-2.5 py-1 text-xs font-bold text-leaf-shadow sm:px-3"
-                  data-testid="paid-badge"
-                >
-                  <Crown size={12} /> Pro
-                </span>
-              )}
-
-              {loading ? null : user ? (
-                <div ref={profileRef} className="relative">
-                  <button
-                    onClick={() => setProfileOpen((o) => !o)}
-                    className="inline-flex items-center gap-1.5 rounded-full border-2 border-black/10 bg-white px-2.5 py-1.5 text-sm font-bold text-ink hover:bg-black/[0.03]"
-                    data-testid="profile-menu-button"
-                    aria-label="Open profile menu"
-                  >
-                    {user.picture ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={user.picture}
-                        alt=""
-                        className="h-5 w-5 rounded-full"
-                      />
-                    ) : (
-                      <User size={14} />
-                    )}
-
-                    <ChevronDown size={12} />
-                  </button>
-
-                  {profileOpen && (
-                    <div
-                      className="absolute right-0 top-full mt-2 w-48 overflow-hidden rounded-2xl border-2 border-black/5 bg-white shadow-tactile shadow-black/10"
-                      data-testid="profile-menu"
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      data-testid={`desktop-${link.testId}`}
+                      className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-bold transition-colors duration-150 ${
+                        active
+                          ? "bg-brand/10 text-brand-shadow"
+                          : isPricing
+                            ? "text-mango-shadow hover:bg-mango/10"
+                            : "text-ink-soft hover:bg-black/[0.03] hover:text-ink"
+                      }`}
                     >
-                      <div className="border-b-2 border-black/5 px-3 py-2.5">
-                        <p className="truncate text-sm font-bold">{user.name}</p>
-                        <p className="truncate text-xs text-ink-faint">
-                          {user.email}
-                        </p>
-                      </div>
+                      {link.label}
+                      {isPricing && !active && (
+                        <span className="h-1.5 w-1.5 rounded-full bg-mango" aria-hidden="true" />
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
 
-                      <Link
-                        href="/profile"
-                        data-testid="menu-profile"
-                        className="block px-3 py-2.5 text-sm font-bold text-ink hover:bg-black/[0.03]"
-                      >
-                        Profile
-                      </Link>
-
-                      <button
-                        onClick={logout}
-                        data-testid="logout-button"
-                        className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-bold text-cherry hover:bg-cherry/[0.08]"
-                      >
-                        <LogOut size={14} /> Logout
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <button
-                  onClick={login}
-                  className="btn-tactile bg-brand !px-4 !py-2 text-sm shadow-tactile shadow-brand-shadow"
-                  data-testid="login-button"
-                >
-                  <LogIn size={14} /> Sign in
-                </button>
-              )}
-
-              <button
-                onClick={() => setMenuOpen((o) => !o)}
-                aria-label="Toggle menu"
-                aria-expanded={menuOpen}
-                aria-controls="mobile-menu-panel"
-                className="grid h-9 w-9 place-items-center rounded-xl border-2 border-black/10 bg-white text-ink lg:hidden"
-                data-testid="mobile-menu-toggle"
-              >
-                {menuOpen ? <X size={16} /> : <Menu size={16} />}
-              </button>
+              {rightCluster}
             </div>
-          </div>
+          ) : (
+            <>
+              {/* Desktop links, centered independently of the logo/profile widths */}
+              <div className="hidden items-center gap-1 lg:absolute lg:left-1/2 lg:flex lg:-translate-x-1/2">
+                {links.map((link) => {
+                  const active = pathname === link.href;
+
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      data-testid={`desktop-${link.testId}`}
+                      className={`rounded-xl px-3 py-2 text-sm font-bold transition-colors ${
+                        active
+                          ? "bg-brand/10 text-brand-shadow"
+                          : "text-ink-soft hover:bg-black/[0.03] hover:text-ink"
+                      }`}
+                    >
+                      {link.label}
+                    </Link>
+                  );
+                })}
+              </div>
+
+              {rightCluster}
+            </>
+          )}
         </div>
 
         {/* Mobile menu: an overlay drawer (backdrop + absolutely-positioned
@@ -292,13 +315,17 @@ export function NavBar() {
                 transition={{ duration: 0.15 }}
                 data-testid="mobile-menu"
               >
-                <ul className="mx-auto max-w-3xl space-y-1.5">
-                  {PUBLIC_LINKS.map((link) => (
+                <ul
+                  className={`mx-auto max-w-3xl ${isWide ? "space-y-1.5" : "space-y-1"}`}
+                >
+                  {links.map((link) => (
                     <li key={link.href}>
                       <Link
                         href={link.href}
                         data-testid={`mobile-${link.testId}`}
-                        className={`block rounded-xl px-4 py-3 text-base font-bold transition-colors duration-150 ${
+                        className={`block rounded-xl font-bold transition-colors duration-150 ${
+                          isWide ? "px-4 py-3 text-base" : "px-3 py-2.5 text-sm"
+                        } ${
                           pathname === link.href
                             ? "bg-brand/10 text-brand-shadow"
                             : "text-ink hover:bg-black/[0.03]"

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BookOpen, Mail, Sparkles } from "lucide-react";
+import { isWideRoute } from "@/lib/marketingRoutes";
 
 const SECTIONS: {
   title: string;
@@ -42,12 +43,12 @@ export function Footer() {
   // Hide footer inside review sessions to keep focus.
   if (pathname?.startsWith("/review")) return null;
 
-  const isLanding = pathname === "/";
+  const isWide = isWideRoute(pathname);
 
   return (
     <footer
       className={`mx-auto mt-16 px-4 pb-28 md:mt-20 md:pb-14 ${
-        isLanding ? "max-w-7xl" : "max-w-3xl"
+        isWide ? "max-w-7xl" : "max-w-3xl"
       }`}
       data-testid="site-footer"
     >

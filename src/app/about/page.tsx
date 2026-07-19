@@ -37,7 +37,7 @@ export default function AboutPage() {
         </p>
       </Prose>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="mx-auto grid max-w-4xl gap-4 md:grid-cols-3">
         {[
           {
             icon: BookOpen,

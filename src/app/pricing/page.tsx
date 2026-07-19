@@ -23,10 +23,12 @@ export default async function PricingPage() {
         accent="mango"
       />
 
-      <PricingCards
-        isPaid={sub?.isPaid ?? false}
-        isTrialing={sub?.isTrialing ?? false}
-      />
+      <div className="mx-auto max-w-4xl">
+        <PricingCards
+          isPaid={sub?.isPaid ?? false}
+          isTrialing={sub?.isTrialing ?? false}
+        />
+      </div>
     </div>
   );
 }

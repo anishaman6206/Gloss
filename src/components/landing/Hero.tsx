@@ -14,6 +14,7 @@ const TRUST_ITEMS = [
   "Scan & define, always free",
   `Save & review from ${PLANS.monthly.price}/month`,
   "7-day free trial",
+  "Tap multiple words at once",
   "Privacy-first OCR",
 ];
 
