@@ -42,9 +42,13 @@ export function Footer() {
   // Hide footer inside review sessions to keep focus.
   if (pathname?.startsWith("/review")) return null;
 
+  const isLanding = pathname === "/";
+
   return (
     <footer
-      className="mx-auto mt-24 max-w-3xl px-4 pb-28 md:pb-14"
+      className={`mx-auto mt-16 px-4 pb-28 md:mt-20 md:pb-14 ${
+        isLanding ? "max-w-7xl" : "max-w-3xl"
+      }`}
       data-testid="site-footer"
     >
       <div className="relative overflow-hidden rounded-[2rem] border-2 border-black/5 bg-white p-8 shadow-tactile shadow-black/5 md:p-10">
@@ -111,7 +115,7 @@ export function Footer() {
             <a
               href="mailto:gloss.theta@gmail.com"
               data-testid="footer-support-email"
-              className="mt-3 inline-flex items-center gap-2 rounded-2xl bg-black/[0.03] px-3 py-2 text-sm font-bold text-ink hover:bg-black/[0.05]"
+              className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-ink hover:text-brand"
             >
               <Mail size={14} className="text-brand" />
               gloss.theta@gmail.com

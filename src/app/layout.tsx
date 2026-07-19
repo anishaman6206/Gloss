@@ -3,6 +3,7 @@ import { Fredoka, Nunito } from "next/font/google";
 import "./globals.css";
 import { NavBar } from "@/components/ui/NavBar";
 import { Footer } from "@/components/ui/Footer";
+import { MainContainer } from "@/components/ui/MainContainer";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 
 const fredoka = Fredoka({
@@ -50,9 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen font-body text-ink antialiased">
         <AuthProvider>
           <NavBar />
-          <main className="mx-auto max-w-3xl px-4 pb-6 pt-6" data-testid="app-main">
-            {children}
-          </main>
+          <MainContainer>{children}</MainContainer>
           <Footer />
         </AuthProvider>
       </body>

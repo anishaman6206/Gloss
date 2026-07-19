@@ -35,6 +35,7 @@ const PUBLIC_LINKS = [
   { href: "/pricing", label: "Pricing", testId: "nav-pricing" },
   { href: "/about", label: "About", testId: "nav-about" },
   { href: "/faq", label: "FAQ", testId: "nav-faq" },
+  { href: "/contact", label: "Contact", testId: "nav-contact" },
 ];
 
 export function NavBar() {
@@ -96,6 +97,7 @@ export function NavBar() {
   }, [profileOpen]);
 
   const isAppRoute = APP_LINKS.some((l) => pathname?.startsWith(l.href));
+  const isLanding = pathname === "/";
 
   return (
     <>
@@ -104,7 +106,11 @@ export function NavBar() {
         className="sticky top-0 z-40 border-b-2 border-black/5 bg-bg/85 backdrop-blur-xl relative"
         data-testid="top-navbar"
       >
-        <div className="relative mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-3">
+        <div
+          className={`relative mx-auto flex items-center justify-between gap-3 px-4 py-2.5 ${
+            isLanding ? "max-w-7xl" : "max-w-3xl"
+          }`}
+        >
           <Link
             href="/"
             className="flex items-center gap-2"
@@ -119,133 +125,141 @@ export function NavBar() {
             </span>
           </Link>
 
-          {/* Desktop links, centered independently of the logo/profile widths */}
-          <div className="hidden items-center gap-1 lg:absolute lg:left-1/2 lg:flex lg:-translate-x-1/2">
-            {PUBLIC_LINKS.map((link) => {
-              const active = pathname === link.href;
+          <div className="flex items-center gap-3 lg:gap-6">
+            {/* Desktop links, on the right side next to the profile/CTA cluster */}
+            <div className="hidden items-center gap-1 lg:flex">
+              {PUBLIC_LINKS.map((link) => {
+                const active = pathname === link.href;
+                const isPricing = link.href === "/pricing";
 
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  data-testid={`desktop-${link.testId}`}
-                  className={`rounded-xl px-3 py-2 text-sm font-bold transition-colors ${
-                    active
-                      ? "bg-brand/10 text-brand-shadow"
-                      : "text-ink-soft hover:bg-black/[0.03] hover:text-ink"
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              );
-            })}
-          </div>
-
-          <div className="flex items-center gap-2">
-            {user && (
-              <span
-                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold sm:px-3 ${
-                  streak > 0 ? "bg-mango/15 text-mango-shadow" : "bg-black/[0.04] text-ink-faint"
-                }`}
-                data-testid="streak-badge"
-              >
-                <Flame size={12} className={streak > 0 ? "animate-wiggle" : ""} />
-                {streak}
-              </span>
-            )}
-
-            {sub?.isTrialing && (
-              <span
-                className="inline-flex items-center gap-1 rounded-full bg-mango/15 px-2.5 py-1 text-xs font-bold text-mango-shadow sm:px-3"
-                data-testid="trial-badge"
-              >
-                <Crown size={12} />
-                <span className="sm:hidden">{sub.daysLeft}d</span>
-                <span className="hidden sm:inline">Trial · {sub.daysLeft}d</span>
-              </span>
-            )}
-
-            {sub?.isPaid && (
-              <span
-                className="inline-flex items-center gap-1 rounded-full bg-leaf/15 px-2.5 py-1 text-xs font-bold text-leaf-shadow sm:px-3"
-                data-testid="paid-badge"
-              >
-                <Crown size={12} /> Pro
-              </span>
-            )}
-
-            {loading ? null : user ? (
-              <div ref={profileRef} className="relative">
-                <button
-                  onClick={() => setProfileOpen((o) => !o)}
-                  className="inline-flex items-center gap-1.5 rounded-full border-2 border-black/10 bg-white px-2.5 py-1.5 text-sm font-bold text-ink hover:bg-black/[0.03]"
-                  data-testid="profile-menu-button"
-                  aria-label="Open profile menu"
-                >
-                  {user.picture ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={user.picture}
-                      alt=""
-                      className="h-5 w-5 rounded-full"
-                    />
-                  ) : (
-                    <User size={14} />
-                  )}
-
-                  <ChevronDown size={12} />
-                </button>
-
-                {profileOpen && (
-                  <div
-                    className="absolute right-0 top-full mt-2 w-48 overflow-hidden rounded-2xl border-2 border-black/5 bg-white shadow-tactile shadow-black/10"
-                    data-testid="profile-menu"
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    data-testid={`desktop-${link.testId}`}
+                    className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-bold transition-colors duration-150 ${
+                      active
+                        ? "bg-brand/10 text-brand-shadow"
+                        : isPricing
+                          ? "text-mango-shadow hover:bg-mango/10"
+                          : "text-ink-soft hover:bg-black/[0.03] hover:text-ink"
+                    }`}
                   >
-                    <div className="border-b-2 border-black/5 px-3 py-2.5">
-                      <p className="truncate text-sm font-bold">{user.name}</p>
-                      <p className="truncate text-xs text-ink-faint">
-                        {user.email}
-                      </p>
+                    {link.label}
+                    {isPricing && !active && (
+                      <span className="h-1.5 w-1.5 rounded-full bg-mango" aria-hidden="true" />
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+
+            <div className="flex items-center gap-2">
+              {user && (
+                <span
+                  className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold sm:px-3 ${
+                    streak > 0 ? "bg-mango/15 text-mango-shadow" : "bg-black/[0.04] text-ink-faint"
+                  }`}
+                  data-testid="streak-badge"
+                >
+                  <Flame size={12} className={streak > 0 ? "animate-wiggle" : ""} />
+                  {streak}
+                </span>
+              )}
+
+              {sub?.isTrialing && (
+                <span
+                  className="inline-flex items-center gap-1 rounded-full bg-mango/15 px-2.5 py-1 text-xs font-bold text-mango-shadow sm:px-3"
+                  data-testid="trial-badge"
+                >
+                  <Crown size={12} />
+                  <span className="sm:hidden">{sub.daysLeft}d</span>
+                  <span className="hidden sm:inline">Trial · {sub.daysLeft}d</span>
+                </span>
+              )}
+
+              {sub?.isPaid && (
+                <span
+                  className="inline-flex items-center gap-1 rounded-full bg-leaf/15 px-2.5 py-1 text-xs font-bold text-leaf-shadow sm:px-3"
+                  data-testid="paid-badge"
+                >
+                  <Crown size={12} /> Pro
+                </span>
+              )}
+
+              {loading ? null : user ? (
+                <div ref={profileRef} className="relative">
+                  <button
+                    onClick={() => setProfileOpen((o) => !o)}
+                    className="inline-flex items-center gap-1.5 rounded-full border-2 border-black/10 bg-white px-2.5 py-1.5 text-sm font-bold text-ink hover:bg-black/[0.03]"
+                    data-testid="profile-menu-button"
+                    aria-label="Open profile menu"
+                  >
+                    {user.picture ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={user.picture}
+                        alt=""
+                        className="h-5 w-5 rounded-full"
+                      />
+                    ) : (
+                      <User size={14} />
+                    )}
+
+                    <ChevronDown size={12} />
+                  </button>
+
+                  {profileOpen && (
+                    <div
+                      className="absolute right-0 top-full mt-2 w-48 overflow-hidden rounded-2xl border-2 border-black/5 bg-white shadow-tactile shadow-black/10"
+                      data-testid="profile-menu"
+                    >
+                      <div className="border-b-2 border-black/5 px-3 py-2.5">
+                        <p className="truncate text-sm font-bold">{user.name}</p>
+                        <p className="truncate text-xs text-ink-faint">
+                          {user.email}
+                        </p>
+                      </div>
+
+                      <Link
+                        href="/profile"
+                        data-testid="menu-profile"
+                        className="block px-3 py-2.5 text-sm font-bold text-ink hover:bg-black/[0.03]"
+                      >
+                        Profile
+                      </Link>
+
+                      <button
+                        onClick={logout}
+                        data-testid="logout-button"
+                        className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-bold text-cherry hover:bg-cherry/[0.08]"
+                      >
+                        <LogOut size={14} /> Logout
+                      </button>
                     </div>
+                  )}
+                </div>
+              ) : (
+                <button
+                  onClick={login}
+                  className="btn-tactile bg-brand !px-4 !py-2 text-sm shadow-tactile shadow-brand-shadow"
+                  data-testid="login-button"
+                >
+                  <LogIn size={14} /> Sign in
+                </button>
+              )}
 
-                    <Link
-                      href="/profile"
-                      data-testid="menu-profile"
-                      className="block px-3 py-2.5 text-sm font-bold text-ink hover:bg-black/[0.03]"
-                    >
-                      Profile
-                    </Link>
-
-                    <button
-                      onClick={logout}
-                      data-testid="logout-button"
-                      className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-bold text-cherry hover:bg-cherry/[0.08]"
-                    >
-                      <LogOut size={14} /> Logout
-                    </button>
-                  </div>
-                )}
-              </div>
-            ) : (
               <button
-                onClick={login}
-                className="btn-tactile bg-brand !px-4 !py-2 text-sm shadow-tactile shadow-brand-shadow"
-                data-testid="login-button"
+                onClick={() => setMenuOpen((o) => !o)}
+                aria-label="Toggle menu"
+                aria-expanded={menuOpen}
+                aria-controls="mobile-menu-panel"
+                className="grid h-9 w-9 place-items-center rounded-xl border-2 border-black/10 bg-white text-ink lg:hidden"
+                data-testid="mobile-menu-toggle"
               >
-                <LogIn size={14} /> Sign in
+                {menuOpen ? <X size={16} /> : <Menu size={16} />}
               </button>
-            )}
-
-            <button
-              onClick={() => setMenuOpen((o) => !o)}
-              aria-label="Toggle menu"
-              aria-expanded={menuOpen}
-              aria-controls="mobile-menu-panel"
-              className="grid h-9 w-9 place-items-center rounded-xl border-2 border-black/10 bg-white text-ink lg:hidden"
-              data-testid="mobile-menu-toggle"
-            >
-              {menuOpen ? <X size={16} /> : <Menu size={16} />}
-            </button>
+            </div>
           </div>
         </div>
 
@@ -278,13 +292,13 @@ export function NavBar() {
                 transition={{ duration: 0.15 }}
                 data-testid="mobile-menu"
               >
-                <ul className="mx-auto max-w-3xl space-y-1">
+                <ul className="mx-auto max-w-3xl space-y-1.5">
                   {PUBLIC_LINKS.map((link) => (
                     <li key={link.href}>
                       <Link
                         href={link.href}
                         data-testid={`mobile-${link.testId}`}
-                        className={`block rounded-xl px-3 py-2.5 text-sm font-bold ${
+                        className={`block rounded-xl px-4 py-3 text-base font-bold transition-colors duration-150 ${
                           pathname === link.href
                             ? "bg-brand/10 text-brand-shadow"
                             : "text-ink hover:bg-black/[0.03]"

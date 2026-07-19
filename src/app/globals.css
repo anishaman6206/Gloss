@@ -42,6 +42,9 @@ body {
   @apply inline-flex items-center justify-center gap-2 rounded-2xl px-6 py-3 font-bold text-white transition-all duration-100 select-none;
   transform: translateY(0);
 }
+.btn-tactile:hover:not(:disabled):not(:active) {
+  filter: brightness(1.04);
+}
 .btn-tactile:active {
   transform: translateY(4px);
   box-shadow: none !important;

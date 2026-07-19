@@ -9,6 +9,8 @@ const config: Config = {
     extend: {
       colors: {
         bg: "#FFF8EF",           // warm paper background
+        cream: "#FBF0DC",        // warm cream section band
+        mist: "#F7F7F5",         // very light gray footer band
         surface: "#FFFFFF",
         ink: {
           DEFAULT: "#1A1A24",
