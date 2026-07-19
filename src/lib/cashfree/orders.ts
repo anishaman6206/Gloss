@@ -1,5 +1,6 @@
 import "server-only";
 import { cashfreeClient, PLANS, type PlanKey } from "./client";
+import { applyPromoDiscount, isValidPromoCode } from "@/lib/promoCode";
 
 function baseUrl() {
   // Same origin convention already used for NextAuth's callback URL.
@@ -13,16 +14,18 @@ const PLACEHOLDER_PHONE = "9999999999";
 
 export async function createOrder(
   user: { id: string; email: string; name: string },
-  plan: PlanKey
+  plan: PlanKey,
+  promoCode?: string
 ) {
   const meta = PLANS[plan];
+  const orderAmount = applyPromoDiscount(meta.amount, promoCode);
   const client = cashfreeClient();
   const orderId = `gloss_${user.id.slice(0, 8)}_${Date.now()}`;
   const origin = baseUrl();
 
   const response = await client.PGCreateOrder({
     order_id: orderId,
-    order_amount: meta.amount,
+    order_amount: orderAmount,
     order_currency: "INR",
     customer_details: {
       customer_id: user.id,
@@ -37,6 +40,7 @@ export async function createOrder(
     order_tags: {
       userId: user.id,
       plan,
+      ...(isValidPromoCode(promoCode) ? { promo: promoCode! } : {}),
     },
   });
 

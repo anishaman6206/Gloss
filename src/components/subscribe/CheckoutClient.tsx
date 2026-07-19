@@ -8,7 +8,9 @@ import {
   ShieldCheck,
   Loader2,
   Check,
+  Tag,
 } from "lucide-react";
+import { isValidPromoCode, applyPromoDiscount, TRIAL_PROMO_DISCOUNT_PERCENT } from "@/lib/promoCode";
 
 type Plan = "monthly" | "yearly";
 
@@ -42,10 +44,12 @@ export function CheckoutClient({
   plan,
   isTrialing,
   daysLeft,
+  promo,
 }: {
   plan: Plan;
   isTrialing: boolean;
   daysLeft: number;
+  promo?: string;
 }) {
   const router = useRouter();
 
@@ -53,6 +57,9 @@ export function CheckoutClient({
   const [error, setError] = useState<string | null>(null);
 
   const meta = META[plan];
+  const promoApplied = isValidPromoCode(promo);
+  const discountedAmount = applyPromoDiscount(meta.amount, promo);
+  const discountedPrice = `₹${discountedAmount}`;
 
   async function pay() {
     setError(null);
@@ -65,7 +72,7 @@ export function CheckoutClient({
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify({ plan }),
+        body: JSON.stringify({ plan, promo }),
       });
 
       const data = await res.json();
@@ -134,12 +141,31 @@ export function CheckoutClient({
             </div>
 
             <p className="whitespace-nowrap font-display text-4xl font-bold">
-              {meta.price}
+              {promoApplied ? (
+                <>
+                  <span className="mr-2 text-xl font-medium text-ink-faint line-through">
+                    {meta.price}
+                  </span>
+                  {discountedPrice}
+                </>
+              ) : (
+                meta.price
+              )}
               <span className="ml-1 text-sm font-medium text-ink-soft">
                 {meta.suffix}
               </span>
             </p>
           </div>
+
+          {promoApplied && (
+            <div
+              className="mt-4 flex items-center gap-2 rounded-2xl bg-brand/10 p-3 text-sm font-bold text-brand-shadow"
+              data-testid="checkout-promo-note"
+            >
+              <Tag size={16} className="shrink-0" />
+              {TRIAL_PROMO_DISCOUNT_PERCENT}% off applied
+            </div>
+          )}
 
           {isTrialing && (
             <div
@@ -160,7 +186,7 @@ export function CheckoutClient({
             </p>
 
             <p className="font-display text-3xl font-bold">
-              {meta.price}
+              {promoApplied ? discountedPrice : meta.price}
               <span className="ml-1 text-sm font-medium text-ink-soft">
                 {meta.suffix}
               </span>
@@ -181,7 +207,7 @@ export function CheckoutClient({
 
             {loading
               ? "Opening secure checkout…"
-              : `Pay ${meta.price} securely`}
+              : `Pay ${promoApplied ? discountedPrice : meta.price} securely`}
           </button>
 
           {error && (

@@ -16,6 +16,7 @@ export default async function CheckoutPage({
 }: {
   searchParams: {
     plan?: string;
+    promo?: string;
   };
 }) {
   const user = await getCurrentUser();
@@ -39,6 +40,7 @@ export default async function CheckoutPage({
       plan={plan}
       isTrialing={sub.isTrialing}
       daysLeft={sub.daysLeft}
+      promo={searchParams.promo}
     />
   );
 }

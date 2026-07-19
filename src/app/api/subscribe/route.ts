@@ -18,12 +18,15 @@ export async function POST(req: Request) {
     );
   }
 
-  const { plan } = (await req.json().catch(() => ({}))) as { plan?: PlanKey };
+  const { plan, promo } = (await req.json().catch(() => ({}))) as {
+    plan?: PlanKey;
+    promo?: string;
+  };
   if (!plan || !(plan in PLANS)) {
     return NextResponse.json({ ok: false, error: "invalid_plan" }, { status: 400 });
   }
 
-  const { orderId, paymentSessionId } = await createOrder(user, plan);
+  const { orderId, paymentSessionId } = await createOrder(user, plan, promo);
 
   return NextResponse.json({
     ok: true,

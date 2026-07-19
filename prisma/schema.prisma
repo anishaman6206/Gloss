@@ -34,6 +34,10 @@ model User {
   reminderEmailsEnabled Boolean   @default(true)
   lastReminderSentAt    DateTime?
 
+  // Trial-conversion nudge emails: 0 = none sent, 1 = "days left" sent,
+  // 2 = "ends today" sent. Prevents re-sending the same stage on every cron run.
+  trialNudgeStage Int @default(0)
+
   // Pro-only streak-freeze perk: one skip-day forgiveness, refilled weekly
   streakFreezesAvailable   Int       @default(0)
   streakFreezesRefreshedAt DateTime?
