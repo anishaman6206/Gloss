@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
   "name": "Gloss",
-  "description": "Look up any word in context while you read — syncs with your Gloss library.",
+  "description": "Look up any word in context while you read, and sync it with your Gloss library.",
   "version": "0.1.0",
-  "permissions": ["storage", "cookies", "scripting", "activeTab", "declarativeNetRequest", "declarativeNetRequestWithHostAccess", "webRequest"],
+  "permissions": ["storage", "declarativeNetRequest", "declarativeNetRequestWithHostAccess", "webRequest"],
   "host_permissions": ["http://*/*", "https://*/*", "file:///*"],
   "background": { "service_worker": "background.js" },
   "content_scripts": [

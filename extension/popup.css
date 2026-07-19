@@ -38,7 +38,7 @@
   --gloss-bg: #232838;
   --gloss-fg: #f2f3f7;
   --gloss-fg-soft: #a6a8bd;
-  --gloss-fg-faint: #7d7f97;
+  --gloss-fg-faint: #9295ac;
   --gloss-border: rgba(255, 255, 255, 0.08);
   --gloss-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
   --gloss-skeleton-a: #2b3145;
@@ -302,7 +302,7 @@
   --gloss-bg: #1b1f2a;
   --gloss-fg: #f2f3f7;
   --gloss-fg-soft: #a6a8bd;
-  --gloss-fg-faint: #7d7f97;
+  --gloss-fg-faint: #9295ac;
   --gloss-divider: rgba(255, 255, 255, 0.08);
   --gloss-accent-bg: rgba(28, 176, 246, 0.14);
   --gloss-hover-bg: rgba(255, 255, 255, 0.08);
@@ -472,6 +472,11 @@ body {
   font-weight: 700;
   animation: gloss-ext-fade-up 320ms ease both;
   animation-delay: 190ms;
+}
+
+:root[data-theme="dark"] .onboarding-hint {
+  background: rgba(255, 150, 0, 0.16);
+  color: #ffb84d;
 }
 
 .onboarding-hint-dot {

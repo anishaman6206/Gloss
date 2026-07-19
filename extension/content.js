@@ -1,4 +1,10 @@
 (() => {
+  // Guards against a duplicate set of listeners/state if this script is ever
+  // injected twice into the same document (e.g. an extension reload during
+  // development re-injecting into a tab that's still open).
+  if (window.__glossContentScriptLoaded) return;
+  window.__glossContentScriptLoaded = true;
+
   const MAX_PHRASE_LEN = 60;
   const SELECTION_DEBOUNCE_MS = 300;
   const GENERIC_LOOKUP_ERROR = "Couldn't get a definition. Try again";
