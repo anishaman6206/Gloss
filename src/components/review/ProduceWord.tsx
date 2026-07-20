@@ -84,7 +84,7 @@ export function ProduceWord({
         </div>
       )}
 
-      {checked && <GradeButtons onGrade={onGraded} />}
+      {checked && <GradeButtons onGrade={onGraded} suggested={correct ? 5 : 1} />}
     </div>
   );
 }

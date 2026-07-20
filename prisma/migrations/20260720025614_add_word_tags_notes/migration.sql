@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Word" ADD COLUMN     "notes" TEXT NOT NULL DEFAULT '',
+ADD COLUMN     "tags" TEXT NOT NULL DEFAULT '[]';

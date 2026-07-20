@@ -35,6 +35,35 @@ export type DefineResult =
 
 export type WordStatus = "new" | "learning" | "learned";
 
+export type LibraryStatusFilter = "all" | WordStatus;
+export type LibrarySortOption = "newest" | "oldest" | "az" | "za";
+
+export type ReviewHistoryEntry = {
+  quality: number;
+  reviewedAt: Date;
+};
+
+// Everything the Library dashboard needs per word - a superset of the base
+// Word row plus derived fields (status/isLeech/isCommon) computed server-side
+// and a capped recent-history slice, so client components never need to
+// re-derive SM-2 state or fetch history themselves.
+export type LibraryWord = {
+  id: string;
+  phrase: string;
+  sentence: string;
+  definition: string;
+  partOfSpeech: string;
+  synonyms: string[];
+  examples: string[];
+  tags: string[];
+  notes: string;
+  status: WordStatus;
+  isLeech: boolean;
+  isCommon: boolean;
+  createdAt: Date;
+  reviewHistory: ReviewHistoryEntry[];
+};
+
 // Review quality mapped from UI interactions onto the SM-2 0-5 scale.
 export type ReviewQuality = 0 | 1 | 2 | 3 | 4 | 5;
 

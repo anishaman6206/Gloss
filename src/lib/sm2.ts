@@ -43,7 +43,7 @@ export function applySm2(state: Sm2State, quality: ReviewQuality, now = new Date
   return { easeFactor, intervalDays, repetitions, lapses, nextReviewAt };
 }
 
-const LEARNED_INTERVAL_DAYS = 21;
+export const LEARNED_INTERVAL_DAYS = 21;
 
 export function wordStatus(review: { repetitions: number; intervalDays: number } | null): WordStatus {
   if (!review || review.repetitions === 0) return "new";

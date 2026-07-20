@@ -3,7 +3,7 @@
 import { useEffect, useState, useTransition } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { gradeReview } from "@/lib/actions";
-import { pickFillBlankSentence } from "@/lib/review";
+import { pickFillBlankSentence, pickReviewSentence } from "@/lib/review";
 import { RecallFlip } from "./RecallFlip";
 import { FillBlank } from "./FillBlank";
 import { ProduceWord } from "./ProduceWord";
@@ -14,6 +14,7 @@ type QueueItem = {
   word: WordWithReview;
   mode: ReviewMode;
   blanked: string | null;
+  displaySentence: string;
 };
 
 function shuffle<T>(items: T[]): T[] {
@@ -28,20 +29,43 @@ function shuffle<T>(items: T[]): T[] {
 const MODES: ReviewMode[] = ["recall-flip", "fill-blank", "produce-word"];
 const FALLBACK_MODES: ReviewMode[] = ["recall-flip", "produce-word"];
 
-// Picks each mode with equal 1-in-3 odds regardless of how often fill-blank
-// happens to have a usable blanked sentence, so a better (or worse) blank
-// match rate never dilutes how often recall-flip/produce-word show up.
-// Only when fill-blank is picked but has no valid blank do we redraw between
-// the other two modes.
+// Mode odds shift with how well-established a word already is (SM-2
+// repetitions), a "desirable difficulty" progression from recognition to
+// active production: brand-new/just-failed words (0 reps) lean toward the
+// easiest mode (recall-flip), well-learned words (3+ reps) lean toward the
+// hardest one (produce-word), and everything in between stays roughly even.
+const MODE_WEIGHTS: Record<"new" | "learning" | "mature", Record<ReviewMode, number>> = {
+  new: { "recall-flip": 0.6, "fill-blank": 0.3, "produce-word": 0.1 },
+  learning: { "recall-flip": 0.33, "fill-blank": 0.34, "produce-word": 0.33 },
+  mature: { "recall-flip": 0.15, "fill-blank": 0.3, "produce-word": 0.55 },
+};
+
+function pickWeightedMode(repetitions: number): ReviewMode {
+  const tier = repetitions === 0 ? "new" : repetitions <= 2 ? "learning" : "mature";
+  const weights = MODE_WEIGHTS[tier];
+
+  let roll = Math.random();
+  for (const mode of MODES) {
+    roll -= weights[mode];
+    if (roll <= 0) return mode;
+  }
+  return MODES[MODES.length - 1];
+}
+
+// Fill-blank happens less often for words whose examples/source sentence
+// don't contain a cleanly blankable phrase, so when it's picked but has no
+// usable blank we redraw between the other two modes instead of just
+// silently dropping the rep to one fixed mode.
 function buildQueue(words: WordWithReview[]): QueueItem[] {
   return shuffle(words).map((word) => {
     const blanked = pickFillBlankSentence(word.examples, word.sentence, word.phrase);
-    const intended = MODES[Math.floor(Math.random() * MODES.length)];
+    const displaySentence = pickReviewSentence(word.examples, word.sentence, word.phrase);
+    const intended = pickWeightedMode(word.review?.repetitions ?? 0);
     const mode =
       intended === "fill-blank" && blanked === null
         ? FALLBACK_MODES[Math.floor(Math.random() * FALLBACK_MODES.length)]
         : intended;
-    return { word, mode, blanked };
+    return { word, mode, blanked, displaySentence };
   });
 }
 
@@ -123,7 +147,7 @@ export function ReviewSession({
         >
           {current.mode === "recall-flip" && (
             <RecallFlip
-              sentence={current.word.sentence}
+              sentence={current.displaySentence}
               phrase={current.word.phrase}
               definition={current.word.definition}
               partOfSpeech={current.word.partOfSpeech}
@@ -146,7 +170,7 @@ export function ReviewSession({
               definition={current.word.definition}
               partOfSpeech={current.word.partOfSpeech}
               phrase={current.word.phrase}
-              sentence={current.word.sentence}
+              sentence={current.displaySentence}
               onGraded={handleGraded}
             />
           )}

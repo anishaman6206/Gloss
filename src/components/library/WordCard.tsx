@@ -1,21 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, Volume2, Sparkles, Trash2 } from "lucide-react";
+import { ChevronDown, Volume2, Sparkles, Trash2, Pencil } from "lucide-react";
 import { speak } from "@/lib/speak";
+import { StatusBadge } from "./StatusBadge";
+import { TagChip } from "./TagChip";
+import { Highlight } from "./Highlight";
 import type { WordStatus } from "@/lib/types";
-
-const STATUS_LABEL: Record<WordStatus, string> = {
-  new: "New",
-  learning: "Learning",
-  learned: "Learned",
-};
-
-const STATUS_STYLE: Record<WordStatus, string> = {
-  new: "bg-brand/10 text-brand-shadow",
-  learning: "bg-mango/15 text-mango-shadow",
-  learned: "bg-leaf/15 text-leaf-shadow",
-};
 
 export function WordCard({
   phrase,
@@ -27,7 +18,11 @@ export function WordCard({
   status,
   isLeech,
   isCommon,
+  tags,
+  notes,
+  query,
   onDelete,
+  onEdit,
 }: {
   phrase: string;
   sentence: string;
@@ -38,7 +33,11 @@ export function WordCard({
   status: WordStatus;
   isLeech?: boolean;
   isCommon?: boolean;
+  tags?: string[];
+  notes?: string;
+  query?: string;
   onDelete?: () => void;
+  onEdit?: () => void;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -54,7 +53,9 @@ export function WordCard({
       >
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <p className="font-display text-lg font-bold">{phrase}</p>
+            <p className="font-display text-lg font-bold">
+              <Highlight text={phrase} query={query ?? ""} />
+            </p>
             <span
               onClick={(e) => {
                 e.stopPropagation();
@@ -77,7 +78,9 @@ export function WordCard({
             </span>
           </div>
           {!open && (
-            <p className="truncate text-sm text-ink-soft">{definition}</p>
+            <p className="truncate text-sm text-ink-soft">
+              <Highlight text={definition} query={query ?? ""} />
+            </p>
           )}
         </div>
         <span className="flex shrink-0 items-center gap-1.5">
@@ -97,11 +100,7 @@ export function WordCard({
               Struggling
             </span>
           )}
-          <span
-            className={`rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wider ${STATUS_STYLE[status]}`}
-          >
-            {STATUS_LABEL[status]}
-          </span>
+          <StatusBadge status={status} />
         </span>
         <ChevronDown
           size={16}
@@ -147,16 +146,40 @@ export function WordCard({
             From: &ldquo;{sentence}&rdquo;
           </p>
 
-          {onDelete && (
-            <button
-              type="button"
-              onClick={onDelete}
-              data-testid={`delete-word-${phrase}`}
-              className="flex items-center gap-1.5 text-xs font-bold text-cherry hover:text-cherry-shadow"
-            >
-              <Trash2 size={13} /> Delete from library
-            </button>
+          {tags && tags.length > 0 && (
+            <div className="flex flex-wrap items-center gap-1.5">
+              {tags.map((tag) => (
+                <TagChip key={tag} tag={tag} />
+              ))}
+            </div>
           )}
+
+          {notes && (
+            <p className="rounded-2xl bg-leaf/[0.06] p-3 text-sm text-ink">{notes}</p>
+          )}
+
+          <div className="flex items-center gap-4">
+            {onEdit && (
+              <button
+                type="button"
+                onClick={onEdit}
+                data-testid={`edit-word-${phrase}`}
+                className="flex items-center gap-1.5 text-xs font-bold text-ink-soft hover:text-brand-shadow"
+              >
+                <Pencil size={13} /> Edit
+              </button>
+            )}
+            {onDelete && (
+              <button
+                type="button"
+                onClick={onDelete}
+                data-testid={`delete-word-${phrase}`}
+                className="flex items-center gap-1.5 text-xs font-bold text-cherry hover:text-cherry-shadow"
+              >
+                <Trash2 size={13} /> Delete from library
+              </button>
+            )}
+          </div>
         </div>
       )}
     </div>
