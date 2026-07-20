@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BookOpen, Mail, Sparkles } from "lucide-react";
-import { isWideRoute } from "@/lib/marketingRoutes";
+import { isWideLayoutRoute } from "@/lib/marketingRoutes";
 
 const SECTIONS: {
   title: string;
@@ -43,7 +43,7 @@ export function Footer() {
   // Hide footer inside review sessions to keep focus.
   if (pathname?.startsWith("/review")) return null;
 
-  const isWide = isWideRoute(pathname);
+  const isWide = isWideLayoutRoute(pathname);
 
   return (
     <footer

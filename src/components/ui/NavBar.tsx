@@ -20,7 +20,7 @@ import {
   Flame,
 } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { isWideRoute } from "@/lib/marketingRoutes";
+import { isAppRoute, isWideLayoutRoute, isWideRoute } from "@/lib/marketingRoutes";
 
 const APP_LINKS = [
   { href: "/scan", label: "Scan", icon: Camera, testId: "nav-scan" },
@@ -39,6 +39,15 @@ const PUBLIC_LINKS = [
 ];
 
 const CONTACT_LINK = { href: "/contact", label: "Contact", testId: "nav-contact" };
+
+// Desktop nav link row: the same set on every page (no About - it lives in
+// the footer), so the bar doesn't visibly change shape as you navigate.
+const DESKTOP_LINKS = [
+  PUBLIC_LINKS.find((l) => l.href === "/")!,
+  ...APP_LINKS,
+  PUBLIC_LINKS.find((l) => l.href === "/pricing")!,
+  PUBLIC_LINKS.find((l) => l.href === "/faq")!,
+];
 
 export function NavBar() {
   const pathname = usePathname();
@@ -98,9 +107,14 @@ export function NavBar() {
     return () => document.removeEventListener("click", onClick);
   }, [profileOpen]);
 
-  const isAppRoute = APP_LINKS.some((l) => pathname?.startsWith(l.href));
   const isWide = isWideRoute(pathname);
+  // Mobile drawer keeps the full public link set (About included) - this
+  // reorganization is desktop-only, mobile stays exactly as it was.
   const links = isWide ? [...PUBLIC_LINKS, CONTACT_LINK] : PUBLIC_LINKS;
+  // App routes (scan, library, review, describe, stats) and profile share the
+  // same wide, home-style layout as marketing pages - kept in sync with the
+  // page container/footer width via isWideLayoutRoute.
+  const groupLinksRight = isWideLayoutRoute(pathname);
 
   const rightCluster = (
     <div className="flex items-center gap-2">
@@ -214,7 +228,7 @@ export function NavBar() {
       >
         <div
           className={`relative mx-auto flex items-center justify-between gap-3 px-4 ${
-            isWide ? "max-w-7xl py-2.5" : "max-w-3xl py-3"
+            groupLinksRight ? "max-w-7xl py-2.5" : "max-w-3xl py-3"
           }`}
         >
           <Link href="/" className="flex items-center gap-2" data-testid="brand-link">
@@ -225,11 +239,11 @@ export function NavBar() {
             <span className="font-display text-2xl font-bold tracking-tight">Gloss</span>
           </Link>
 
-          {isWide ? (
+          {groupLinksRight ? (
             <div className="flex items-center gap-3 lg:gap-6">
               {/* Desktop links, on the right side next to the profile/CTA cluster */}
               <div className="hidden items-center gap-1 lg:flex">
-                {links.map((link) => {
+                {DESKTOP_LINKS.map((link) => {
                   const active = pathname === link.href;
                   const isPricing = link.href === "/pricing";
 
@@ -261,7 +275,7 @@ export function NavBar() {
             <>
               {/* Desktop links, centered independently of the logo/profile widths */}
               <div className="hidden items-center gap-1 lg:absolute lg:left-1/2 lg:flex lg:-translate-x-1/2">
-                {links.map((link) => {
+                {DESKTOP_LINKS.map((link) => {
                   const active = pathname === link.href;
 
                   return (
@@ -342,40 +356,40 @@ export function NavBar() {
         </AnimatePresence>
       </nav>
 
-      {/* Secondary app nav (tablet/desktop) - mirrors the bottom nav's links
-          for screens where the bottom nav is hidden (md:hidden). */}
-      {isAppRoute && (
-        <div
-          className="hidden border-b-2 border-black/5 bg-white/80 backdrop-blur-xl md:block"
-          data-testid="app-navbar"
-        >
-          <div className="mx-auto flex max-w-3xl items-center gap-1 px-4 py-2">
-            {APP_LINKS.map((link) => {
-              const Icon = link.icon;
-              const active = pathname?.startsWith(link.href);
+      {/* Secondary app nav (tablet only, every page) - mirrors the bottom
+          nav's links for the md-lg gap, where the bottom nav is hidden but
+          the main top bar's links (lg:flex) haven't kicked in yet. At lg+
+          these links already live in the top bar, so this row steps aside. */}
+      <div
+        className="hidden border-b-2 border-black/5 bg-white/80 backdrop-blur-xl md:block lg:hidden"
+        data-testid="app-navbar"
+      >
+        <div className="mx-auto flex max-w-3xl items-center gap-1 px-4 py-2">
+          {APP_LINKS.map((link) => {
+            const Icon = link.icon;
+            const active = pathname?.startsWith(link.href);
 
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  data-testid={`desktop-${link.testId}`}
-                  className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-bold transition-colors ${
-                    active
-                      ? "bg-brand/10 text-brand-shadow"
-                      : "text-ink-soft hover:bg-black/[0.03] hover:text-ink"
-                  }`}
-                >
-                  <Icon size={15} strokeWidth={2.4} />
-                  {link.label}
-                </Link>
-              );
-            })}
-          </div>
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                data-testid={`desktop-${link.testId}`}
+                className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-bold transition-colors ${
+                  active
+                    ? "bg-brand/10 text-brand-shadow"
+                    : "text-ink-soft hover:bg-black/[0.03] hover:text-ink"
+                }`}
+              >
+                <Icon size={15} strokeWidth={2.4} />
+                {link.label}
+              </Link>
+            );
+          })}
         </div>
-      )}
+      </div>
 
       {/* Bottom nav (mobile-first) - only on app routes */}
-      {isAppRoute && (
+      {isAppRoute(pathname) && (
         <div
           className="fixed bottom-0 left-0 right-0 z-40 border-t-2 border-black/5 bg-white/90 backdrop-blur-xl md:hidden"
           data-testid="bottom-nav"
