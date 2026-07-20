@@ -5,17 +5,15 @@ import Link from "next/link";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { Camera, ArrowRight, Zap, Check } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { PLANS } from "@/lib/planPricing";
 import { BrowserMockup } from "./mockups/BrowserMockup";
 import { WordPopupMockup } from "./mockups/WordPopupMockup";
 import { SavedConfirmationMockup } from "./mockups/SavedConfirmationMockup";
 
 const TRUST_ITEMS = [
   "Scan & define, always free",
-  `Save & review from ${PLANS.monthly.price}/month`,
   "7-day free trial",
   "Tap multiple words at once",
-  "Privacy-first OCR",
+  "Photos never leave your device",
 ];
 
 export function Hero() {
@@ -47,7 +45,7 @@ export function Hero() {
           <span className="text-brand">you actually read.</span>
         </h1>
 
-        <p className="mx-auto mt-4 max-w-xl text-lg text-ink-soft md:text-xl lg:mx-0">
+        <p className="mx-auto mt-4 max-w-xl text-xl text-ink-soft lg:mx-0">
           Snap a page. Tap a word. Get its meaning{" "}
           <em className="rounded bg-mango/25 px-1 not-italic">in context</em>, then keep
           it forever with spaced repetition.
@@ -87,7 +85,7 @@ export function Hero() {
           )}
         </div>
 
-        <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-ink-soft lg:justify-start">
+        <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-base text-ink-soft lg:justify-start">
           {TRUST_ITEMS.map((item) => (
             <li key={item} className="inline-flex items-center gap-1.5">
               <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-leaf/20 text-leaf-shadow">
@@ -159,38 +157,15 @@ export function Hero() {
         </motion.div>
       </div>
 
-      {/* Right, mobile/tablet: a plain vertical story, no overlap, no absolute
-          positioning - a purpose-built layout, not a shrunk desktop one. */}
+      {/* Right, mobile/tablet: a single static preview, no animation needed
+          on small screens. */}
       <div
-        className="mx-auto flex w-full max-w-xs flex-col items-center gap-4 lg:hidden"
+        className="mx-auto flex w-full max-w-xs flex-col items-center lg:hidden"
         aria-hidden="true"
       >
-        <motion.div
-          className="w-[82%]"
-          initial={reduceMotion ? false : { opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
+        <div className="w-[82%]">
           <BrowserMockup />
-        </motion.div>
-
-        <motion.div
-          className="w-[90%]"
-          initial={reduceMotion ? false : { opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.25 }}
-        >
-          <WordPopupMockup />
-        </motion.div>
-
-        <motion.div
-          className="w-[62%]"
-          initial={reduceMotion ? false : { opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-        >
-          <SavedConfirmationMockup />
-        </motion.div>
+        </div>
       </div>
     </section>
   );

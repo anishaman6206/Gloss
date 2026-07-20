@@ -20,6 +20,10 @@ const FAQS = [
     a: "Yes. Scanning pages and getting word meanings is always free (up to 40 lookups per day for guests). Saving words and reviewing them come with a 7-day free trial, followed by a small subscription.",
   },
   {
+    q: "What happens to my saved words after the free trial ends?",
+    a: "Nothing is ever deleted. If you don't subscribe once the trial ends, your library stays exactly as it is and you can still browse it, but saving new words and grading review sessions pause until you subscribe. Pick a plan any time and you'll pick up right where you left off.",
+  },
+  {
     q: "What can I scan?",
     a: "Any page with printed or clearly written text, including novels, textbooks, magazines, articles, and worksheets. Handwriting works best when it's neat and the photo is well lit.",
   },

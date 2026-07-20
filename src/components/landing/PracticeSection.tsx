@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Camera, ArrowRight, Image as ImageIcon } from "lucide-react";
-import { OCRScanMockup } from "./mockups/OCRScanMockup";
+import { BookPageMockup } from "./mockups/BookPageMockup";
 import { ChatBubbleMockup } from "./mockups/ChatBubbleMockup";
 
 export function PracticeSection() {
@@ -13,38 +13,43 @@ export function PracticeSection() {
 
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         <motion.div
-          className="relative rounded-3xl border-2 border-black/5 bg-white p-6 shadow-tactile shadow-black/5"
+          className="relative flex h-full flex-col rounded-3xl border-2 border-black/5 bg-white p-6 shadow-tactile shadow-black/5"
           data-testid="practice-path-scan"
-          whileHover={{ y: -4 }}
-          transition={{ duration: 0.2 }}
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0, transition: { duration: 0.5 } }}
+          viewport={{ once: true, margin: "-80px" }}
+          whileHover={{ y: -4, transition: { duration: 0.2 } }}
         >
           <span className="grid h-12 w-12 place-items-center rounded-2xl bg-brand/15 text-brand-shadow">
             <Camera size={22} strokeWidth={2.4} />
           </span>
           <h3 className="mt-4 font-display text-xl font-bold">Reading something?</h3>
           <p className="mt-1 text-ink-soft">
-            Snap the page, tap the words you don&apos;t know, and save them for spaced-repetition
-            review.
+            Same scan-and-tap flow from above. Works on any book, article, or PDF.
           </p>
 
           <div className="mt-4">
-            <OCRScanMockup />
+            <BookPageMockup />
           </div>
+
+          <div className="flex-1" />
 
           <Link
             href="/scan"
             data-testid="practice-path-scan-cta"
-            className="btn-tactile mt-5 !py-3.5 !px-6 text-base bg-brand shadow-tactile shadow-brand-shadow"
+            className="btn-tactile mt-5 self-start !py-3.5 !px-6 text-base bg-brand shadow-tactile shadow-brand-shadow"
           >
             Scan a page <ArrowRight size={18} />
           </Link>
         </motion.div>
 
         <motion.div
-          className="relative overflow-hidden rounded-3xl border-2 border-mango/25 bg-gradient-to-br from-mango/[0.05] to-transparent p-6 shadow-tactile shadow-mango-shadow/70"
+          className="relative flex h-full flex-col overflow-hidden rounded-3xl border-2 border-mango/25 bg-gradient-to-br from-mango/[0.05] to-transparent p-6 shadow-tactile shadow-mango-shadow/70"
           data-testid="practice-path-describe"
-          whileHover={{ y: -4 }}
-          transition={{ duration: 0.2 }}
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0, transition: { duration: 0.5, delay: 0.1 } }}
+          viewport={{ once: true, margin: "-80px" }}
+          whileHover={{ y: -4, transition: { duration: 0.2 } }}
         >
           <span className="absolute right-4 top-4 inline-flex items-center gap-1.5 rounded-full border border-mango/30 bg-white px-2.5 py-1 text-xs font-bold text-mango-shadow">
             <span className="relative flex h-1.5 w-1.5">
@@ -66,10 +71,12 @@ export function PracticeSection() {
             <ChatBubbleMockup />
           </div>
 
+          <div className="flex-1" />
+
           <Link
             href="/describe"
             data-testid="practice-path-describe-cta"
-            className="btn-tactile mt-5 !py-3.5 !px-6 text-base bg-mango shadow-tactile shadow-mango-shadow"
+            className="btn-tactile mt-5 self-start !py-3.5 !px-6 text-base bg-mango shadow-tactile shadow-mango-shadow"
           >
             Try picture practice <ArrowRight size={18} />
           </Link>

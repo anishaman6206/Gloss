@@ -1,44 +1,16 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { WordPopupMockup } from "./mockups/WordPopupMockup";
 import { LibraryRowMockup } from "./mockups/LibraryRowMockup";
-import { FlashcardMockup } from "./mockups/FlashcardMockup";
 import { StatsMockup } from "./mockups/StatsMockup";
 
 const ROWS = [
-  {
-    eyebrow: "Word lookup",
-    title: "Never interrupt your reading just to open a dictionary.",
-    body: "Tap a word without leaving the page. The definition comes from the exact sentence you tapped, with synonyms and an example one glance away.",
-    mockup: (
-      <WordPopupMockup
-        className="mx-auto max-w-sm"
-        word="ephemeral"
-        definition="lasting for a very short time"
-        partOfSpeech="adjective"
-        synonyms={["fleeting", "transient", "momentary"]}
-        examples={[
-          "The morning mist was ephemeral, vanishing the moment sunlight touched the hills.",
-          "Fame in the digital age can feel ephemeral, here one day and forgotten the next.",
-        ]}
-      />
-    ),
-    tint: "bg-brand/15 text-brand-shadow",
-  },
   {
     eyebrow: "Your library",
     title: "Stop taking screenshots you'll never revisit.",
     body: "Every word you save is sorted into new, learning, and learned automatically, with struggling words flagged so you know exactly what to focus on.",
     mockup: <LibraryRowMockup className="mx-auto max-w-sm" />,
     tint: "bg-mango/15 text-mango-shadow",
-  },
-  {
-    eyebrow: "Spaced repetition",
-    title: "Remember words months later instead of forgetting them tomorrow.",
-    body: "SM-2 spaced repetition schedules each word right before you're about to forget it. Recall, fill-blank, and produce-word keep it from feeling repetitive.",
-    mockup: <FlashcardMockup className="mx-auto max-w-sm" />,
-    tint: "bg-leaf/15 text-leaf-shadow",
   },
   {
     eyebrow: "Progress",

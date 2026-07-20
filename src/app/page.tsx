@@ -21,8 +21,8 @@ function Band({
     <section className={`relative w-full ${glow ? "overflow-hidden" : ""} ${bgClass}`}>
       {glow && (
         <>
-          <div className="pointer-events-none absolute left-0 top-0 h-[560px] w-[560px] -translate-x-1/3 -translate-y-1/4 rounded-full bg-brand/[0.08] blur-[120px]" />
-          <div className="pointer-events-none absolute right-0 top-0 h-[560px] w-[560px] translate-x-1/3 -translate-y-1/4 rounded-full bg-mango/[0.08] blur-[120px]" />
+          <div className="pointer-events-none absolute left-0 top-0 h-[560px] w-[560px] -translate-x-1/3 -translate-y-1/4 rounded-full bg-brand/[0.04] blur-[100px]" />
+          <div className="pointer-events-none absolute right-0 top-0 h-[560px] w-[560px] translate-x-1/3 -translate-y-1/4 rounded-full bg-mango/[0.02] blur-[100px]" />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-cream md:h-36" />
         </>
       )}

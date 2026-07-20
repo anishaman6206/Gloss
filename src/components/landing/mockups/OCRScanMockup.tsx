@@ -38,7 +38,7 @@ export function OCRScanMockup({ className = "" }: { className?: string }) {
       <div className="mt-3 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-white/70">
         <span>Scanning page…</span>
         <span className="flex items-center gap-1">
-          <span className="h-1.5 w-1.5 rounded-full bg-leaf" /> On-device OCR
+          <span className="h-1.5 w-1.5 rounded-full bg-leaf" /> Stays on your device
         </span>
       </div>
     </div>

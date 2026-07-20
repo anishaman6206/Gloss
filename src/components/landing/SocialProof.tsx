@@ -1,4 +1,7 @@
-import { Star, Sparkles, BookOpen, ShieldCheck, Repeat2 } from "lucide-react";
+"use client";
+
+import { motion } from "framer-motion";
+import { Star } from "lucide-react";
 
 const TESTIMONIALS = [
   {
@@ -27,13 +30,6 @@ const TESTIMONIALS = [
   },
 ];
 
-const METRICS = [
-  { icon: Sparkles, label: "Thousands of words saved and reviewed" },
-  { icon: BookOpen, label: "Built for readers, not scrollers" },
-  { icon: ShieldCheck, label: "OCR that never leaves your device" },
-  { icon: Repeat2, label: "Reviews backed by spaced repetition" },
-];
-
 export function SocialProof() {
   return (
     <div data-testid="social-proof">
@@ -47,11 +43,15 @@ export function SocialProof() {
         className="mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 md:grid md:grid-cols-3 md:overflow-visible md:pb-0"
         data-testid="testimonial-list"
       >
-        {TESTIMONIALS.map((t) => (
-          <div
+        {TESTIMONIALS.map((t, i) => (
+          <motion.div
             key={t.name}
             className="flex w-[82%] shrink-0 snap-center flex-col rounded-3xl border-2 border-black/5 bg-white p-7 shadow-tactile shadow-black/5 sm:w-[65%] md:w-auto md:min-h-[220px]"
             data-testid={`testimonial-${t.initials}`}
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.5, delay: i * 0.1 }}
           >
             <div className="flex items-center gap-0.5" aria-label="5 out of 5 stars">
               {Array.from({ length: 5 }).map((_, i) => (
@@ -69,29 +69,12 @@ export function SocialProof() {
                 {t.initials}
               </span>
               <div className="min-w-0">
-                <p className="truncate font-display text-sm font-bold">{t.name}</p>
-                <p className="truncate text-xs text-ink-faint">{t.role}</p>
+                <p className="truncate font-display text-base font-bold">{t.name}</p>
+                <p className="truncate text-sm text-ink-faint">{t.role}</p>
               </div>
             </div>
-          </div>
+          </motion.div>
         ))}
-      </div>
-
-      <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        {METRICS.map((m) => {
-          const Icon = m.icon;
-          return (
-            <div
-              key={m.label}
-              className="rounded-2xl border-2 border-black/5 bg-white p-4 text-center shadow-tactile shadow-black/5"
-            >
-              <span className="mx-auto grid h-10 w-10 place-items-center rounded-xl bg-brand/10 text-brand-shadow">
-                <Icon size={18} strokeWidth={2.4} />
-              </span>
-              <p className="mt-2 text-sm font-bold leading-snug">{m.label}</p>
-            </div>
-          );
-        })}
       </div>
     </div>
   );

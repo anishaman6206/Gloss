@@ -11,7 +11,7 @@ const STEPS = [
     icon: Camera,
     tint: "bg-brand/15 text-brand-shadow",
     title: "Snap it",
-    body: "Take a picture of the page you're reading. Text is OCR'd in your browser, nothing leaves your device.",
+    body: "Snap the page or upload a photo you already have. Your browser reads the text right there, nothing leaves your device.",
     preview: <OCRScanMockup />,
   },
   {
@@ -25,7 +25,7 @@ const STEPS = [
     icon: Repeat2,
     tint: "bg-leaf/15 text-leaf-shadow",
     title: "Own it",
-    body: "Saved words come back with SM-2 spaced repetition. Recall, fill-blank, produce-word. Mixed, never boring.",
+    body: "Saved words come back right before you'd forget them, mixed across a few quiz styles so review never feels repetitive.",
     preview: <FlashcardMockup />,
   },
 ];
@@ -52,8 +52,10 @@ export function StepsSection() {
               <motion.div
                 className="relative flex h-full flex-col rounded-3xl border-2 border-black/5 bg-white p-6 shadow-tactile shadow-black/5"
                 data-testid={`how-step-${i}`}
-                whileHover={{ y: -4, scale: 1.015 }}
-                transition={{ duration: 0.2 }}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0, transition: { duration: 0.5, delay: i * 0.1 } }}
+                viewport={{ once: true, margin: "-80px" }}
+                whileHover={{ y: -4, scale: 1.015, transition: { duration: 0.2 } }}
               >
                 <div className="flex items-center gap-3">
                   <span
